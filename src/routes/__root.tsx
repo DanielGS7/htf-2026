@@ -7,8 +7,6 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { Sidebar } from '#/components/layout/Sidebar'
-import { Topbar } from '#/components/layout/Topbar'
-import { THEME_INIT_SCRIPT } from '#/lib/theme'
 
 import appCss from '../styles.css?url'
 
@@ -29,21 +27,17 @@ function AppLayout() {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <Topbar />
-        <main className="flex-1 px-8 pt-6 pb-10">
-          <Outlet />
-        </main>
-      </div>
+      <main className="min-w-0 flex-1 px-16 py-10">
+        <Outlet />
+      </main>
     </div>
   )
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>
       <body className="bg-app font-sans antialiased">

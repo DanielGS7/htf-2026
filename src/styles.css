@@ -1,9 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
-/* `dark:` utilities follow the `.dark` class on <html> (set by the theme script). */
-@custom-variant dark (&:where(.dark, .dark *));
-
 @theme inline {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
@@ -23,42 +20,22 @@
   --color-glow: var(--glow);
 }
 
-/* Light theme (default when the OS prefers light) */
 :root {
-  --app: #f5f2fb;
-  --sidebar: #ffffff;
+  --app: #ffffff;
+  --sidebar: #1b1340;
   --panel: #ffffff;
-  --card: #fbf9ff;
-  --card-strong: #f1ebfc;
-  --line: rgb(76 29 149 / 0.1);
-  --fg: #1d1530;
-  --muted: #6c6287;
-  --subtle: rgb(76 29 149 / 0.05);
-  --subtle-hover: rgb(76 29 149 / 0.09);
-  --accent: #7c3aed;
-  --accent-from: #9a6bff;
-  --accent-to: #6a32e0;
-  --glow: rgb(139 92 246 / 0.2);
+  --card: #ffffff;
+  --card-strong: #f5f4f2;
+  --line: #eae7e4;
+  --fg: #0c0c14;
+  --muted: #706d6b;
+  --subtle: #f5f4f2;
+  --subtle-hover: #eae7e4;
+  --accent: #6d4aff;
+  --accent-from: #a995ff;
+  --accent-to: #6d4aff;
+  --glow: rgb(109 74 255 / 0.2);
   color-scheme: light;
-}
-
-/* Dark theme — deep indigo/purple night */
-:root.dark {
-  --app: #130d20;
-  --sidebar: #170f27;
-  --panel: #1a112b;
-  --card: #201634;
-  --card-strong: #2a1d42;
-  --line: rgb(255 255 255 / 0.07);
-  --fg: #f2edfb;
-  --muted: #a398bd;
-  --subtle: rgb(255 255 255 / 0.05);
-  --subtle-hover: rgb(255 255 255 / 0.09);
-  --accent: #a78bfa;
-  --accent-from: #8f5cff;
-  --accent-to: #5b2bc9;
-  --glow: rgb(143 92 255 / 0.45);
-  color-scheme: dark;
 }
 
 html,

@@ -1,5 +1,5 @@
 import {Link} from '@tanstack/react-router'
-import {Activity, LayoutGrid, LogOut, type LucideIcon,} from 'lucide-react'
+import {Activity, LayoutGrid, User, type LucideIcon} from 'lucide-react'
 
 type NavItem = {
   label: string
@@ -12,54 +12,49 @@ const navItems: NavItem[] = [
   { label: 'Overview', icon: LayoutGrid, to: '/' },
 ]
 
+// Icon-only items: the label lives in aria-label/title for screen readers and hover.
 const itemClass =
-  'flex w-full items-center gap-3 whitespace-nowrap px-7 py-4 text-left text-lg text-muted transition-colors hover:bg-subtle hover:text-fg'
-const activeClass =
-  'bg-gradient-to-r from-[color-mix(in_oklab,var(--accent-from)_45%,var(--accent-to))] to-accent-to text-white shadow-md shadow-violet-700/15 inset-shadow-[0_1px_0_rgb(255_255_255/0.22)] hover:text-white'
+  'flex size-12 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white'
+const activeClass = 'bg-white/10 text-white'
 
 export function Sidebar() {
   return (
-    <aside className="sticky top-0 flex h-screen w-[300px] shrink-0 flex-col border-r border-line bg-sidebar">
-      <div className="flex items-center gap-4 border-b border-line px-7 py-7">
-        <div className="flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-[color-mix(in_oklab,var(--accent-from)_45%,var(--accent-to))] to-accent-to text-white shadow-md shadow-violet-700/20 inset-shadow-[0_1px_0_rgb(255_255_255/0.22)]">
-          <Activity className="size-7" strokeWidth={2} />
-        </div>
-        <div>
-          <p className="text-xl font-semibold text-fg">Achrona</p>
-          <p className="text-muted">Control Center</p>
-        </div>
+    <aside className="sticky top-0 flex h-screen w-20 shrink-0 flex-col items-center bg-sidebar py-5">
+      <div className="mb-6 flex size-12 items-center justify-center rounded-xl bg-linear-to-br from-accent-from to-accent-to text-white shadow-md shadow-black/30">
+        <Activity className="size-7" strokeWidth={2} />
       </div>
 
-      <nav className="flex flex-1 flex-col gap-1 py-8">
+      <nav className="flex w-full flex-1 flex-col items-center gap-1">
         {navItems.map(({ label, icon: Icon, to }) => {
-          const content = (
-            <>
-              <Icon className="size-6" strokeWidth={1.5} />
-              {label}
-            </>
-          )
+          const icon = <Icon className="size-6" strokeWidth={1.5} />
           return to ? (
             <Link
               key={label}
               to={to}
+              aria-label={label}
+              title={label}
               className={itemClass}
               activeOptions={{ exact: true }}
               activeProps={{ className: activeClass }}
             >
-              {content}
+              {icon}
             </Link>
           ) : (
-            <button key={label} type="button" className={itemClass}>
-              {content}
+            <button key={label} type="button" aria-label={label} title={label} className={itemClass}>
+              {icon}
             </button>
           )
         })}
       </nav>
 
-      <div className="py-8">
-        <button type="button" className={itemClass}>
-          <LogOut className="size-6" strokeWidth={1.5} />
-          Log Out
+      <div className="flex w-full flex-col items-center gap-4">
+        <button
+          type="button"
+          aria-label="User menu"
+          title="User menu"
+          className="flex size-10 items-center justify-center rounded-full border border-line bg-white text-fg transition-colors hover:bg-subtle"
+        >
+          <User className="size-5" strokeWidth={1.75} />
         </button>
       </div>
     </aside>

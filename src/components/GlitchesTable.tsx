@@ -1,57 +1,43 @@
 import { EllipsisVertical } from 'lucide-react'
-import { Card } from '#/components/ui/Card.tsx'
 import { IconButton } from '#/components/ui/IconButton.tsx'
 import type { Glitch } from '#/lib/glitch.ts'
 
-// Placeholder rows — replace with real data once the API is wired up.
-const glitches: Glitch[] = [
-  { glitchId: 'GL-0142', status: 'LEAKED', description: 'Time loop detected near the eastern clock tower', timestamp: '2026-11-10T13:42:00Z' },
-  { glitchId: 'GL-0141', status: 'ASSESSING', description: 'Magic reserves dropping faster than expected', timestamp: '2026-11-10T11:05:00Z' },
-  { glitchId: 'GL-0139', status: 'CONTAINING', description: 'Portal flicker in the archive vaults', timestamp: '2026-11-09T22:17:00Z' },
-  { glitchId: 'GL-0137', status: 'FIXED', description: 'Echo sensors reporting duplicate signals', timestamp: '2026-11-08T08:30:00Z' },
-]
-
-const columns = ['ID', 'Status', 'Description', 'Timestamp', 'Action']
+const columns = ['ID', 'Description', 'Timestamp', 'Action']
 
 const timestampFormat = new Intl.DateTimeFormat('en-GB', {
   dateStyle: 'medium',
   timeStyle: 'short',
 })
 
-export function GlitchesTable() {
+export function GlitchesTable({ glitches }: { glitches: Glitch[] }) {
   return (
-    <Card className="p-8">
-      <h2 className="mb-8 text-2xl text-fg">All Glitches</h2>
-
+    <section className="flex flex-col gap-6">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[720px] border-separate border-spacing-0 text-left">
+        <table className="w-full min-w-[720px] text-left">
           <thead>
-            <tr className="text-lg text-muted">
+            <tr className="border-b-2 border-line text-muted">
               {columns.map((col, i) => (
                 <th
                   key={col}
-                  className={`bg-subtle px-5 py-5 font-normal ${
-                    i === 0 ? 'rounded-l-2xl' : ''
-                  } ${i === columns.length - 1 ? 'rounded-r-2xl text-center' : ''}`}
+                  className={`px-5 py-4 font-normal ${i === columns.length - 1 ? 'text-center' : ''}`}
                 >
                   {col}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="text-lg text-fg">
+          <tbody className="text-fg">
             {glitches.map((glitch) => (
               <tr key={glitch.glitchId}>
-                <td className="px-5 py-5 whitespace-nowrap">{glitch.glitchId}</td>
-                <td className="px-5 py-5">{glitch.status}</td>
-                <td className="px-5 py-5">{glitch.description}</td>
-                <td className="px-5 py-5 whitespace-nowrap">
+                <td className="px-5 py-4 whitespace-nowrap">{glitch.glitchId}</td>
+                <td className="px-5 py-4">{glitch.description}</td>
+                <td className="px-5 py-4 whitespace-nowrap">
                   {/* Server and browser time zones can differ; the browser's wins. */}
                   <time dateTime={glitch.timestamp} suppressHydrationWarning>
                     {timestampFormat.format(new Date(glitch.timestamp))}
                   </time>
                 </td>
-                <td className="px-5 py-5 text-center">
+                <td className="px-5 py-4 text-center">
                   <IconButton aria-label={`${glitch.glitchId} actions`}>
                     <EllipsisVertical className="size-5" />
                   </IconButton>
@@ -61,6 +47,6 @@ export function GlitchesTable() {
           </tbody>
         </table>
       </div>
-    </Card>
+    </section>
   )
 }
