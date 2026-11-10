@@ -29,6 +29,8 @@ npm run dev
 > Om alle opdrachten gelijkwaardig te beoordelingen, verwachten dit als minimale setup. 
 > Hierna kiezen jullie zelf welke uitbreidingen jullie willen toevoegen.
 
+![datamodel](datamodel.png)
+
 Maak een webapplicatie waarin guardians kunnen inloggen. Eens ingelogd, zien ze een lijst met glitches.
 Guardians hebben een role.
 - Role `defender` kan echoes melden. Elke echo wordt standaard aanzien als een glitch 
