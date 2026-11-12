@@ -12,7 +12,7 @@ Deze repository bevat een basis [Tanstack Start](https://tanstack.com/start) op 
 - **ORM:** [Drizzle](https://orm.drizzle.team)
 - **Styling:** [Tailwind](https://tailwindcss.com)
 - **Build tool:** [Vite](https://vite.dev)
-- 
+
 Om op te starten kan je volgende commando's gebruiken. 
 
 ```bash
