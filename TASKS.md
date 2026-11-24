@@ -32,31 +32,31 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 ## WP-C — Real-time ops
 | Done | Task | Ref | Owner | Notes |
 |:---:|---|---|---|---|
-| [ ] | Desync simulator + scenarios + reset | F14, F21 | | |
-| [ ] | Magic gauge component | F12 | | |
-| [ ] | Achrona SVG map (districts, pulsing markers) | F13 | | good fit for whoever likes design/illustration |
-| [ ] | `/mission` big-screen dashboard + join QR | F30 | | |
-| [ ] | `/admin` command deck (simulator, lockdown, roles) | §7 | | |
-| [ ] | `getLockdownState()` + seed it in AppProviders | §7 | | |
+| [ ] | Desync simulator + scenarios + reset | F14, F21 | Claude (agent) | in progress |
+| [ ] | Magic gauge component | F12 | Claude (agent) | in progress |
+| [ ] | Achrona SVG map (districts, pulsing markers) | F13 | Claude (agent) | in progress; good fit for whoever likes design/illustration |
+| [ ] | `/mission` big-screen dashboard + join QR | F30 | Claude (agent) | in progress |
+| [ ] | `/admin` command deck (simulator, lockdown, roles) | §7 | Claude (agent) | in progress |
+| [ ] | `getLockdownState()` + seed it in AppProviders | §7 | Claude (agent) | in progress |
 
 ## WP-D — AI layer
 | Done | Task | Ref | Owner | Notes |
 |:---:|---|---|---|---|
-| [ ] | Claude triage (grouping, type, severity, moderation) | F17–F20 | | needs `ANTHROPIC_API_KEY` |
-| [ ] | Runbook generation + panel | F23 | | |
-| [ ] | Oracle chatbot page | F24 | | |
-| [ ] | Auto-assignment suggestion via AI | F22 | | heuristic version exists in WP-B |
+| [ ] | Claude triage (grouping, type, severity, moderation) | F17–F20 | Claude (agent) | in progress; needs `ANTHROPIC_API_KEY` |
+| [ ] | Runbook generation + panel | F23 | Claude (agent) | in progress |
+| [ ] | Oracle chatbot page | F24 | Claude (agent) | in progress |
+| [ ] | Auto-assignment suggestion via AI | F22 | Claude (agent) | in progress; heuristic version exists in WP-B |
 
 ## WP-E — Field and engagement
 | Done | Task | Ref | Owner | Notes |
 |:---:|---|---|---|---|
-| [ ] | `/report` mobile echo form | F15 | | |
-| [ ] | Speech-to-text | F25 | | |
-| [ ] | Photo upload (client-side resize) | F26 | | |
-| [ ] | Offline queue for echoes | F16 | | |
-| [ ] | Leaderboard + badges | F27 | | |
-| [ ] | Browser notifications for critical glitches | F28 | | |
-| [ ] | `/council` printable PDF report | F29 | | |
+| [ ] | `/report` mobile echo form | F15 | Claude (agent) | in progress |
+| [ ] | Speech-to-text | F25 | Claude (agent) | in progress |
+| [ ] | Photo upload (client-side resize) | F26 | Claude (agent) | in progress |
+| [ ] | Offline queue for echoes | F16 | Claude (agent) | in progress |
+| [ ] | Leaderboard + badges | F27 | Claude (agent) | in progress |
+| [ ] | Browser notifications for critical glitches | F28 | Claude (agent) | in progress |
+| [ ] | `/council` printable PDF report | F29 | Claude (agent) | in progress |
 
 ## Ship and present
 | Done | Task | Ref | Owner | Notes |

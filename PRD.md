@@ -248,6 +248,11 @@ import { GlitchTypeIcon, StatusBadge, SeverityBadge } from '#/components/glitche
 ```
 If a dependency isn't built yet, create **nothing** in another WP's folder. Render a simple inline placeholder and note it in your report.
 
+**Placeholder handoffs (WP-A and WP-B are finished):**
+- WP-C may edit `src/components/glitches/OverviewOps.tsx` to swap its dashed boxes for the real `MagicGauge` / `AchronaMap compact`, and the initial lockdown `useState` in `src/components/layout/AppProviders.tsx`.
+- WP-D may edit `src/routes/glitches.$glitchId.tsx` only to replace the plain-text runbook block with `<RunbookPanel>`.
+- WP-E may add a `/report` link or button where it's missing, but only in `src/components/layout/nav.ts`.
+
 ---
 
 ## 9. Demo script (presentation, ~7 min, each member presents their part)
