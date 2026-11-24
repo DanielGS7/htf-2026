@@ -17,6 +17,9 @@ const IGNORED_SERVER_WARNINGS = new Set([
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
+  server: {
+    allowedHosts: ['moore-trees-sentence-exact.trycloudflare.com'],
+  },
   plugins: [
     devtools(),
     nitro({
