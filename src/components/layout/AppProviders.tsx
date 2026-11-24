@@ -63,9 +63,9 @@ export function AppProviders({ children, signedIn }: { children: ReactNode; sign
         {lockdown && signedIn && (
           <div
             role="alert"
-            className="sticky top-0 z-[55] flex items-center justify-center gap-2 bg-linear-to-r from-accent-to via-accent to-accent-to px-4 py-2 text-center text-sm font-semibold tracking-wide text-white uppercase"
+            className="hazard-strip sticky top-0 z-[55] flex items-center justify-center gap-3 px-4 py-3 text-center text-sm font-bold tracking-widest text-[#160f1f] uppercase [font-stretch:92%]"
           >
-            <ShieldAlert className="size-4 shrink-0 animate-pulse" />
+            <ShieldAlert className="size-5 shrink-0" />
             <span>Lockdown active{reason ? `: ${reason}` : ''}</span>
           </div>
         )}
@@ -88,10 +88,10 @@ function OfflinePill() {
   return (
     <div
       role="status"
-      className="glass fixed top-3 left-1/2 z-[65] flex -translate-x-1/2 items-center gap-2 rounded-full border-warning/40 px-3 py-1.5 text-xs font-medium text-warning"
+      className="glass fixed top-3 left-1/2 z-[65] flex -translate-x-1/2 items-center gap-2 rounded-sm border-warning/60 border-l-4 border-l-warning px-3 py-1.5 text-xs font-semibold tracking-wide text-warning uppercase"
     >
       <WifiOff className="size-3.5" />
-      Offline: reconnecting to the grid...
+      Offline, reconnecting to the grid...
     </div>
   )
 }

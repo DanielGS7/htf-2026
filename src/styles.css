@@ -327,3 +327,18 @@ h1, h2, h3, .font-display {
   .no-print { display: none !important; }
   body::after { display: none; }
 }
+
+/* Lockdown alert strip: orange-red plate with stepped hazard edges (see AppProviders). */
+.hazard-strip {
+  background:
+    repeating-linear-gradient(135deg, rgb(0 0 0 / 0.22) 0 10px, transparent 10px 20px) bottom / 100% 6px no-repeat,
+    repeating-linear-gradient(135deg, rgb(0 0 0 / 0.22) 0 10px, transparent 10px 20px) top / 100% 4px no-repeat,
+    linear-gradient(180deg, #f9a040, #f48d30 45%, #ee5f33);
+  box-shadow: 0 6px 0 -2px rgb(10 6 16 / 0.55);
+}
+
+/* Left-rail accent: a thin vertical line with a diamond, for the sidebar. */
+.rail-line {
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--line), transparent);
+}

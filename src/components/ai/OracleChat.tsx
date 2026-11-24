@@ -5,7 +5,7 @@
  * @usedBy src/routes/oracle.tsx
  */
 import { useEffect, useRef, useState } from 'react'
-import { Eye, Send } from 'lucide-react'
+import { Send } from 'lucide-react'
 import { askOracleFn } from '#/lib/ai.functions.ts'
 import { Markdown } from './Markdown.tsx'
 
@@ -46,21 +46,24 @@ export function OracleChat() {
   }
 
   return (
-    <div className="flex h-[min(70vh,640px)] flex-col overflow-hidden rounded-2xl border border-line bg-card shadow-[0_0_40px_-12px_var(--glow)]">
-      <div className="flex-1 space-y-4 overflow-y-auto p-4" aria-live="polite">
+    <div className="glass hud flex h-[min(70vh,640px)] flex-col rounded-lg">
+      <div className="flex items-center gap-2 border-b border-line px-4 py-2">
+        <img src="/htf/oracle-orb.png" alt="" aria-hidden className="size-6" />
+        <span className="label">Scrying terminal</span>
+        <span className="label ml-auto text-success">connected</span>
+      </div>
+      <div className="flex-1 space-y-3 overflow-y-auto p-4" aria-live="polite">
         {messages.length === 0 && (
           <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-            <div className="grid size-14 place-items-center rounded-full bg-gradient-to-br from-accent-from to-accent-to text-on-accent shadow-[0_0_30px_var(--glow)]">
-              <Eye className="size-7" />
-            </div>
-            <p className="max-w-sm text-sm text-muted">Ask, guardian. The Oracle reads the ley lines and the echoes of Achrona.</p>
+            <img src="/htf/oracle-orb.png" alt="" aria-hidden className="drift size-24" />
+            <p className="max-w-sm text-sm text-fg">Ask, guardian. The Oracle reads the ley lines and the echoes of Achrona.</p>
             <div className="flex flex-wrap justify-center gap-2">
               {SUGGESTED.map((q) => (
                 <button
                   key={q}
                   type="button"
                   onClick={() => send(q)}
-                  className="rounded-full border border-line bg-subtle px-3 py-1.5 text-xs text-fg transition hover:bg-subtle-hover"
+                  className="min-h-9 rounded-sm border border-line bg-subtle px-2.5 py-1.5 text-left text-sm font-medium text-fg transition hover:border-accent/60 hover:bg-subtle-hover"
                 >
                   {q}
                 </button>
@@ -68,24 +71,30 @@ export function OracleChat() {
             </div>
           </div>
         )}
-        {messages.map((m, i) => (
-          <div key={i} className={m.role === 'user' ? 'flex justify-end' : 'flex justify-start'}>
-            <div
-              className={
-                m.role === 'user'
-                  ? 'max-w-[85%] rounded-2xl rounded-br-sm bg-accent px-3.5 py-2 text-sm text-on-accent'
-                  : 'max-w-[90%] rounded-2xl rounded-bl-sm border border-line bg-panel px-3.5 py-2.5'
-              }
-            >
-              {m.role === 'user' ? m.content : <Markdown compact>{m.content}</Markdown>}
+        {messages.map((m, i) =>
+          m.role === 'user' ? (
+            <div key={i} className="flex justify-end">
+              <div className="max-w-[85%] rounded-md border border-accent/50 bg-accent/15 px-3.5 py-2 text-sm text-fg break-words">
+                <p className="label mb-0.5 text-accent-ink">You</p>
+                {m.content}
+              </div>
             </div>
-          </div>
-        ))}
+          ) : (
+            <div key={i} className="flex items-start gap-2">
+              <img src="/htf/oracle-orb.png" alt="" aria-hidden className="mt-1 size-8 shrink-0" />
+              <div className="min-w-0 max-w-[92%] rounded-md border border-line bg-panel px-3.5 py-2.5">
+                <p className="label mb-1 text-magic-soft">Oracle</p>
+                <Markdown compact>{m.content}</Markdown>
+              </div>
+            </div>
+          ),
+        )}
         {busy && (
-          <div className="flex justify-start" aria-label="The Oracle is thinking">
-            <div className="flex gap-1 rounded-2xl rounded-bl-sm border border-line bg-panel px-4 py-3">
+          <div className="flex items-start gap-2" aria-label="The Oracle is thinking">
+            <img src="/htf/oracle-orb.png" alt="" aria-hidden className="size-8 shrink-0 animate-pulse" />
+            <div className="flex gap-1 rounded-md border border-line bg-panel px-4 py-3">
               {[0, 1, 2].map((i) => (
-                <span key={i} className="size-1.5 animate-bounce rounded-full bg-accent" style={{ animationDelay: `${i * 150}ms` }} />
+                <span key={i} className="size-1.5 animate-bounce bg-magic-soft" style={{ animationDelay: `${i * 150}ms` }} />
               ))}
             </div>
           </div>
@@ -104,13 +113,13 @@ export function OracleChat() {
           onChange={(e) => setInput(e.target.value)}
           maxLength={600}
           placeholder="Ask the Oracle..."
-          className="min-w-0 flex-1 rounded-xl border border-line bg-app px-3 py-2 text-sm text-fg outline-none placeholder:text-muted focus:border-accent"
+          className="min-h-11 min-w-0 flex-1 rounded-md border border-line bg-app px-3 text-base text-fg outline-none placeholder:text-muted focus:border-accent"
         />
         <button
           type="submit"
           disabled={busy || !input.trim()}
           aria-label="Send"
-          className="grid size-10 place-items-center rounded-xl bg-accent text-on-accent transition hover:opacity-90 disabled:opacity-50"
+          className="grid size-11 shrink-0 place-items-center rounded-md bg-[linear-gradient(180deg,var(--accent-from),var(--accent)_70%,var(--accent-to))] text-on-accent shadow-[inset_0_-3px_0_rgb(0_0_0/0.28)] transition hover:brightness-110 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Send className="size-4" />
         </button>

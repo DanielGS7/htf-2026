@@ -75,7 +75,7 @@ export function NotifyToggle() {
         onClick={toggle}
         aria-pressed={on}
         title="Get alerted when a critical glitch opens"
-        className={`inline-flex min-h-11 items-center gap-2 rounded-xl border px-3 text-sm font-medium transition ${on ? 'border-accent/50 bg-accent/15 text-accent' : 'border-line bg-subtle text-muted hover:text-fg'}`}
+        className={`inline-flex min-h-11 items-center gap-2 rounded-md border px-3 text-sm font-semibold transition ${on ? 'border-accent/60 bg-accent/15 text-accent-ink' : 'border-line bg-subtle text-fg hover:border-accent/60 hover:bg-subtle-hover'}`}
       >
         {on ? <Bell className="size-4" /> : <BellOff className="size-4" />}
         {on ? 'Critical alerts on' : 'Alert me on critical glitches'}

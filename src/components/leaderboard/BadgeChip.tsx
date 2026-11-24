@@ -1,5 +1,5 @@
 /**
- * @file Badge chip with tooltip (native title + visible on focus) explaining how it is earned.
+ * @file Squared badge tag with tooltip (native title + focusable) explaining how it is earned.
  * @exports BadgeChip
  * @usedBy src/routes/leaderboard.tsx, src/components/leaderboard/Podium.tsx
  */
@@ -16,7 +16,7 @@ export function BadgeChip({ id, compact = false }: { id: BadgeId; compact?: bool
       title={`${m.label}: ${m.hint}`}
       tabIndex={0}
       aria-label={`${m.label}: ${m.hint}`}
-      className="inline-flex items-center gap-1 rounded-full border border-line bg-subtle px-2 py-1 text-xs font-medium"
+      className="inline-flex items-center gap-1 rounded-sm border border-line bg-subtle px-1.5 py-0.5 font-mono text-[11px] leading-4 font-semibold tracking-wider uppercase focus-visible:outline-2 focus-visible:outline-accent"
       style={{ color: m.color }}
     >
       <Icon className="size-3.5" />

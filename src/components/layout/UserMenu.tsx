@@ -42,18 +42,18 @@ export function UserMenu({ placement, showNav = false }: { placement: 'side' | '
         title={`${me.codename} (${me.role})`}
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="flex size-10 items-center justify-center rounded-full border border-line bg-linear-to-br from-accent-from to-accent-to font-display text-sm font-bold text-on-accent shadow-[0_0_18px_-4px_var(--glow)] transition hover:brightness-110"
+        className="flex size-10 items-center justify-center rounded-md border border-accent/50 bg-linear-to-b from-accent-from to-accent-to font-display text-base font-bold text-on-accent shadow-[inset_0_-3px_0_rgb(0_0_0/0.28)] transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
         {me.codename.slice(0, 1).toUpperCase()}
       </button>
       {open && (
         <div
-          className={`glass float-in absolute z-50 w-60 rounded-2xl p-2 ${
+          className={`glass hud float-in absolute z-50 w-60 rounded-md p-2 ${
             placement === 'side' ? 'bottom-0 left-full ml-3' : 'right-0 bottom-full mb-3'
           }`}
         >
           <div className="px-2 py-2">
-            <p className="truncate font-display font-semibold">{me.codename}</p>
+            <p className="truncate font-display text-lg font-bold tracking-wide uppercase">{me.codename}</p>
             <Badge tone={me.role === 'commander' ? 'accent' : 'neutral'} className="mt-1">
               <Role className="size-3" />
               {me.role}
@@ -61,16 +61,16 @@ export function UserMenu({ placement, showNav = false }: { placement: 'side' | '
           </div>
           <div className="my-1 h-px bg-line" />
           {extra.map(({ label, icon: Icon, to }) => (
-            <Link key={to} to={to} onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm hover:bg-subtle">
+            <Link key={to} to={to} onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-sm px-2 py-2.5 text-sm hover:bg-subtle">
               <Icon className="size-4 text-muted" />
               {label}
             </Link>
           ))}
-          <button type="button" onClick={toggleTheme} className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm hover:bg-subtle">
+          <button type="button" onClick={toggleTheme} className="flex w-full items-center gap-2 rounded-sm px-2 py-2.5 text-sm hover:bg-subtle">
             {theme === 'dark' ? <Sun className="size-4 text-muted" /> : <Moon className="size-4 text-muted" />}
             {theme === 'dark' ? 'Light mode' : 'Dark mode'}
           </button>
-          <button type="button" onClick={logout} className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm text-danger hover:bg-subtle">
+          <button type="button" onClick={logout} className="flex w-full items-center gap-2 rounded-sm px-2 py-2.5 text-sm text-danger hover:bg-subtle">
             <LogOut className="size-4" />
             Log out
           </button>

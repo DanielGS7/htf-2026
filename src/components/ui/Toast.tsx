@@ -17,10 +17,17 @@ export const useToast = () => useContext(Ctx)
 
 const ICON = { info: Info, warning: AlertTriangle, danger: OctagonAlert, success: CheckCircle2 }
 const COLOR: Record<Tone, string> = {
-  info: 'text-accent',
+  info: 'text-accent-ink',
   warning: 'text-warning',
   danger: 'text-danger',
   success: 'text-success',
+}
+/** Coloured left edge per tone. */
+const EDGE: Record<Tone, string> = {
+  info: 'border-l-accent',
+  warning: 'border-l-warning',
+  danger: 'border-l-danger',
+  success: 'border-l-success',
 }
 
 let nextId = 1
@@ -52,10 +59,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {items.map((t) => {
           const Icon = ICON[t.tone]
           return (
-            <div key={t.id} className="glass float-in pointer-events-auto flex items-start gap-3 rounded-xl p-3">
-              <Icon className={`mt-0.5 size-5 shrink-0 ${COLOR[t.tone]}`} />
+            <div key={t.id} className={`glass float-in pointer-events-auto flex items-start gap-3 rounded-md border-l-4 p-3 ${EDGE[t.tone]}`}>
+              <Icon className={`mt-0.5 size-4 shrink-0 ${COLOR[t.tone]}`} />
               <p className="flex-1 text-sm">{t.message}</p>
-              <button type="button" aria-label="Dismiss" title="Dismiss" onClick={() => dismiss(t.id)} className="text-muted hover:text-fg">
+              <button type="button" aria-label="Dismiss" title="Dismiss" onClick={() => dismiss(t.id)} className="rounded-sm text-muted hover:text-fg focus-visible:outline-2 focus-visible:outline-accent">
                 <X className="size-4" />
               </button>
             </div>

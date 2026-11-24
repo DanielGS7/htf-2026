@@ -4,7 +4,7 @@
  */
 import { useState } from 'react'
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
-import { Shield, Sparkles } from 'lucide-react'
+import { Shield, Radio } from 'lucide-react'
 import { AuthShell } from '#/components/layout/AuthShell'
 import { Button } from '#/components/ui/Button'
 import { joinFn } from '#/lib/auth.functions'
@@ -42,12 +42,12 @@ function JoinPage() {
 
   return (
     <AuthShell character={4} title="Become a guardian" subtitle="Achrona is under attack. Help us defend it.">
-      <ul className="mb-6 space-y-3 text-sm text-muted">
+      <ul className="mb-6 space-y-3 text-sm text-fg">
         <li className="flex gap-3"><Shield className="size-5 shrink-0 text-accent" /> You get a secret codename. No sign-up, no password.</li>
-        <li className="flex gap-3"><Sparkles className="size-5 shrink-0 text-accent" /> Report strange things you see: the Oracle groups them live.</li>
+        <li className="flex gap-3"><Radio className="size-5 shrink-0 text-accent" /> Report strange things you see: the Oracle groups them live.</li>
       </ul>
       {error && (
-        <p role="alert" className="mb-4 rounded-xl border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">{error}</p>
+        <p role="alert" className="mb-4 rounded-md border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">{error}</p>
       )}
       <Button size="lg" className="w-full" onClick={join} disabled={busy}>
         <Shield className="size-5" />
@@ -55,7 +55,7 @@ function JoinPage() {
       </Button>
       <p className="mt-5 text-center text-sm text-muted">
         Commander?{' '}
-        <Link to="/login" className="font-semibold text-accent hover:underline">Log in</Link>
+        <Link to="/login" className="font-semibold text-accent-ink underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-accent">Log in</Link>
       </p>
     </AuthShell>
   )
