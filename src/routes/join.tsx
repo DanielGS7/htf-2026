@@ -41,7 +41,7 @@ function JoinPage() {
   }
 
   return (
-    <AuthShell title="Become a guardian" subtitle="Achrona is under attack. Help us defend it.">
+    <AuthShell character={4} title="Become a guardian" subtitle="Achrona is under attack. Help us defend it.">
       <ul className="mb-6 space-y-3 text-sm text-muted">
         <li className="flex gap-3"><Shield className="size-5 shrink-0 text-accent" /> You get a secret codename. No sign-up, no password.</li>
         <li className="flex gap-3"><Sparkles className="size-5 shrink-0 text-accent" /> Report strange things you see: the Oracle groups them live.</li>

@@ -35,14 +35,15 @@ export const GLITCH_TYPES = [
 ] as const
 export type GlitchType = (typeof GLITCH_TYPES)[number]
 
+/** Colours come from the HTF 2026 palette (see docs/DESIGN.md), distinct enough to tell apart on a projector. */
 export const GLITCH_TYPE_META: Record<GlitchType, { label: string; icon: string; color: string }> = {
-  TIME_LOOP: { label: 'Time loop', icon: 'Hourglass', color: '#f59e0b' },
-  MAGIC_DRAIN: { label: 'Magic drain', icon: 'BatteryLow', color: '#8b5cf6' },
-  PORTAL_FLICKER: { label: 'Portal flicker', icon: 'CircleDashed', color: '#06b6d4' },
-  ECHO_STORM: { label: 'Echo storm', icon: 'Radio', color: '#ec4899' },
-  MEMORY_LEAK: { label: 'Memory leak', icon: 'Droplets', color: '#3b82f6' },
-  REALITY_TEAR: { label: 'Reality tear', icon: 'Zap', color: '#ef4444' },
-  UNKNOWN: { label: 'Unknown', icon: 'HelpCircle', color: '#71717a' },
+  TIME_LOOP: { label: 'Time loop', icon: 'Hourglass', color: '#f48d30' },
+  MAGIC_DRAIN: { label: 'Magic drain', icon: 'BatteryLow', color: '#c04df0' },
+  PORTAL_FLICKER: { label: 'Portal flicker', icon: 'CircleDashed', color: '#3ccfb4' },
+  ECHO_STORM: { label: 'Echo storm', icon: 'Radio', color: '#e292f4' },
+  MEMORY_LEAK: { label: 'Memory leak', icon: 'Droplets', color: '#5b8cff' },
+  REALITY_TEAR: { label: 'Reality tear', icon: 'Zap', color: '#ff5a3c' },
+  UNKNOWN: { label: 'Unknown', icon: 'HelpCircle', color: '#a3a1bb' },
 }
 
 /**

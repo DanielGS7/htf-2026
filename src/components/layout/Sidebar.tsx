@@ -6,7 +6,7 @@
  * @usedBy src/routes/__root.tsx
  */
 import { Link } from '@tanstack/react-router'
-import { Hexagon, Moon, Sun } from 'lucide-react'
+import { Moon, Sun } from 'lucide-react'
 import { useMe } from '#/lib/auth.functions.ts'
 import { useTheme } from './AppProviders.tsx'
 import { UserMenu } from './UserMenu.tsx'
@@ -22,9 +22,7 @@ export function Sidebar() {
   return (
     <aside className="no-print sticky top-0 z-40 hidden h-screen w-20 shrink-0 flex-col items-center border-r border-line bg-sidebar py-5 md:flex">
       <Link to="/" aria-label="Achrona Mission Control" title="Achrona Mission Control" className="mb-6">
-        <div className="relative flex size-12 items-center justify-center rounded-2xl bg-linear-to-br from-accent-from to-accent-to text-on-accent shadow-[0_0_28px_-4px_var(--glow)]">
-          <Hexagon className="size-7" strokeWidth={2} />
-        </div>
+        <img src="/htf/oracle-orb.png" alt="" className="size-12 drop-shadow-[0_4px_0_rgb(0_0_0/0.45)] transition hover:-rotate-6" />
       </Link>
 
       <nav className="flex w-full flex-1 flex-col items-center gap-1.5">

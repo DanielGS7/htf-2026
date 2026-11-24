@@ -65,7 +65,7 @@
 - `src/components/layout/AppProviders.tsx` — Client providers for the whole app: theme (dark/light, persisted), lockdown state (from `lockdown` live events or magic < 40), toaster, lockdown banner frame and offline pill. `useTheme()` -> { theme, toggleTheme, lockdown }.
   - @exports AppProviders, useTheme
   - @usedBy src/routes/__root.tsx
-- `src/components/layout/AuthShell.tsx` — Full-screen centred shell for the public /login and /join pages: starfield, glow, logo.
+- `src/components/layout/AuthShell.tsx` — Full-screen shell for the public /login and /join pages, in the HTF 2026 look: plum vignette, purple voxel lightning on both edges, the official "Curse of Achrona" title art and a character peeking past the form (desktop only).
   - @exports AuthShell
   - @usedBy src/routes/login.tsx, src/routes/join.tsx
 - `src/components/layout/Sidebar.tsx` — Desktop (md+) left icon rail: logo, nav to every route (commander items hidden for defenders), theme toggle and user menu. Mobile uses TabBar instead. z-40: the sticky rail is its own stacking context, so it must sit above page content for the hover labels to show over it (modals are z-50, toasts z-[70]).
@@ -123,7 +123,7 @@
   - @usedBy src/routes/mission.tsx, src/routes/admin.tsx, src/components/mission/MagicGauge.tsx, src/components/map/AchronaMap.tsx
 - `src/components/ui/Badge.tsx` — Badge primitive (small pill). Tones map to theme tokens.
   - @exports Badge
-- `src/components/ui/Button.tsx` — Button primitive. Variants: primary (glowing accent gradient), secondary, ghost, danger.
+- `src/components/ui/Button.tsx` — Button primitive in the HTF look: chunky plates, uppercase Saira, a darker bottom edge instead of a glow. Variants: primary (blue plate), secondary (outlined), ghost, danger (orange-red plate).
   - @exports Button
 - `src/components/ui/Card.tsx` — Card UI primitive: frosted themed surface.
   - @exports Card
@@ -135,6 +135,10 @@
   - @exports Kbd
 - `src/components/ui/Modal.tsx` — Modal dialog primitive: backdrop, Escape to close, click outside to close.
   - @exports Modal
+- `src/components/ui/PageHeader.tsx` — Page header used by every in-app page: HUD label, HTF blackletter title (extruded), one-line subtitle and optional actions on the right. The gothic title is the ONE blackletter element per page.
+  - @exports PageHeader
+  - @usedBy src/routes/* (all signed-in pages)
+  - @example <PageHeader label="Mission log" title="Overview" subtitle="3 open glitches" actions={<Button/>} />
 - `src/components/ui/Toast.tsx` — Toast system. <ToastProvider> mounts the stack and feeds it from `toast` live events; `useToast()` returns push({ tone, message }) for local toasts.
   - @exports ToastProvider, useToast
   - @usedBy src/components/layout/AppProviders.tsx
