@@ -1,6 +1,7 @@
 /**
  * @file Live echo feed for the big screen: newest first, district tag, reporter, relative time, big type.
- * Echoes rejected by AI moderation are shown struck-through with the reason.
+ * Echoes rejected by AI moderation are shown struck-through with the reason. Needs a `relative` parent
+ * with a height: echoes that don't fit wrap out of view instead of being clipped mid-line.
  * @exports EchoFeed
  * @usedBy src/routes/mission.tsx
  */
@@ -26,14 +27,14 @@ export function EchoFeed({ echoes, limit = 12 }: { echoes: Echo[]; limit?: numbe
     )
   }
   return (
-    <ul className="flex min-h-0 flex-col gap-2 overflow-hidden">
+    <ul className="absolute inset-0 flex flex-col flex-wrap content-start gap-2 overflow-hidden">
       {echoes.slice(0, limit).map((e, i) => {
         const district = DISTRICTS.find((d) => d.id === e.districtId)?.name
         const rejected = e.moderation === 'rejected'
         return (
           <li
             key={e.echoId}
-            className={`float-in [@media(max-height:800px)]:nth-[n+3]:hidden border-l-4 py-1 pr-2 pl-3 ${rejected ? 'border-danger bg-danger/5' : i === 0 ? 'border-magic bg-magic/10' : 'border-line'}`}
+            className={`float-in w-full shrink-0 border-l-4 py-1 pr-2 pl-3 ${rejected ? 'border-danger bg-danger/5' : i === 0 ? 'border-magic bg-magic/10' : 'border-line'}`}
           >
             <div className="flex items-center gap-2 text-sm text-muted">
               {rejected ? <Ban className="size-4 text-danger" /> : <Radio className="size-4 text-accent" />}

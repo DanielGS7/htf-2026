@@ -1,6 +1,7 @@
 /**
  * @file Ranked list of the most urgent open glitches (severity, then echo count) in projector-size type.
- * Each row carries a severity-coloured left bar (critical pulses).
+ * Each row carries a severity-coloured left bar (critical pulses). Needs a `relative` parent with a height:
+ * the list fills it and drops the rows that don't fit.
  * @exports TopGlitches
  * @usedBy src/routes/mission.tsx
  */
@@ -25,9 +26,11 @@ export function TopGlitches({ glitches, limit = 5, onSelect }: { glitches: Glitc
     )
   }
   return (
-    <ol className="flex h-full min-h-0 flex-col gap-2 [@media(max-height:800px)]:gap-1.5">
+    // Column flex + wrap: rows keep their natural height and any row that doesn't fit wraps into a second
+    // column outside the clipped box, so we show as many whole rows as fit instead of squashing them.
+    <ol className="absolute inset-0 flex flex-col flex-wrap content-start gap-2 overflow-hidden [@media(max-height:800px)]:gap-1.5">
       {top.map((g) => (
-        <li key={g.glitchId} className="float-in min-h-0 flex-1 basis-0 [@media(max-height:800px)]:nth-[n+4]:hidden" style={{ maxHeight: '8rem' }}>
+        <li key={g.glitchId} className="float-in w-full shrink-0 grow" style={{ maxHeight: '8rem' }}>
           <button
             type="button"
             onClick={() => onSelect?.(g.glitchId)}

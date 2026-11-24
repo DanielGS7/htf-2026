@@ -227,8 +227,8 @@ function MissionControl() {
               <Stat label="Guardians" value={snap.guardianCount} />
             </div>
           </Panel>
-          <Panel title="Sensor grid" className="min-h-[18rem] flex-1 overflow-hidden [@media(max-height:800px)]:min-h-0">
-            <div className="min-h-0 flex-1">
+          <Panel title="Sensor grid" className="min-h-[18rem] flex-1 overflow-hidden lg:min-h-[10rem]">
+            <div className="min-h-0 flex-1 [container-type:size]">
               <DistrictSparklines latest={snap.latest} history={snap.history} large />
             </div>
           </Panel>
@@ -236,9 +236,12 @@ function MissionControl() {
 
         {/* centre: alert plate, map, echo feed (no overlays on the map) */}
         <div className="flex min-w-0 flex-col gap-4 lg:min-h-0 [@media(max-height:800px)]:gap-2.5">
-          <AchronaMap glitches={snap.glitches} readings={snap.latest} className="w-full shrink-0 aspect-[10/7]" onSelect={open} />
-          <Panel title="Live echoes" className="min-h-[10rem] flex-1 overflow-hidden [@media(max-height:800px)]:min-h-0">
-            <EchoFeed echoes={snap.echoes} limit={3} />
+          <AchronaMap glitches={snap.glitches} readings={snap.latest} className="aspect-[10/7] w-full shrink-0 lg:min-h-0 lg:shrink" onSelect={open} />
+          {/* min height = room for one whole echo; the map gives up height first */}
+          <Panel title="Live echoes" className="min-h-[10rem] flex-1 overflow-hidden lg:min-h-[8.5rem]">
+            <div className="relative min-h-0 flex-1">
+              <EchoFeed echoes={snap.echoes} limit={3} />
+            </div>
           </Panel>
         </div>
 
@@ -261,8 +264,8 @@ function MissionControl() {
               </div>
             )}
           </Panel>
-          <Panel title="Top glitches" className="flex-1 overflow-hidden">
-            <div className="min-h-0 flex-1">
+          <Panel title="Top glitches" className="min-h-[20rem] flex-1 overflow-hidden lg:min-h-[8rem]">
+            <div className="relative min-h-0 flex-1">
               <TopGlitches glitches={snap.glitches} limit={alarm ? 5 : 4} onSelect={open} />
             </div>
           </Panel>
