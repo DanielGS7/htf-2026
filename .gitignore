@@ -14,3 +14,7 @@ todos.json
 
 # SQLite
 local.db*
+
+# Playwright
+test-results/
+playwright-report/

@@ -44,7 +44,7 @@
 - `src/components/glitches/GlitchList.tsx` — Dense glitch table for the overview: type icon, severity, status, district, echoes, assignee, age. Rows flash when `flash` contains their id; `selectedId` is the j/k cursor.
   - @exports GlitchList
   - @usedBy src/routes/index.tsx
-- `src/components/glitches/OverviewOps.tsx` — Overview header widgets: magic gauge + compact map. Inline placeholders until WP-C's MagicGauge / AchronaMap exist (swap the TODO blocks for the real imports, see PRD §8).
+- `src/components/glitches/OverviewOps.tsx` — Overview header widgets: the live magic gauge, the compact Achrona map (clicking a glitch marker opens that glitch) and a small severity summary with a link to the big-screen mission control.
   - @exports OverviewOps
   - @usedBy src/routes/index.tsx
 - `src/components/glitches/ReportEchoDialog.tsx` — Desktop "Report echo" dialog (key `n`). Submits via createEcho and shows what the AI did with it.
@@ -88,6 +88,9 @@
 - `src/components/leaderboard/badgeMeta.ts` — Badge catalogue for the leaderboard (client + server safe, no imports). Ids are computed server-side in field.functions.ts; this file only describes them.
   - @exports BADGE_META, BadgeId (type)
   - @usedBy src/lib/field.functions.ts, src/components/leaderboard/BadgeChip.tsx
+- `src/components/map/AchronaMap.tsx` — The map of Achrona: a hand-crafted fantasy SVG (1000x700) with a stylised landmass, river, mountains, roads and six organic district regions at the DISTRICTS coordinates. Districts are tinted and glow by their live magic (subscribes to `sensor.reading`; pass `readings` to control it), low-magic districts "glitch", and open glitches are pulsing markers coloured by type and sized by severity. Click a marker to select it. `compact` is the small overview variant.
+  - @exports AchronaMap
+  - @usedBy src/routes/mission.tsx, src/components/glitches/OverviewOps.tsx
 - `src/components/map/geometry.ts` — Hand-tuned geometry for the Achrona map (viewBox 1000x700): landmass and river paths, roads between districts, a deterministic organic blob per district, and marker placement helpers.
   - @exports LANDMASS, RIVER, MOUNTAINS, ROADS, districtBlob, markerOffset, hash
   - @usedBy src/components/map/AchronaMap.tsx
@@ -112,7 +115,7 @@
 - `src/components/mission/TopGlitches.tsx` — Ranked list of the most urgent open glitches (severity, then echo count) for the big screen.
   - @exports TopGlitches
   - @usedBy src/routes/mission.tsx
-- `src/components/mission/magicColor.ts` — Shared magic-level colour scale: violet (healthy) -> blue -> amber -> orange -> red (critical), plus a status word per level. Used by the gauge, the map and the sparklines.
+- `src/components/mission/magicColor.ts` — Shared magic-level colour scale: violet (healthy) -> pink -> amber -> orange -> red (critical), plus a status word per level. Used by the gauge, the map and the sparklines.
   - @exports magicColor, magicRgb, magicStatus
   - @usedBy src/components/mission/*, src/components/map/AchronaMap.tsx
 - `src/components/mission/useOpsLive.ts` — Hook that keeps an `OpsSnapshot` live: applies sensor/magic/echo/glitch/lockdown events as they arrive and re-syncs from the server every few seconds (self-heals after resets or drops). Also `useMagicLevel` (just the overall level) and `useDistrictMagic` (latest value per district), used by the self-subscribing MagicGauge and AchronaMap.
@@ -184,7 +187,8 @@
   - @usedBy src/components/field/EchoComposer.tsx
 - `src/router.tsx` — TanStack Router factory (getRouter) used by TanStack Start.
 - `src/routes/__root.tsx` — Root route: HTML shell (theme init script, no-flash) + app layout. beforeLoad fetches the current guardian (`getMe`) and exposes it as route context `{ me }` (read with `useMe()` from #/lib/auth.functions.ts or `useRouteContext({ from: '__root__' })`). Redirects logged-out users to /login?next=..., and logged-in users away from /login. Public paths: /login, /join, /api/*. Public pages render without the sidebar/tab bar.
-- `src/routes/admin.tsx` — Route /admin — Command deck. PLACEHOLDER: owned and replaced by WP-C (see PRD.md).
+- `src/routes/admin.tsx` — Route /admin — Command deck (commander only; defenders see a "forbidden" state). Simulator start/stop, Desync scenario buttons, reset demo (two-step confirm), lockdown toggle with a reason, live magic gauge + sensor bars, and a guardian list with role change.
+  - @usedBy router
 - `src/routes/api/events.ts` — GET /api/events — Server-Sent Events stream of LiveEvent JSON (one per `data:` line). Sends a heartbeat comment every 15s so proxies/tunnels keep the connection open.
   - @usedBy src/lib/useLiveEvents.ts (EventSource)
 - `src/routes/council.tsx` — Route /council: official "Report to the High Council of Achrona" (commander only; friendly forbidden state otherwise). "Download PDF" calls window.print(); scoped @media print styles hide the app chrome and force a white page.
@@ -197,7 +201,8 @@
 - `src/routes/leaderboard.tsx` — Route /leaderboard: top-3 podium, ranked list with badges and tooltips, live refresh on echo.created / glitch.updated (debounced), current user highlighted.
   - @usedBy router
 - `src/routes/login.tsx` — Route /login — codename + password form; wrong credentials show an inline error. Optional `?next=` path to return to after login. Links to /join (quick-join).
-- `src/routes/mission.tsx` — Route /mission — Mission control. PLACEHOLDER: owned and replaced by WP-C (see PRD.md).
+- `src/routes/mission.tsx` — Route /mission — full-screen mission control for the projector: live Achrona map in the centre, magic gauge, district sensor sparklines, live echo feed, top glitches and a big QR code ("Scan to join the defense"). Lockdown takes over the map with a huge pulsing banner. Press `f` for browser fullscreen. Optional `?host=https://venue.example` overrides the QR base URL.
+  - @usedBy router
 - `src/routes/oracle.tsx` — Route /oracle: chat with the Oracle of Achrona (AI grounded in live glitch data).
   - @usedBy router
 - `src/routes/report.tsx` — Route /report: mobile-first field report. Greeting + points, EchoComposer (text/voice/photo, offline queue), critical-alert opt-in and a live feed of the latest glitches. Refreshes on live events.

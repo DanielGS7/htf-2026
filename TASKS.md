@@ -27,17 +27,17 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 | [x] | Glitch detail, echo timeline, status stepper | F5, F6 | Claude | |
 | [x] | Commander: status, assign, move echo | F6, F8, F17 | Claude | |
 | [x] | Keyboard shortcuts | F9 | Claude | |
-| [ ] | Browser test of the full lifecycle (commander + defender) | §7 | | not tested yet |
+| [x] | Browser test of the full lifecycle (commander + defender) | §7 | Claude | covered by `npm run e2e` |
 
 ## WP-C — Real-time ops
 | Done | Task | Ref | Owner | Notes |
 |:---:|---|---|---|---|
-| [ ] | Desync simulator + scenarios + reset | F14, F21 | Claude (agent) | in progress |
-| [ ] | Magic gauge component | F12 | Claude (agent) | in progress |
-| [ ] | Achrona SVG map (districts, pulsing markers) | F13 | Claude (agent) | in progress; good fit for whoever likes design/illustration |
-| [ ] | `/mission` big-screen dashboard + join QR | F30 | Claude (agent) | in progress |
-| [ ] | `/admin` command deck (simulator, lockdown, roles) | §7 | Claude (agent) | in progress |
-| [ ] | `getLockdownState()` + seed it in AppProviders | §7 | Claude (agent) | in progress |
+| [x] | Desync simulator + scenarios + reset | F14, F21 | Claude (agent) | Total Desync = best demo scenario (lockdown at ~30s) |
+| [x] | Magic gauge component | F12 | Claude (agent) |  |
+| [x] | Achrona SVG map (districts, pulsing markers) | F13 | Claude (agent) | art can still be polished by a teammate |
+| [x] | `/mission` big-screen dashboard + join QR | F30 | Claude (agent) | use `/mission?host=<public url>` when projecting from localhost |
+| [x] | `/admin` command deck (simulator, lockdown, roles) | §7 | Claude (agent) | defender 'forbidden' view only checked by E2E |
+| [x] | `getLockdownState()` + seed it in AppProviders | §7 | Claude (agent) |  |
 
 ## WP-D — AI layer
 | Done | Task | Ref | Owner | Notes |
@@ -65,6 +65,8 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 | [ ] | Deploy to Optis + public URL for the QR | §10 | | |
 | [ ] | Get an Anthropic API key and set `ANTHROPIC_API_KEY` | WP-D | | then smoke-test triage, runbook, Oracle |
 | [ ] | Load test: 50 simulated phones | Phase 2 | | |
+| [x] | Headless E2E suite (13 flows) | Phase 2 | Claude | `npm run e2e` (Playwright, reseeds DB) |
+| [ ] | Fix /mission layout: lockdown banner covers map, empty space under map | Phase 2 | | seen in E2E screenshots |
 | [ ] | Demo script + timings | §9 | | |
 | [ ] | Slides (story, architecture, who built what) | §9 | | |
 | [ ] | Two full rehearsals incl. hotspot fallback | §9 | | |

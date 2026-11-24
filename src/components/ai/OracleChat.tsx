@@ -23,7 +23,10 @@ export function OracleChat() {
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), [messages, busy])
+  useEffect(() => {
+    // Braces matter: newer Chrome returns a Promise from scrollIntoView, which React would call as cleanup.
+    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  }, [messages, busy])
 
   async function send(text: string) {
     const question = text.trim()

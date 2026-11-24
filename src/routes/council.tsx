@@ -77,7 +77,7 @@ function Sheet({ r }: { r: CouncilReport }) {
           <ScrollText className="mx-auto size-9 text-accent" />
           <p className="mt-2 font-mono text-xs tracking-[0.3em] text-muted uppercase">Achrona Mission Control · Official dispatch</p>
           <h1 className="mt-1 text-3xl font-bold">Report to the High Council of Achrona</h1>
-          <p className="mt-1 text-sm text-muted">Issued {date}</p>
+          <p className="mt-1 text-sm text-muted">Issued <time dateTime={r.generatedAt} suppressHydrationWarning>{date}</time></p>
         </header>
 
         <section className="mt-6" aria-labelledby="c-summary">

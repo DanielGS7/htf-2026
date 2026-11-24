@@ -25,6 +25,10 @@ export function AppProviders({ children, signedIn }: { children: ReactNode; sign
 
   // Read the stored preference after hydration (the inline script already set the attribute).
   useEffect(() => setTheme(readTheme()), [])
+  // Marks the app as interactive (E2E tests wait for html[data-hydrated]).
+  useEffect(() => {
+    document.documentElement.dataset.hydrated = 'true'
+  }, [])
   // Seed lockdown from the server so late joiners see an ongoing lockdown (live events only cover changes).
   useEffect(() => {
     getLockdownState()

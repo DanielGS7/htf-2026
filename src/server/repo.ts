@@ -26,7 +26,9 @@ const glitchColumns = {
   assigneeId: glitches.assigneeId,
   runbook: glitches.runbook,
   updatedAt: glitches.updatedAt,
-  echoCount: sql<number>`(select count(*)::int from ${echoes} where ${echoes.glitchId} = ${glitches.glitchId} and ${echoes.moderation} = 'ok')`,
+  // Fully qualified on purpose: Drizzle renders ${glitches.glitchId} as a bare "glitch_id", which inside
+  // this subquery would resolve to echoes.glitch_id and count every echo.
+  echoCount: sql<number>`(select count(*)::int from "echoes" e where e."glitch_id" = "glitches"."glitch_id" and e."moderation" = 'ok')`,
 }
 
 type GlitchRow = { districtId: string | null } & Omit<Glitch, 'districtId'>
