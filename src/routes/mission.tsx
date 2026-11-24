@@ -216,7 +216,7 @@ function MissionControl() {
       ) : game.phase === 'ended' ? (
         <EndedTakeover game={game} />
       ) : (
-      <main className="relative z-10 grid shrink-0 gap-4 [@media(max-height:800px)]:gap-3 px-4 py-4 lg:px-5 xl:px-9 [@media(max-height:800px)]:py-2.5 lg:min-h-0 lg:flex-1 lg:shrink lg:grid-cols-[clamp(15rem,24vw,32rem)_minmax(0,1fr)_clamp(16rem,24vw,32rem)] lg:grid-rows-1">
+      <main className="relative z-10 grid shrink-0 grid-cols-[minmax(0,1fr)] gap-4 [@media(max-height:800px)]:gap-3 px-4 py-4 lg:px-5 xl:px-9 [@media(max-height:800px)]:py-2.5 lg:min-h-0 lg:flex-1 lg:shrink lg:grid-cols-[clamp(15rem,24vw,32rem)_minmax(0,1fr)_clamp(16rem,24vw,32rem)] lg:grid-rows-1">
         {/* left: gauge + sensors */}
         <div className="flex flex-col gap-4 lg:min-h-0 [@media(max-height:800px)]:gap-2.5">
           <Panel title="Magic level" hud className="items-stretch">
@@ -224,7 +224,7 @@ function MissionControl() {
             <div className="mt-3 grid grid-cols-3 gap-2 [@media(max-height:800px)]:mt-1.5">
               <Stat label="Glitches" value={snap.glitches.length} tone={snap.glitches.length ? 'text-warning' : 'text-success'} />
               <Stat label="At risk" value={atRisk} tone={atRisk ? 'text-danger' : 'text-success'} />
-              <Stat label="Guardians" value={snap.guardianCount} />
+              <Stat label="Guardians" short="Players" value={snap.guardianCount} />
             </div>
           </Panel>
           <Panel title="Sensor grid" className="min-h-[18rem] flex-1 overflow-hidden lg:min-h-[10rem]">
@@ -286,11 +286,21 @@ function Guardians({ n, small = false }: { n: number; small?: boolean }) {
   )
 }
 
-function Stat({ label, value, tone = 'text-fg' }: { label: string; value: number; tone?: string }) {
+/** `short` replaces the label below xl, where the tiles are ~58px wide. */
+function Stat({ label, short, value, tone = 'text-fg' }: { label: string; short?: string; value: number; tone?: string }) {
   return (
     <div className="border border-line bg-subtle/60 px-1 py-1.5 text-center">
       <div className={`font-display text-4xl leading-none font-extrabold tabular-nums 2xl:text-5xl [@media(max-height:800px)]:text-3xl ${tone}`}>{value}</div>
-      <div className="label mt-1 text-xs! tracking-wider whitespace-nowrap max-xl:tracking-normal max-xl:text-[0.65rem]! [@media(max-height:800px)]:mt-0.5">{label}</div>
+      <div className="label mt-1 text-xs! tracking-wider whitespace-nowrap max-xl:tracking-normal max-xl:text-[0.75rem]! [@media(max-height:800px)]:mt-0.5">
+        {short ? (
+          <>
+            <span className="max-xl:hidden">{label}</span>
+            <span className="xl:hidden">{short}</span>
+          </>
+        ) : (
+          label
+        )}
+      </div>
     </div>
   )
 }

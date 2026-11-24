@@ -10,22 +10,22 @@ import { AchronaMap } from '#/components/map/AchronaMap.tsx'
 import { MagicGauge } from '#/components/mission/MagicGauge.tsx'
 import { SEVERITIES, type Glitch } from '#/lib/glitch.ts'
 
-const SEV_TEXT: Record<string, string> = { critical: 'text-danger', high: 'text-warning', medium: 'text-accent-ink', low: 'text-muted' }
+const SEV_TEXT: Record<string, string> = { critical: 'text-danger', high: 'text-warning', medium: 'text-info-ink', low: 'text-muted' }
 
 export function OverviewOps({ glitches, onSelect }: { glitches: Glitch[]; onSelect: (id: string) => void }) {
   const open = glitches.filter((g) => g.status !== 'FIXED')
   return (
-    <div className="grid gap-3 md:grid-cols-[220px_auto_minmax(0,1fr)]">
+    <div className="grid gap-3 md:grid-cols-[200px_minmax(0,1fr)] lg:grid-cols-[220px_auto_minmax(0,1fr)]">
       <div className="glass flex items-center justify-center rounded-lg p-3">
         <MagicGauge size="sm" />
       </div>
-      <AchronaMap glitches={glitches} compact onSelect={onSelect} className="aspect-[10/7] w-full md:h-60 md:w-auto" />
+      <AchronaMap glitches={glitches} compact onSelect={onSelect} className="aspect-[10/7] w-full md:order-last md:col-span-2 lg:order-none lg:col-span-1 lg:h-60 lg:w-auto" />
       <div className="glass hud flex flex-col gap-4 rounded-lg p-4 md:min-w-52">
         <div>
           <p className="label">Open glitches</p>
           <div className="font-display text-6xl leading-none font-bold tabular-nums text-fg">{open.length}</div>
         </div>
-        <ul className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
           {[...SEVERITIES].reverse().map((s) => {
             const n = open.filter((g) => g.severity === s).length
             return (

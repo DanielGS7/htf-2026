@@ -42,7 +42,7 @@ export function EchoFeed({ echoes, limit = 12 }: { echoes: Echo[]; limit?: numbe
               {district && <span className="truncate">in {district}</span>}
               <span className="ml-auto shrink-0 font-mono">{now ? timeAgo(e.timestamp, now) : ''}</span>
             </div>
-            <p className={`line-clamp-2 [@media(max-height:950px)]:line-clamp-1 text-xl leading-snug font-medium ${rejected ? 'text-muted line-through' : 'text-fg'}`}>{e.description}</p>
+            <p className={`line-clamp-2 [@media(max-height:700px)]:line-clamp-1 text-xl leading-snug font-medium ${rejected ? 'text-muted line-through' : 'text-fg'}`}>{e.description}</p>
             {rejected && <p className="text-sm font-semibold text-danger">Rejected by moderation{e.moderationReason ? `: ${e.moderationReason}` : ''}</p>}
           </li>
         )

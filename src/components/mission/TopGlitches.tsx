@@ -10,7 +10,7 @@ import { DISTRICTS, type Glitch } from '#/lib/glitch.ts'
 import { GlitchTypeIcon, SeverityBadge, StatusBadge } from '#/components/glitches/badges.tsx'
 
 const RANK = { low: 0, medium: 1, high: 2, critical: 3 } as const
-const BAR = { low: 'bg-muted', medium: 'bg-accent', high: 'bg-warning', critical: 'bg-danger animate-pulse' } as const
+const BAR = { low: 'bg-muted', medium: 'bg-info', high: 'bg-warning', critical: 'bg-danger animate-pulse' } as const
 
 export function TopGlitches({ glitches, limit = 5, onSelect }: { glitches: Glitch[]; limit?: number; onSelect?: (id: string) => void }) {
   const top = glitches
@@ -39,11 +39,11 @@ export function TopGlitches({ glitches, limit = 5, onSelect }: { glitches: Glitc
             <span className={`w-1.5 shrink-0 ${BAR[g.severity]}`} aria-hidden />
             <GlitchTypeIcon type={g.type} className="my-2 size-7 shrink-0 self-center [@media(max-height:800px)]:size-6" />
             <span className="min-w-0 flex-1 self-center py-1 pr-3">
-              <span className="line-clamp-1 text-xl 2xl:line-clamp-2 leading-tight font-semibold text-fg [@media(max-height:800px)]:text-lg">{g.description}</span>
-              <span className="mt-1 flex items-center gap-x-2 overflow-hidden text-base whitespace-nowrap text-muted [@media(max-height:800px)]:text-sm">
+              <span className="line-clamp-2 text-xl leading-tight font-semibold text-fg [@media(max-height:800px)]:text-lg">{g.description}</span>
+              <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-base whitespace-nowrap text-muted [@media(max-height:800px)]:text-sm">
                 <SeverityBadge severity={g.severity} />
                 <StatusBadge status={g.status} />
-                <span className="min-w-0 truncate">{DISTRICTS.find((d) => d.id === g.districtId)?.name ?? 'Unlocated'}</span>
+                <span className="min-w-0 truncate max-xl:hidden">{DISTRICTS.find((d) => d.id === g.districtId)?.name ?? 'Unlocated'}</span>
               </span>
             </span>
           </button>

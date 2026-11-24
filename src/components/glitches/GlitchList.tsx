@@ -1,7 +1,7 @@
 /**
  * @file Dense glitch table for the overview: type icon (type colour), mono ID, severity, status, district, echoes,
  * assignee, age. Critical rows get a red left edge, FIXED rows are dimmed, rows flash (.glitch) when `flash`
- * contains their id; `selectedId` is the j/k cursor. Column order is relied on by e2e (echoes = 6th td).
+ * contains their id; `selectedId` is the j/k cursor. Below lg only icon + title cell show (meta folds under the title). Column order is relied on by e2e (echoes = 6th td).
  * @exports GlitchList
  * @usedBy src/routes/index.tsx
  */
@@ -42,11 +42,11 @@ export function GlitchList({
   }
   return (
     <div className="glass overflow-x-auto rounded-lg">
-      <table className="w-full min-w-[820px] text-left text-sm">
+      <table className="w-full text-left text-sm lg:min-w-[820px]">
         <thead className="bg-panel">
           <tr>
             {['', 'Glitch', 'Severity', 'Status', 'District', 'Echoes', 'Assignee', 'Age'].map((h, i) => (
-              <th key={i} className={TH}>
+              <th key={i} className={`${TH} ${i > 1 ? 'hidden lg:table-cell' : ''}`}>
                 {h}
               </th>
             ))}
@@ -68,7 +68,7 @@ export function GlitchList({
                 <td className={`w-10 py-2 pr-1 pl-3 ${critical ? 'shadow-[inset_3px_0_0_var(--danger)]' : ''}`}>
                   <GlitchTypeIcon type={g.type} className="size-5" />
                 </td>
-                <td className="max-w-md px-3 py-2">
+                <td className="px-3 py-2 lg:max-w-md">
                   <Link
                     to="/glitches/$glitchId"
                     params={{ glitchId: g.glitchId }}
@@ -78,21 +78,31 @@ export function GlitchList({
                     {g.description}
                   </Link>
                   <div className="mt-0.5 font-mono text-xs text-muted">{g.glitchId}</div>
+                  {/* Below lg the extra columns are hidden: the essentials move under the title. */}
+                  <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted lg:hidden">
+                    <SeverityBadge severity={g.severity} />
+                    <StatusBadge status={g.status} />
+                    <span>{districtName(g.districtId)}</span>
+                    <span className="inline-flex items-center gap-1">
+                      <MessageSquare className="size-3" aria-hidden="true" />
+                      {g.echoCount ?? 0}
+                    </span>
+                  </div>
                 </td>
-                <td className="px-3 py-2">
+                <td className="hidden lg:table-cell px-3 py-2">
                   <SeverityBadge severity={g.severity} />
                 </td>
-                <td className="px-3 py-2">
+                <td className="hidden lg:table-cell px-3 py-2">
                   <StatusBadge status={g.status} />
                 </td>
-                <td className="whitespace-nowrap px-3 py-2 text-muted">{districtName(g.districtId)}</td>
-                <td className="px-3 py-2">
+                <td className="hidden lg:table-cell whitespace-nowrap px-3 py-2 text-muted">{districtName(g.districtId)}</td>
+                <td className="hidden lg:table-cell px-3 py-2">
                   <span className="inline-flex items-center gap-1.5 font-display font-bold tabular-nums text-fg">
                     <MessageSquare className="size-3.5 text-muted" aria-hidden="true" />
                     {g.echoCount ?? 0}
                   </span>
                 </td>
-                <td className="whitespace-nowrap px-3 py-2">
+                <td className="hidden lg:table-cell whitespace-nowrap px-3 py-2">
                   {g.assigneeId ? (
                     <span className={g.assigneeId === meId ? 'font-semibold text-accent-ink' : 'text-fg'}>
                       {g.assigneeId === meId ? 'You' : (names[g.assigneeId] ?? '?')}
@@ -101,7 +111,7 @@ export function GlitchList({
                     <span className="text-muted">Unassigned</span>
                   )}
                 </td>
-                <td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-muted" title={g.timestamp}>
+                <td className="hidden lg:table-cell whitespace-nowrap px-3 py-2 font-mono text-xs text-muted" title={g.timestamp}>
                   <time dateTime={g.timestamp} suppressHydrationWarning>
                     <TimeAgo iso={g.timestamp} />
                   </time>

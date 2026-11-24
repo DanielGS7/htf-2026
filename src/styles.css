@@ -52,6 +52,8 @@
   --color-accent-from: var(--accent-from);
   --color-accent-to: var(--accent-to);
   --color-accent-ink: var(--accent-ink);
+  --color-info: var(--info);
+  --color-info-ink: var(--info-ink);
   --color-magic: var(--magic);
   --color-magic-soft: var(--magic-soft);
   --color-glow: var(--glow);
@@ -78,11 +80,14 @@
   --accent-to: #004fe2;
   /* Accent as readable text on the page background. */
   --accent-ink: #0042bd;
+  /* Info = the blue of the severity/status scales. Unlike accent, lockdown never re-tints it. */
+  --info: #004fe2;
+  --info-ink: #0042bd;
   --magic: #8a22b8;
   --magic-soft: #a52bd9;
   --glow: rgb(0 79 226 / 0.18);
-  --success: #0f8a74;
-  --warning: #b8620f;
+  --success: #0c7a66;
+  --warning: #a3560b;
   --danger: #c7361b;
   --on-accent: #ffffff;
   --grain-opacity: 0.07;
@@ -106,6 +111,8 @@
   --accent-from: #5b8cff;
   --accent-to: #004fe2;
   --accent-ink: #8fb0ff;
+  --info: #4a7dff;
+  --info-ink: #8fb0ff;
   --magic: #a52bd9;
   --magic-soft: #e292f4;
   --glow: rgb(74 125 255 / 0.28);
@@ -396,4 +403,12 @@ h1, h2, h3, .font-display {
   width: 1px;
   background: linear-gradient(to bottom, transparent, var(--line), transparent);
 }
+}
+
+/* Text coloured with the magic scale (magicColor) is tuned for dark panels; darken it on parchment. */
+[data-theme="light"] .magic-ink {
+  filter: brightness(0.6) saturate(1.5);
+}
+[data-theme="dark"] .magic-ink {
+  filter: none;
 }

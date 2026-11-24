@@ -34,8 +34,8 @@ export function DistrictSparklines({
                 ))}
               </span>
             </span>
-            <Sparkline values={history[d.id] ?? []} className={large ? 'h-9 w-20 2xl:h-10 2xl:w-28 [@container(max-height:17rem)]:hidden' : 'h-8 w-20'} />
-            <span className={`text-right font-display font-bold tabular-nums ${large ? 'w-12 text-2xl 2xl:w-[4.25rem] 2xl:text-3xl [@container(max-height:17rem)]:text-xl [@container(max-height:17rem)]:leading-none' : 'w-14 text-xl'}`} style={{ color }}>
+            <Sparkline values={history[d.id] ?? []} className={large ? 'h-9 w-20 max-xl:hidden 2xl:h-10 2xl:w-28 [@container(max-height:17rem)]:hidden' : 'h-8 w-20'} />
+            <span className={`magic-ink text-right font-display font-bold tabular-nums ${large ? 'w-12 text-2xl 2xl:w-[4.25rem] 2xl:text-3xl [@container(max-height:17rem)]:text-xl [@container(max-height:17rem)]:leading-none' : 'w-14 text-xl'}`} style={{ color }}>
               {Math.round(m)}
             </span>
           </li>

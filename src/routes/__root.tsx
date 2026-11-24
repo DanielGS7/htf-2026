@@ -69,6 +69,8 @@ function AppLayout() {
   )
 }
 
+const SHOW_DEVTOOLS = import.meta.env.DEV && import.meta.env.VITE_DEVTOOLS === '1'
+
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" data-theme="dark" suppressHydrationWarning>
@@ -78,15 +80,18 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="bg-app font-sans antialiased">
         {children}
-        <TanStackDevtools
-          config={{ position: 'bottom-right' }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
+        {/* Opt-in (VITE_DEVTOOLS=1): the floating button sits over the projector and phone UIs. */}
+        {SHOW_DEVTOOLS && (
+          <TanStackDevtools
+            config={{ position: 'bottom-right' }}
+            plugins={[
+              {
+                name: 'Tanstack Router',
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+            ]}
+          />
+        )}
         <Scripts />
       </body>
     </html>

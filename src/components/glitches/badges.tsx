@@ -23,20 +23,20 @@ export function GlitchTypeIcon({ type, className = 'size-4', withLabel = false }
 export const STATUS_STYLE: Record<GlitchStatus, string> = {
   LEAKED: 'bg-danger/15 text-danger border-danger/50',
   ASSESSING: 'bg-warning/15 text-warning border-warning/50',
-  CONTAINING: 'bg-accent/15 text-accent-ink border-accent/50',
+  CONTAINING: 'bg-info/15 text-info-ink border-info/50',
   FIXED: 'bg-success/15 text-success border-success/50',
 }
 
-const TAG = 'inline-flex items-center rounded-sm border px-1.5 py-0.5 font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.1em]'
+const TAG = 'inline-flex items-center rounded-sm border px-1.5 py-0.5 font-mono text-[12px] font-semibold uppercase leading-none tracking-[0.08em]'
 
 export function StatusBadge({ status }: { status: GlitchStatus }) {
   return <span className={`${TAG} ${STATUS_STYLE[status]}`}>{status}</span>
 }
 
-/** Severity scale: low = muted, medium = accent, high = warning, critical = danger + pulse. */
+/** Severity scale: low = muted, medium = info (blue, stays blue in lockdown), high = warning, critical = danger + pulse. */
 export const SEVERITY_STYLE: Record<Severity, string> = {
   low: 'bg-muted/10 text-muted border-muted/40',
-  medium: 'bg-accent/15 text-accent-ink border-accent/50',
+  medium: 'bg-info/15 text-info-ink border-info/50',
   high: 'bg-warning/15 text-warning border-warning/50',
   critical: 'bg-danger/20 text-danger border-danger/60 animate-pulse',
 }

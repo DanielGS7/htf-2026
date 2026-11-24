@@ -10,7 +10,7 @@ import { Button } from '#/components/ui/Button.tsx'
 import { PageHeader } from '#/components/ui/PageHeader.tsx'
 import { RunbookPanel } from '#/components/ai/RunbookPanel.tsx'
 import { CommanderPanel } from '#/components/glitches/CommanderPanel.tsx'
-import { DistrictMiniMap } from '#/components/glitches/DistrictMiniMap.tsx'
+import { AchronaMap } from '#/components/map/AchronaMap.tsx'
 import { EchoTimeline } from '#/components/glitches/EchoTimeline.tsx'
 import { GlitchTypeIcon, SeverityBadge, StatusBadge, TimeAgo } from '#/components/glitches/badges.tsx'
 import { ReportEchoDialog } from '#/components/glitches/ReportEchoDialog.tsx'
@@ -104,7 +104,7 @@ function GlitchDetailPage() {
         </section>
         <aside className="space-y-5">
           {isCommander && <CommanderPanel glitch={glitch} />}
-          <DistrictMiniMap districtId={glitch.districtId} color={typeMeta.color} />
+          <AchronaMap glitches={[glitch]} compact className="aspect-[10/7] w-full" />
           <RunbookPanel glitch={glitch} canGenerate={me?.role === 'commander'} />
         </aside>
       </div>

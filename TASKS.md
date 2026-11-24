@@ -87,6 +87,18 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 | [x] | Light mode: sidebar icons invisible, map broken | F10 | Claude | sidebar/tab bar/map are always-dark zones |
 | [x] | Bigger, higher-contrast text for a lit projector room | F32 | Claude | type scale +8-10%, weight 500, brighter muted |
 
+## Visual fixes round 2 (full UI audit: phone 360px, laptop, 1024x768 + 1920x1080 projector; dark/light/lockdown)
+| Done | Task | Ref | Owner | Notes |
+|:---:|---|---|---|---|
+| [x] | Toasts no longer cover the projector (hidden on /mission) or phone role card / meeting / fix overlays | F33 | Claude | |
+| [x] | TanStack devtools button hidden (opt in with `VITE_DEVTOOLS=1`) | F32 | Claude | it floated over projector + phones |
+| [x] | Phone: glitch list without sideways scroll, tab bar fits 360px (Home/Report/Oracle/Ranks), stepper labels | F15 | Claude | |
+| [x] | Lockdown keeps MEDIUM / CONTAINING blue (new `info` token) instead of turning alarm-red | F10 | Claude | |
+| [x] | 1024x768 projector: Top glitches readable (2-line titles), echo feed 2 lines, stat labels fit | F30 | Claude | |
+| [x] | Light mode: sensor percentages readable, badge text 12px + darker orange/teal | F10 | Claude | |
+| [x] | Glitch detail uses the real compact Achrona map (old mini map clipped labels) | F5 | Claude | |
+| [x] | /mission on a phone no longer overflows; leaderboard badge chips don't wrap | F32 | Claude | |
+
 ## Game mode: Desync Protocol (F33, Among Us-style)
 | Done | Task | Ref | Owner | Notes |
 |:---:|---|---|---|---|

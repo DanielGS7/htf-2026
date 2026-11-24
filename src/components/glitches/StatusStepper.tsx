@@ -1,6 +1,7 @@
 /**
  * @file Horizontal LEAKED -> ASSESSING -> CONTAINING -> FIXED track in the DESIGN.md status colours: reached
- * stages are filled, the current stage is lit with its colour, later stages are hollow. Commanders can click a step to jump.
+ * stages are filled, the current stage is lit with its colour, later stages are hollow. On phones only the
+ * current stage is labelled (four labels don't fit 360px). Commanders can click a step to jump.
  * @exports StatusStepper
  * @usedBy src/routes/glitches.$glitchId.tsx
  */
@@ -10,7 +11,7 @@ import { GLITCH_STATUSES, type GlitchStatus } from '#/lib/glitch.ts'
 const COLOR: Record<GlitchStatus, { text: string; bg: string; border: string; outline: string }> = {
   LEAKED: { text: 'text-danger', bg: 'bg-danger', border: 'border-danger', outline: 'outline-danger' },
   ASSESSING: { text: 'text-warning', bg: 'bg-warning', border: 'border-warning', outline: 'outline-warning' },
-  CONTAINING: { text: 'text-accent-ink', bg: 'bg-accent', border: 'border-accent', outline: 'outline-accent' },
+  CONTAINING: { text: 'text-info-ink', bg: 'bg-info', border: 'border-info', outline: 'outline-info' },
   FIXED: { text: 'text-success', bg: 'bg-success', border: 'border-success', outline: 'outline-success' },
 }
 
@@ -49,15 +50,15 @@ export function StatusStepper({
               <span
                 className={`flex size-8 items-center justify-center rounded-sm border-2 ${
                   active
-                    ? `${c.bg} ${c.border} ${c.outline} text-white outline-2 outline-offset-2`
+                    ? `${c.bg} ${c.border} ${c.outline} text-[#160f1f] outline-2 outline-offset-2`
                     : reached
                       ? `${c.border} bg-card ${c.text}`
                       : 'border-line bg-card text-muted group-enabled:group-hover:border-fg'
                 }`}
               >
-                {reached && !active ? <Check className="size-4" /> : <span className={`font-mono text-xs font-bold ${active ? 'text-white' : ''}`}>{i + 1}</span>}
+                {reached && !active ? <Check className="size-4" /> : <span className={`font-mono text-sm font-bold ${active ? 'text-[#160f1f]' : ''}`}>{i + 1}</span>}
               </span>
-              <span className={`font-mono text-[11px] font-semibold tracking-[0.12em] uppercase ${active ? c.text : reached ? 'text-fg' : 'text-muted'}`}>{s}</span>
+              <span className={`font-mono text-[12px] font-semibold tracking-[0.12em] uppercase ${active ? '' : 'max-sm:hidden'} ${active ? c.text : reached ? 'text-fg' : 'text-muted'}`}>{s}</span>
             </button>
           </li>
         )

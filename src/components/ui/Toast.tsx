@@ -1,11 +1,13 @@
 /**
  * @file Toast system. <ToastProvider> mounts the stack and feeds it from `toast` live events;
- * `useToast()` returns push({ tone, message }) for local toasts.
+ * `useToast()` returns push({ tone, message }) for local toasts. Hidden on /mission; z-45 sits under
+ * modals and full-screen game overlays (z-50) so it never covers a role card or meeting.
  * @exports ToastProvider, useToast
  * @usedBy src/components/layout/AppProviders.tsx
  */
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react'
 import { AlertTriangle, CheckCircle2, Info, OctagonAlert, X } from 'lucide-react'
+import { useRouterState } from '@tanstack/react-router'
 import { useLiveEvents } from '#/lib/useLiveEvents.ts'
 
 type Tone = 'info' | 'warning' | 'danger' | 'success'
@@ -34,6 +36,8 @@ let nextId = 1
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<ToastItem[]>([])
+  // The projector (/mission) narrates events itself (feed, takeovers, voice): toasts there only cover data.
+  const onProjector = useRouterState({ select: (s) => s.location.pathname === '/mission' })
 
   const dismiss = useCallback((id: number) => setItems((l) => l.filter((t) => t.id !== id)), [])
   const push = useCallback<Push>(
@@ -54,7 +58,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div
         aria-live="polite"
-        className="pointer-events-none fixed right-4 bottom-20 z-[70] flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-2 md:bottom-4"
+        hidden={onProjector}
+        className="pointer-events-none fixed right-4 bottom-20 z-[45] flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-2 md:bottom-4"
       >
         {items.map((t) => {
           const Icon = ICON[t.tone]

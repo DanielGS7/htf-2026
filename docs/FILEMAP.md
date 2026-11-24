@@ -80,13 +80,10 @@
 - `src/components/glitches/CommanderPanel.tsx` — Commander-only controls on the glitch detail: advance status, status dropdown, assign defender (with the suggested defender = fewest open assignments highlighted).
   - @exports CommanderPanel
   - @usedBy src/routes/glitches.$glitchId.tsx
-- `src/components/glitches/DistrictMiniMap.tsx` — Tiny SVG showing where in Achrona a glitch sits (highlighted district). Lightweight stand-in for the full AchronaMap so the detail page needs no cross-WP dependency.
-  - @exports DistrictMiniMap
-  - @usedBy src/routes/glitches.$glitchId.tsx
 - `src/components/glitches/EchoTimeline.tsx` — Echo timeline for a glitch: vertical line with diamond nodes, reporter codename (font-display), time, text, photo. Rejected echoes are muted with their reason (the server only sends them to commanders / the reporter). Commanders can move an echo to another glitch or into a new one (overrides AI grouping).
   - @exports EchoTimeline
   - @usedBy src/routes/glitches.$glitchId.tsx
-- `src/components/glitches/GlitchList.tsx` — Dense glitch table for the overview: type icon (type colour), mono ID, severity, status, district, echoes, assignee, age. Critical rows get a red left edge, FIXED rows are dimmed, rows flash (.glitch) when `flash` contains their id; `selectedId` is the j/k cursor. Column order is relied on by e2e (echoes = 6th td).
+- `src/components/glitches/GlitchList.tsx` — Dense glitch table for the overview: type icon (type colour), mono ID, severity, status, district, echoes, assignee, age. Critical rows get a red left edge, FIXED rows are dimmed, rows flash (.glitch) when `flash` contains their id; `selectedId` is the j/k cursor. Below lg only icon + title cell show (meta folds under the title). Column order is relied on by e2e (echoes = 6th td).
   - @exports GlitchList
   - @usedBy src/routes/index.tsx
 - `src/components/glitches/OverviewOps.tsx` — Overview header widgets: the live magic gauge, the compact Achrona map (clicking a glitch marker opens that glitch) and a severity readout (big numbers, HUD panel) with a link to the big-screen mission control.
@@ -98,7 +95,7 @@
 - `src/components/glitches/ShortcutsHelp.tsx` — Modal listing keyboard shortcuts (key `?`). Uses the shared Modal primitive (Escape / backdrop close).
   - @exports ShortcutsHelp
   - @usedBy src/routes/index.tsx, src/routes/glitches.$glitchId.tsx
-- `src/components/glitches/StatusStepper.tsx` — Horizontal LEAKED -> ASSESSING -> CONTAINING -> FIXED track in the DESIGN.md status colours: reached stages are filled, the current stage is lit with its colour, later stages are hollow. Commanders can click a step to jump.
+- `src/components/glitches/StatusStepper.tsx` — Horizontal LEAKED -> ASSESSING -> CONTAINING -> FIXED track in the DESIGN.md status colours: reached stages are filled, the current stage is lit with its colour, later stages are hollow. On phones only the current stage is labelled (four labels don't fit 360px). Commanders can click a step to jump.
   - @exports StatusStepper
   - @usedBy src/routes/glitches.$glitchId.tsx
 - `src/components/glitches/badges.tsx` — Reusable glitch badges: type icon (in its type colour), squared status and severity tags on the DESIGN.md scales.
@@ -113,7 +110,7 @@
 - `src/components/layout/AuthShell.tsx` — Full-screen shell for the public /login and /join pages, in the HTF 2026 look: plum vignette, purple voxel lightning on both edges, the official "Curse of Achrona" title art, and a character standing on the bottom edge of the screen, partly BEHIND the form card. (The HTF character art fades out at the bottom, so it must always sit on a bottom edge; see docs/DESIGN.md §6.)
   - @exports AuthShell
   - @usedBy src/routes/login.tsx, src/routes/join.tsx
-- `src/components/layout/Sidebar.tsx` — Desktop (md+) left icon rail: logo, nav to every route (commander items hidden for defenders), theme toggle and user menu. Mobile uses TabBar instead. z-40: the sticky rail is its own stacking context, so it must sit above page content for the hover labels to show over it (modals are z-50, toasts z-[70]).
+- `src/components/layout/Sidebar.tsx` — Desktop (md+) left icon rail: logo, nav to every route (commander items hidden for defenders), theme toggle and user menu. Mobile uses TabBar instead. z-40: the sticky rail is its own stacking context, so it must sit above page content for the hover labels to show over it (modals are z-50, toasts z-[45], hidden on /mission).
   - @usedBy src/routes/__root.tsx
 - `src/components/layout/TabBar.tsx` — Mobile (<md) bottom tab bar: primary routes plus the user menu (which holds the rest).
   - @exports TabBar
@@ -139,10 +136,10 @@
 - `src/components/map/geometry.ts` — Hand-tuned geometry for the Achrona map (viewBox 1000x700): landmass and river paths, roads between districts, a deterministic organic blob per district, and marker placement helpers.
   - @exports LANDMASS, RIVER, MOUNTAINS, ROADS, districtBlob, markerOffset, hash
   - @usedBy src/components/map/AchronaMap.tsx
-- `src/components/mission/DistrictSparklines.tsx` — Per-district sensor panel: name, a stepped sparkline of the last ~2 minutes, a segmented bar and the live magic percentage in the magic colour. `large` = projector sizing.
+- `src/components/mission/DistrictSparklines.tsx` — Per-district sensor panel: name, a stepped sparkline of the last ~2 minutes, a segmented bar and the live magic percentage in the magic colour. `large` = projector sizing; inside a `[container-type:size]` parent shorter than 17rem it collapses each row to one line (name + bar + number) so nothing overlaps.
   - @exports DistrictSparklines
   - @usedBy src/routes/mission.tsx, src/routes/admin.tsx
-- `src/components/mission/EchoFeed.tsx` — Live echo feed for the big screen: newest first, district tag, reporter, relative time, big type. Echoes rejected by AI moderation are shown struck-through with the reason.
+- `src/components/mission/EchoFeed.tsx` — Live echo feed for the big screen: newest first, district tag, reporter, relative time, big type. Echoes rejected by AI moderation are shown struck-through with the reason. Needs a `relative` parent with a height: echoes that don't fit wrap out of view instead of being clipped mid-line.
   - @exports EchoFeed
   - @usedBy src/routes/mission.tsx
 - `src/components/mission/JoinQr.tsx` — QR code that sends the audience to `${origin}/join` (F30). Pass `base` to override the origin (e.g. the venue URL when the projector is on localhost). `showUrl={false}` hides the caption.
@@ -157,7 +154,7 @@
 - `src/components/mission/Sparkline.tsx` — Hand-rolled SVG sparkline (stepped line, flat tinted area, square end block), coloured by the latest magic value.
   - @exports Sparkline
   - @usedBy src/components/mission/DistrictSparklines.tsx, src/routes/admin.tsx
-- `src/components/mission/TopGlitches.tsx` — Ranked list of the most urgent open glitches (severity, then echo count) in projector-size type. Each row carries a severity-coloured left bar (critical pulses).
+- `src/components/mission/TopGlitches.tsx` — Ranked list of the most urgent open glitches (severity, then echo count) in projector-size type. Each row carries a severity-coloured left bar (critical pulses). Needs a `relative` parent with a height: the list fills it and drops the rows that don't fit.
   - @exports TopGlitches
   - @usedBy src/routes/mission.tsx
 - `src/components/mission/magicColor.ts` — Shared magic-level colour scale (HTF palette): blue/teal (healthy) -> purple -> orange -> red (critical), plus a status word per level. Used by the gauge, the map and the sparklines.
@@ -196,7 +193,7 @@
   - @exports PageHeader
   - @usedBy src/routes/* (all signed-in pages)
   - @example <PageHeader label="Mission log" title="Overview" subtitle="3 open glitches" actions={<Button/>} />
-- `src/components/ui/Toast.tsx` — Toast system. <ToastProvider> mounts the stack and feeds it from `toast` live events; `useToast()` returns push({ tone, message }) for local toasts.
+- `src/components/ui/Toast.tsx` — Toast system. <ToastProvider> mounts the stack and feeds it from `toast` live events; `useToast()` returns push({ tone, message }) for local toasts. Hidden on /mission; z-45 sits under modals and full-screen game overlays (z-50) so it never covers a role card or meeting.
   - @exports ToastProvider, useToast
   - @usedBy src/components/layout/AppProviders.tsx
 - `src/db/index.ts` — PostgreSQL connection pool (node-postgres) wrapped in Drizzle. SERVER-ONLY. Reads DATABASE_URL (default: the docker-compose database). All queries are async: `await db.select()...`, use `.returning()` for inserted rows.

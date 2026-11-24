@@ -16,7 +16,7 @@ export function BadgeChip({ id, compact = false }: { id: BadgeId; compact?: bool
       title={`${m.label}: ${m.hint}`}
       tabIndex={0}
       aria-label={`${m.label}: ${m.hint}`}
-      className="inline-flex items-center gap-1 rounded-sm border border-line bg-subtle px-1.5 py-0.5 font-mono text-[11px] leading-4 font-semibold tracking-wider uppercase focus-visible:outline-2 focus-visible:outline-accent"
+      className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-sm border border-line bg-subtle px-1.5 py-0.5 font-mono text-[12px] leading-4 font-semibold tracking-wider uppercase focus-visible:outline-2 focus-visible:outline-accent"
       style={{ color: m.color }}
     >
       <Icon className="size-3.5" />

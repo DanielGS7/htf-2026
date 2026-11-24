@@ -2,7 +2,7 @@
  * @file Desktop (md+) left icon rail: logo, nav to every route (commander items hidden for defenders),
  * theme toggle and user menu. Mobile uses TabBar instead.
  * z-40: the sticky rail is its own stacking context, so it must sit above page content for the
- * hover labels to show over it (modals are z-50, toasts z-[70]).
+ * hover labels to show over it (modals are z-50, toasts z-[45], hidden on /mission).
  * @usedBy src/routes/__root.tsx
  */
 import { Link } from '@tanstack/react-router'
