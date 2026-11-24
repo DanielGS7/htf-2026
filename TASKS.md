@@ -73,7 +73,7 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 ## Demo day
 | Done | Task | Ref | Owner | Notes |
 |:---:|---|---|---|---|
-| [ ] | Cloudflare Tunnel (`cloudflared`) to the laptop, HTTPS URL for phones | §2 | colleague | in progress |
+| [x] | Cloudflare Tunnel (`cloudflared`) to the laptop, HTTPS URL for phones | §2 | colleague | Keanu |
 | [ ] | Real-phone pass over the tunnel (voice, camera, offline queue, 360px) | F15, F25, F26, F16 | | after the tunnel works |
 | [ ] | Wire + level-test the walkie-talkie audio | F31 | | |
 | [ ] | Check `claude -p` is logged in on the demo laptop | §10 | | |
