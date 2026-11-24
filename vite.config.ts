@@ -18,7 +18,7 @@ const IGNORED_SERVER_WARNINGS = new Set([
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
   server: {
-    allowedHosts: ['vcr-segments-versions-characteristic.trycloudflare.com'],
+    allowedHosts: ['.trycloudflare.com'],
   },
   plugins: [
     devtools(),
