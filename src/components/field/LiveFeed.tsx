@@ -4,7 +4,7 @@
  * @usedBy src/routes/report.tsx
  */
 import { Link } from '@tanstack/react-router'
-import { GlitchTypeIcon, SeverityBadge, StatusBadge, timeAgo } from '#/components/glitches/badges.tsx'
+import { GlitchTypeIcon, SeverityBadge, StatusBadge, TimeAgo } from '#/components/glitches/badges.tsx'
 import type { Glitch } from '#/lib/glitch.ts'
 
 export function LiveFeed({ glitches }: { glitches: Glitch[] }) {
@@ -30,7 +30,7 @@ export function LiveFeed({ glitches }: { glitches: Glitch[] }) {
                 <span>{g.echoCount ?? 0} echo{g.echoCount === 1 ? '' : 'es'}</span>
               </p>
             </div>
-            <span className="shrink-0 font-mono text-xs text-muted">{timeAgo(g.updatedAt)}</span>
+            <span className="shrink-0 font-mono text-xs text-muted"><TimeAgo iso={g.updatedAt} /></span>
           </Link>
         </li>
       ))}

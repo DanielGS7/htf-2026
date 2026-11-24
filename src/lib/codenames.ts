@@ -9,7 +9,7 @@ const ADJECTIVES = [
   'Twilight', 'Solar', 'Arcane', 'Iron', 'Velvet', 'Wild', 'Noble', 'Shimmering', 'Dusk', 'Golden',
 ]
 const NOUNS = [
-  'Lantern', 'Falcon', 'Rune', 'Warden', 'Comet', 'Griffin', 'Sentinel', 'Willow', 'Phoenix', 'Raven',
+  'Lantern', 'Falcon', 'Rune', 'Warden', 'Comet', 'Griffin', 'Willow', 'Phoenix', 'Raven',
   'Wisp', 'Talisman', 'Fox', 'Beacon', 'Drake', 'Sage', 'Compass', 'Thistle', 'Oracle', 'Cipher',
   'Pilgrim', 'Spark', 'Harbor', 'Quill', 'Wyrm', 'Lynx', 'Aegis', 'Meteor', 'Herald', 'Owl',
 ]

@@ -61,16 +61,17 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 ## Integration and polish
 | Done | Task | Ref | Owner | Notes |
 |:---:|---|---|---|---|
-| [x] | Headless E2E suite (13 flows) | Phase 2 | Claude | `npm run e2e` (Playwright, reseeds DB) |
+| [x] | Headless E2E suite (14 flows, incl. hydration check) | Phase 2 | Claude | `npm run e2e` (Playwright, reseeds DB) |
 | [x] | AI via `claude -p --model haiku` (no API key) | §2 | Claude | ~4s per echo; live-tested triage, grouping, moderation, auto-close, Oracle, runbook |
 | [ ] | Show AI assignment pick + AI badge in the app | F22 | Claude | assignment pick done (glitch detail); AI badge only on /oracle |
 | [ ] | Send photos through moderation too | F19 | Claude | |
-| [ ] | Fix /mission layout (lockdown banner over map, empty space) | F30 | Claude (agent) | part of V3 |
+| [x] | Fix /mission layout (lockdown banner over map, empty space) | F30 | Claude (agent) | |
 | [ ] | README: how to run locally | | Claude | |
 | [x] | Visual foundation: HTF 2026 palette, fonts, assets, PageHeader, docs/DESIGN.md | F32 | Claude | |
 | [x] | Visual V1: shell, UI primitives, login/join, toasts, lockdown chrome | F32 | Claude (agent) | lockdown strip not screenshot-checked yet |
 | [x] | Visual V2: overview + glitch detail + badges | F32 | Claude (agent) | |
-| [ ] | Visual V3: /mission, /admin, map, gauge (+ /mission layout fix) | F32 | Claude (agent) | in progress |
+| [x] | Visual V3: /mission, /admin, map, gauge (+ /mission layout fix) | F32 | Claude (agent) | good at 1920×1080 + 1440×900 |
+| [ ] | /mission fits small projectors (1280×720, 1024×768) | F30 | Claude (agent) | in progress: rows overlap, lockdown plate truncated at 1280×720 |
 | [x] | Visual V4: /report, /leaderboard, /council, /oracle | F32 | Claude (agent) | |
 | [ ] | Radio desk: walkie-talkie → speech-to-text → echoes | F31 | | hardware: walkie audio out → laptop mic in |
 

@@ -1,6 +1,6 @@
 /**
  * @file Reusable glitch badges: type icon (in its type colour), squared status and severity tags on the DESIGN.md scales.
- * @exports GlitchTypeIcon, StatusBadge, SeverityBadge, STATUS_STYLE, SEVERITY_STYLE, timeAgo
+ * @exports GlitchTypeIcon, StatusBadge, SeverityBadge, STATUS_STYLE, SEVERITY_STYLE, timeAgo, TimeAgo
  * @usedBy src/components/glitches/*, src/routes/index.tsx, other work packages
  */
 import { BatteryLow, CircleDashed, Droplets, Hourglass, HelpCircle, Radio, Zap, type LucideIcon } from 'lucide-react'
@@ -52,4 +52,17 @@ export function timeAgo(iso: string, now = Date.now()): string {
   if (s < 3600) return `${Math.floor(s / 60)}m`
   if (s < 86400) return `${Math.floor(s / 3600)}h`
   return `${Math.floor(s / 86400)}d`
+}
+
+/**
+ * Relative time as a <time> element. Server and browser render it a moment apart ("44s" vs "45s"),
+ * so the mismatch is expected and suppressed. Use this in JSX instead of calling timeAgo() inline.
+ */
+export function TimeAgo({ iso, suffix = '' }: { iso: string; suffix?: string }) {
+  return (
+    <time dateTime={iso} suppressHydrationWarning>
+      {timeAgo(iso)}
+      {suffix}
+    </time>
+  )
 }

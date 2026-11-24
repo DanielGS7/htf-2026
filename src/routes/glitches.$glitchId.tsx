@@ -12,7 +12,7 @@ import { RunbookPanel } from '#/components/ai/RunbookPanel.tsx'
 import { CommanderPanel } from '#/components/glitches/CommanderPanel.tsx'
 import { DistrictMiniMap } from '#/components/glitches/DistrictMiniMap.tsx'
 import { EchoTimeline } from '#/components/glitches/EchoTimeline.tsx'
-import { GlitchTypeIcon, SeverityBadge, StatusBadge, timeAgo } from '#/components/glitches/badges.tsx'
+import { GlitchTypeIcon, SeverityBadge, StatusBadge, TimeAgo } from '#/components/glitches/badges.tsx'
 import { ReportEchoDialog } from '#/components/glitches/ReportEchoDialog.tsx'
 import { ShortcutsHelp } from '#/components/glitches/ShortcutsHelp.tsx'
 import { StatusStepper } from '#/components/glitches/StatusStepper.tsx'
@@ -81,7 +81,7 @@ function GlitchDetailPage() {
           <StatusBadge status={glitch.status} />
           <SeverityBadge severity={glitch.severity} />
           <span className="text-muted">
-            {district?.name ?? 'Unknown district'} · opened {timeAgo(glitch.timestamp)} ago · {glitch.echoCount ?? 0} {glitch.echoCount === 1 ? 'echo' : 'echoes'} ·{' '}
+            {district?.name ?? 'Unknown district'} · opened <TimeAgo iso={glitch.timestamp} suffix=" ago" /> · {glitch.echoCount ?? 0} {glitch.echoCount === 1 ? 'echo' : 'echoes'} ·{' '}
             {assignee ? (
               <>
                 assigned to <span className="font-semibold text-fg">{assignee.guardianId === me?.guardianId ? 'you' : assignee.codename}</span>

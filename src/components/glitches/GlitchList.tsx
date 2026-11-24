@@ -8,7 +8,7 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { MessageSquare } from 'lucide-react'
 import { DISTRICTS, type Glitch } from '#/lib/glitch.ts'
-import { GlitchTypeIcon, SeverityBadge, StatusBadge, timeAgo } from './badges.tsx'
+import { GlitchTypeIcon, SeverityBadge, StatusBadge, TimeAgo } from './badges.tsx'
 
 
 const districtName = (id: string | null) => DISTRICTS.find((d) => d.id === id)?.name ?? '-'
@@ -102,7 +102,7 @@ export function GlitchList({
                 </td>
                 <td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-muted" title={g.timestamp}>
                   <time dateTime={g.timestamp} suppressHydrationWarning>
-                    {timeAgo(g.timestamp)}
+                    <TimeAgo iso={g.timestamp} />
                   </time>
                 </td>
               </tr>

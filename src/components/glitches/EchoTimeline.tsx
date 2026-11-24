@@ -11,7 +11,7 @@ import { useRouter } from '@tanstack/react-router'
 import { ArrowRightLeft, Ban } from 'lucide-react'
 import { getGlitches, moveEcho } from '#/lib/glitches.functions.ts'
 import type { Echo, Glitch } from '#/lib/glitch.ts'
-import { timeAgo } from './badges.tsx'
+import { TimeAgo } from './badges.tsx'
 
 function MoveControl({ echo }: { echo: Echo }) {
   const router = useRouter()
@@ -72,7 +72,7 @@ export function EchoTimeline({ echoes, isCommander }: { echoes: Echo[]; isComman
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <span className="font-display text-base font-bold tracking-wide text-fg">{e.reporterCodename ?? 'Unknown'}</span>
                 <time dateTime={e.timestamp} title={e.timestamp} suppressHydrationWarning className="font-mono text-xs text-muted">
-                  {timeAgo(e.timestamp)} ago
+                  <TimeAgo iso={e.timestamp} suffix=" ago" />
                 </time>
                 <span className="font-mono text-xs text-muted">{e.echoId}</span>
                 {isCommander && (

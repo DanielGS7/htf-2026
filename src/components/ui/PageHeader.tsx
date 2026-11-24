@@ -24,7 +24,8 @@ export function PageHeader({
       <div className="min-w-0">
         {label && <p className="label mb-1">{label}</p>}
         <h1 className="font-gothic text-5xl sm:text-6xl">{title}</h1>
-        {subtitle && <p className="mt-3 text-muted">{subtitle}</p>}
+        {/* div, not p: subtitle may contain block elements (e.g. SimStatus on /admin). */}
+        {subtitle && <div className="mt-3 text-muted">{subtitle}</div>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </header>

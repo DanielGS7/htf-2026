@@ -1,5 +1,5 @@
 /**
- * @file Pill showing the simulator phase (CALM / UNDER ATTACK / RECOVERING) with the scenario
+ * @file Plate showing the simulator phase (CALM / UNDER ATTACK / RECOVERING) with the scenario
  * name and a progress bar while an attack runs. Elapsed time is extrapolated locally between syncs.
  * @exports SimStatus
  * @usedBy src/routes/mission.tsx, src/routes/admin.tsx
@@ -33,9 +33,9 @@ export function SimStatus({ sim }: { sim: SimulatorState }) {
         : [Activity, 'SENSORS OFFLINE', 'border-line bg-subtle text-muted']
 
   return (
-    <div className={`relative overflow-hidden rounded-full border px-4 py-1.5 ${cls}`}>
+    <div className={`relative overflow-hidden rounded-md border px-4 py-1.5 ${cls}`}>
       {attack && <div className="absolute inset-y-0 left-0 bg-danger/20" style={{ width: `${pct}%`, transition: 'width 1s linear' }} />}
-      <div className="relative flex items-center gap-2 text-sm font-bold tracking-widest uppercase">
+      <div className="relative flex items-center gap-2 font-display text-sm font-bold tracking-widest uppercase">
         <Icon className={`size-4 ${attack ? 'animate-pulse' : ''}`} />
         {label}
       </div>
