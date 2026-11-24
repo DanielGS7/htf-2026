@@ -25,22 +25,22 @@ export function TopGlitches({ glitches, limit = 5, onSelect }: { glitches: Glitc
     )
   }
   return (
-    <ol className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)] gap-2" style={{ gridTemplateRows: `repeat(${top.length}, minmax(0, 9rem))` }}>
+    <ol className="flex h-full min-h-0 flex-col gap-2 [@media(max-height:800px)]:gap-1.5">
       {top.map((g) => (
-        <li key={g.glitchId} className="float-in min-h-0">
+        <li key={g.glitchId} className="float-in min-h-0 flex-1 basis-0 [@media(max-height:800px)]:nth-[n+4]:hidden" style={{ maxHeight: '8rem' }}>
           <button
             type="button"
             onClick={() => onSelect?.(g.glitchId)}
-            className="flex size-full max-h-32 overflow-hidden items-stretch gap-3 border border-line bg-subtle/60 text-left transition hover:bg-subtle-hover"
+            className="flex size-full overflow-hidden items-stretch gap-3 border border-line bg-subtle/60 text-left transition hover:bg-subtle-hover"
           >
             <span className={`w-1.5 shrink-0 ${BAR[g.severity]}`} aria-hidden />
-            <GlitchTypeIcon type={g.type} className="my-2 size-7 shrink-0 self-center" />
-            <span className="min-w-0 flex-1 self-center py-2 pr-3">
-              <span className="line-clamp-1 text-xl 2xl:line-clamp-2 leading-tight font-semibold text-fg">{g.description}</span>
-              <span className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-base text-muted">
+            <GlitchTypeIcon type={g.type} className="my-2 size-7 shrink-0 self-center [@media(max-height:800px)]:size-6" />
+            <span className="min-w-0 flex-1 self-center py-1 pr-3">
+              <span className="line-clamp-1 text-xl 2xl:line-clamp-2 leading-tight font-semibold text-fg [@media(max-height:800px)]:text-lg">{g.description}</span>
+              <span className="mt-1 flex items-center gap-x-2 overflow-hidden text-base whitespace-nowrap text-muted [@media(max-height:800px)]:text-sm">
                 <SeverityBadge severity={g.severity} />
                 <StatusBadge status={g.status} />
-                <span className="truncate">{DISTRICTS.find((d) => d.id === g.districtId)?.name ?? 'Unlocated'}</span>
+                <span className="min-w-0 truncate">{DISTRICTS.find((d) => d.id === g.districtId)?.name ?? 'Unlocated'}</span>
               </span>
             </span>
           </button>

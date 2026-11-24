@@ -33,7 +33,7 @@ export function EchoFeed({ echoes, limit = 12 }: { echoes: Echo[]; limit?: numbe
         return (
           <li
             key={e.echoId}
-            className={`float-in border-l-4 py-1 pr-2 pl-3 ${rejected ? 'border-danger bg-danger/5' : i === 0 ? 'border-magic bg-magic/10' : 'border-line'}`}
+            className={`float-in [@media(max-height:800px)]:nth-[n+3]:hidden border-l-4 py-1 pr-2 pl-3 ${rejected ? 'border-danger bg-danger/5' : i === 0 ? 'border-magic bg-magic/10' : 'border-line'}`}
           >
             <div className="flex items-center gap-2 text-sm text-muted">
               {rejected ? <Ban className="size-4 text-danger" /> : <Radio className="size-4 text-accent" />}
@@ -41,7 +41,7 @@ export function EchoFeed({ echoes, limit = 12 }: { echoes: Echo[]; limit?: numbe
               {district && <span className="truncate">in {district}</span>}
               <span className="ml-auto shrink-0 font-mono">{now ? timeAgo(e.timestamp, now) : ''}</span>
             </div>
-            <p className={`line-clamp-2 text-xl leading-snug font-medium ${rejected ? 'text-muted line-through' : 'text-fg'}`}>{e.description}</p>
+            <p className={`line-clamp-2 [@media(max-height:950px)]:line-clamp-1 text-xl leading-snug font-medium ${rejected ? 'text-muted line-through' : 'text-fg'}`}>{e.description}</p>
             {rejected && <p className="text-sm font-semibold text-danger">Rejected by moderation{e.moderationReason ? `: ${e.moderationReason}` : ''}</p>}
           </li>
         )

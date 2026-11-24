@@ -65,7 +65,7 @@ export function MagicGauge({ level, size = 'lg' }: { level?: number; size?: 'sm'
 
   return (
     <div
-      className={`relative mx-auto aspect-[300/252] w-full select-none ${big ? 'max-w-[min(32rem,52vh)]' : 'max-w-[11rem]'}`}
+      className={`relative mx-auto aspect-[300/252] w-full select-none ${big ? 'max-w-[min(32rem,52vh)] [@media(max-height:800px)]:max-w-[min(32rem,40vh)]' : 'max-w-[11rem]'}`}
       role="meter"
       aria-label="Magic level"
       aria-valuemin={0}
