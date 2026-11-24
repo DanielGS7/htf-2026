@@ -68,7 +68,7 @@
 - `src/components/layout/AuthShell.tsx` — Full-screen centred shell for the public /login and /join pages: starfield, glow, logo.
   - @exports AuthShell
   - @usedBy src/routes/login.tsx, src/routes/join.tsx
-- `src/components/layout/Sidebar.tsx` — Desktop (md+) left icon rail: logo, nav to every route (commander items hidden for defenders), theme toggle and user menu. Mobile uses TabBar instead.
+- `src/components/layout/Sidebar.tsx` — Desktop (md+) left icon rail: logo, nav to every route (commander items hidden for defenders), theme toggle and user menu. Mobile uses TabBar instead. z-40: the sticky rail is its own stacking context, so it must sit above page content for the hover labels to show over it (modals are z-50, toasts z-[70]).
   - @usedBy src/routes/__root.tsx
 - `src/components/layout/TabBar.tsx` — Mobile (<md) bottom tab bar: primary routes plus the user menu (which holds the rest).
   - @exports TabBar
@@ -138,7 +138,7 @@
 - `src/components/ui/Toast.tsx` — Toast system. <ToastProvider> mounts the stack and feeds it from `toast` live events; `useToast()` returns push({ tone, message }) for local toasts.
   - @exports ToastProvider, useToast
   - @usedBy src/components/layout/AppProviders.tsx
-- `src/db/index.ts` — PostgreSQL connection pool (node-postgres) wrapped in Drizzle. SERVER-ONLY. Reads DATABASE_URL (Optis in production, docker-compose locally). All queries are async: `await db.select()...`, use `.returning()` for inserted rows.
+- `src/db/index.ts` — PostgreSQL connection pool (node-postgres) wrapped in Drizzle. SERVER-ONLY. Reads DATABASE_URL (default: the docker-compose database). All queries are async: `await db.select()...`, use `.returning()` for inserted rows.
   - @exports db, DEFAULT_DATABASE_URL
 - `src/db/schema.ts` — Drizzle PostgreSQL schema: guardians, sessions, glitches, echoes, sensor_readings.
   - @exports guardians, sessions, glitches, echoes, sensorReadings (drizzle tables)
@@ -175,7 +175,7 @@
 - `src/lib/theme.ts` — Client theme helpers: dark/light preference in localStorage and the <html> data attributes. `THEME_INIT_SCRIPT` is inlined in the root shell to avoid a flash of the wrong theme.
   - @exports Theme, THEME_KEY, THEME_INIT_SCRIPT, readTheme, writeTheme, applyTheme, applyLockdown
   - @usedBy src/components/layout/AppProviders.tsx, src/routes/__root.tsx
-- `src/lib/useLiveEvents.ts` — Client hook: subscribe to the live SSE stream (/api/events). One shared EventSource per tab; auto-reconnects (browser default).
+- `src/lib/useLiveEvents.ts` — Client hook: subscribe to the live SSE stream (/api/events). ONE EventSource per browser, not per tab: the tab holding the `gg-live-leader` Web Lock opens the stream and relays events + connection status to other tabs over BroadcastChannel; when it closes, another tab takes over. This keeps us under the browser's 6-connections-per-host limit (HTTP/1.1), which several open tabs (mission + admin + overview) would otherwise exhaust. Falls back to one EventSource per tab when Web Locks/BroadcastChannel are unavailable.
   - @exports useLiveEvents(handler), useConnectionStatus(), LiveEvent (re-exported type)
   - @usedBy any component that must update in real time
   - @example useLiveEvents((e) => { if (e.type === 'glitch.created') router.invalidate() })
@@ -207,14 +207,19 @@
   - @usedBy router
 - `src/routes/report.tsx` — Route /report: mobile-first field report. Greeting + points, EchoComposer (text/voice/photo, offline queue), critical-alert opt-in and a live feed of the latest glitches. Refreshes on live events.
   - @usedBy router (QR/quick-join landing page)
-- `src/server/ai/claude.ts` — Claude-backed implementations of the AI contracts (src/server/ai/types.ts). SERVER-ONLY; loaded lazily by src/server/ai/index.ts, which handles fallback to heuristics. Uses the beta Messages API so refusals can fall back server-side (`fallbacks: 'default'`, disable with AI_FALLBACKS=0). Structured outputs for triage + assignee; plain text for runbook/oracle.
+- `src/server/ai/claude-cli.ts` — Claude Code CLI provider (AI_PROVIDER=cli, the default): runs `claude -p --model haiku` as a subprocess on the presenter's logged-in subscription, so no API key is needed. SERVER-ONLY. Each call: no tools, no settings/CLAUDE.md, no MCP servers, no session files, cwd = OS temp dir. User text goes over stdin (never argv). Structured output via --json-schema (`structured_output`). At most AI_CLI_CONCURRENCY (default 3) calls run at once; the rest queue. Env: CLAUDE_BIN (default `claude`), AI_MODEL (default `haiku`).
+  - @exports triageClaude, runbookClaude, oracleClaude, assigneeClaude, cliAvailable
+  - @usedBy src/server/ai/index.ts (dynamic import)
+- `src/server/ai/claude.ts` — Anthropic SDK provider (AI_PROVIDER=api, needs ANTHROPIC_API_KEY). SERVER-ONLY; loaded lazily by src/server/ai/index.ts, which handles fallback to heuristics. Prompts live in prompts.ts. Uses the beta Messages API so refusals can fall back server-side (`fallbacks: 'default'`, disable with AI_FALLBACKS=0). Structured outputs for triage + assignee; plain text for runbook/oracle.
   - @exports triageClaude, runbookClaude, oracleClaude, assigneeClaude
   - @usedBy src/server/ai/index.ts (dynamic import)
 - `src/server/ai/heuristics.ts` — Offline fallback for the AI layer: keyword rules, no network. Used when ANTHROPIC_API_KEY is missing, the call fails or times out.
   - @exports triageHeuristic, runbookHeuristic, oracleHeuristic, assigneeHeuristic
-- `src/server/ai/index.ts` — Public entry point of the AI layer. SERVER-ONLY. Every function tries Claude (src/server/ai/claude.ts) and falls back to heuristics.ts on missing key / error / timeout, so the demo never breaks.
-  - @exports triageEcho, generateRunbook, askOracle, suggestAssignee, aiEnabled, aiModel
+- `src/server/ai/index.ts` — Public entry point of the AI layer. SERVER-ONLY. Provider via AI_PROVIDER: `cli` (default: `claude -p --model haiku`, claude-cli.ts), `api` (Anthropic SDK + ANTHROPIC_API_KEY, claude.ts) or `off`. AI_DISABLED=1 also forces `off`. Every function falls back to heuristics.ts on unavailable provider / error / timeout, so the demo never breaks.
+  - @exports triageEcho, generateRunbook, askOracle, suggestAssignee, aiEnabled, aiModel, aiProvider
   - @usedBy src/server/echo-pipeline.ts, src/lib/ai.functions.ts
+- `src/server/ai/prompts.ts` — Shared prompts, output schemas and post-processing for both Claude providers (claude.ts = Anthropic SDK, claude-cli.ts = `claude -p` CLI). SERVER-ONLY.
+  - @exports TRIAGE_SYSTEM, RUNBOOK_SYSTEM, ORACLE_SYSTEM, ASSIGNEE_SYSTEM, triageSchema, assigneeSchema, triageUserMessage, runbookUserMessage, oracleUserMessage, finalizeTriage, finalizeAssignee
 - `src/server/ai/types.ts` — Contracts for the AI layer. Both implementations (claude.ts, heuristics.ts) satisfy these; callers only use src/server/ai/index.ts.
   - @exports TriageInput, TriageResult, OpenGlitchSummary, RunbookInput, OracleInput, OracleTurn, AssigneeCandidate, AssigneeInput, AssigneeResult
 - `src/server/auth.ts` — Session auth helpers. SERVER-ONLY: call these inside createServerFn handlers or server route handlers, never from components. All DB helpers are async. Session = random token in the `gg_session` httpOnly cookie -> `sessions` table.
