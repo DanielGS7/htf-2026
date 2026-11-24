@@ -58,15 +58,23 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 | [x] | Browser notifications for critical glitches | F28 | Claude (agent) | only while `/report` is open; Android shows toast + vibrate only |
 | [x] | `/council` printable PDF report | F29 | Claude (agent) | check print preview |
 
-## Ship and present
+## Integration and polish
 | Done | Task | Ref | Owner | Notes |
 |:---:|---|---|---|---|
-| [ ] | Check Optis: Node version, env vars, SSE support | §10 | | do this early |
-| [ ] | Deploy to Optis + public URL for the QR | §10 | | |
-| [ ] | Get an Anthropic API key and set `ANTHROPIC_API_KEY` | WP-D | | then smoke-test triage, runbook, Oracle |
-| [ ] | Load test: 50 simulated phones | Phase 2 | | |
 | [x] | Headless E2E suite (13 flows) | Phase 2 | Claude | `npm run e2e` (Playwright, reseeds DB) |
-| [ ] | Fix /mission layout: lockdown banner covers map, empty space under map | Phase 2 | | seen in E2E screenshots |
-| [ ] | Demo script + timings | §9 | | |
-| [ ] | Slides (story, architecture, who built what) | §9 | | |
-| [ ] | Two full rehearsals incl. hotspot fallback | §9 | | |
+| [x] | AI via `claude -p --model haiku` (no API key) | §2 | Claude | ~4s per echo; live-tested triage, grouping, moderation, auto-close, Oracle, runbook |
+| [ ] | Show AI assignment pick + AI badge in the app | F22 | Claude | |
+| [ ] | Send photos through moderation too | F19 | Claude | |
+| [ ] | Fix /mission layout (lockdown banner over map, empty space) | F30 | Claude | likely covered by the visual overhaul |
+| [ ] | README: how to run locally | | Claude | |
+| [ ] | Visual overhaul based on the reference repo | F32 | | waiting for the repo choice |
+| [ ] | Radio desk: walkie-talkie → speech-to-text → echoes | F31 | | hardware: walkie audio out → laptop mic in |
+
+## Demo day
+| Done | Task | Ref | Owner | Notes |
+|:---:|---|---|---|---|
+| [ ] | Cloudflare Tunnel (`cloudflared`) to the laptop, HTTPS URL for phones | §2 | colleague | in progress |
+| [ ] | Real-phone pass over the tunnel (voice, camera, offline queue, 360px) | F15, F25, F26, F16 | | after the tunnel works |
+| [ ] | Wire + level-test the walkie-talkie audio | F31 | | |
+| [ ] | Check `claude -p` is logged in on the demo laptop | §10 | | |
+| [ ] | Rehearse the 5-minute app-only demo twice | §9 | | |

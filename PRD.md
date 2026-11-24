@@ -30,10 +30,10 @@ This drives the public vote and shows off creativity and functionality at the sa
 | Language | TypeScript (strict) |
 | UI | React 19, Tailwind 4, lucide-react icons |
 | Framework | TanStack Start (file routes, `createServerFn`, server route handlers) |
-| DB | **PostgreSQL** via Drizzle ORM (`pg` driver). Local: `docker compose up -d`. Prod: Optis `DATABASE_URL` |
+| DB | **PostgreSQL** via Drizzle ORM (`pg` driver), local Docker (`docker compose up -d`), `DATABASE_URL` |
 | Real-time | Server-Sent Events: `GET /api/events` + in-process bus (`src/server/bus.ts`) |
-| AI | Anthropic SDK (`@anthropic-ai/sdk`), model `process.env.AI_MODEL ?? 'claude-opus-5-5'`, **always with heuristic fallback** |
-| Hosting | Optis (single Node instance, since the bus is in-process) |
+| AI | **Claude Code CLI** (`claude -p --model haiku`, uses the presenter's logged-in subscription, no API key). Provider switch `AI_PROVIDER=cli` (default) \| `api` (Anthropic SDK, needs `ANTHROPIC_API_KEY`) \| `off`. **Always with heuristic fallback** |
+| Hosting | **The presenter's laptop**, exposed to phones in the room via a Cloudflare Tunnel (`cloudflared`) for HTTPS. One Node process (the live bus is in-process) |
 | Extra libs (preinstalled) | `zod`, `qrcode`, `react-markdown` |
 
 **Do not add npm packages** without listing them in your report; the coordinator installs them (avoids `package.json` conflicts between parallel agents).
@@ -128,7 +128,11 @@ IDs are referenced by work packages. **P0 = base assignment, must be rock solid.
 - **F27 Leaderboard** with badges (First Responder, Fixer x5, Storm Chaser...).
 - **F28 Notifications**: in-app toasts + browser Notification API for critical glitches (opt-in toggle per user, stored in localStorage).
 - **F29 High Council report**: printable `/council` page (print CSS → "Save as PDF").
-- **F30 Join QR**: `/mission` shows a QR code to `/join` for the audience.
+- **F30 Join QR**: `/mission` shows a QR code to `/join` for the audience (`/mission?host=<tunnel URL>`).
+
+### P4 — Presentation extras
+- **F31 Radio desk (walkie-talkie)**: a guardian "on duty" reports over a real walkie-talkie. The receiving walkie's audio out is wired into the laptop's mic/line in; `/radio` listens continuously (Web Speech API, works on localhost), shows a live signal meter + transcript, and turns each transmission (ended by "over" or a pause) into an echo from the radio guardian, tagged as a radio report on the mission screen. Optional: Mission Control replies over the air (text-to-speech into the walkie's mic in, VOX).
+- **F32 Visual overhaul**: complete restyle based on the reference repository chosen by the team: flashy for the projector, but instantly readable and intuitive without explanation.
 
 ---
 
@@ -228,7 +232,7 @@ Owns: `src/routes/report.tsx`, `src/routes/leaderboard.tsx`, `src/routes/council
 - **Accept:** usable on a 360px phone, voice input works in Chrome, offline queue resends, print preview looks clean.
 
 ### Phase 2 (after the WPs merge): coordinator
-Integration pass, end-to-end demo rehearsal script, deploy to Optis, load test with 50 simulated phones, polish.
+Integration pass, E2E suite (`npm run e2e`), demo rehearsal over the Cloudflare tunnel with real phones, visual overhaul (F32), radio desk (F31).
 
 ---
 
@@ -255,23 +259,23 @@ If a dependency isn't built yet, create **nothing** in another WP's folder. Rend
 
 ---
 
-## 9. Demo script (presentation, ~7 min, each member presents their part)
-1. **Hook (0:00):** Achrona is calm; magic 97%. "You are all guardians now." QR on screen; the audience joins.
-2. **Attack (1:00):** commander triggers *The Desync*. Gauge drains, map lights up, lockdown turns the UI red, phones buzz.
-3. **The room reports (2:00):** audience sends echoes (voice/text/photo). AI groups 40 echoes into 5 glitches live, rejects trolls on screen.
-4. **Command (4:00):** commander assigns, generates a runbook, asks the Oracle "what should we fix first?", advances statuses.
-5. **Recovery (5:30):** "all good again" echoes auto-close glitches; magic climbs to 100%; leaderboard crowns the top audience defenders.
-6. **Close (6:30):** architecture slide + who built what.
+## 9. Demo (5 minutes, app only, no slides)
+The app has to explain itself: big type, obvious next actions, no menus to hunt through.
+1. **0:00 Join:** `/mission` on the projector (calm, magic ~76%). "Scan this, you're guardians now." Phones join via the tunnel URL.
+2. **0:45 Attack:** commander launches *Total Desync* from `/admin`. Gauge drains, map turns red, lockdown at ~30s.
+3. **1:30 Report:** the room sends echoes; the guardian on duty radios one in over the walkie (F31). AI groups, types and moderates them live on the big screen.
+4. **3:00 Command:** open a glitch: assign, AI runbook, ask the Oracle "what should we fix first?", advance statuses.
+5. **4:15 Recover:** "all good again" echoes auto-close glitches, magic climbs back, leaderboard crowns the room's best defenders.
 
 ---
 
 ## 10. Risks and decisions
 | Risk | Mitigation |
 |---|---|
-| Venue Wi-Fi / Optis down | Demo also runs on laptop + phone hotspot; simulator runs without the audience |
-| AI latency or outage | 12s timeout → heuristics; triage runs at low effort; demo works with `AI_DISABLED=1` |
-| Optis and long-lived SSE | Verify early; fallback = client polling every 3s (`useLiveEvents` change only) |
-| Multiple Optis instances | Run a single instance (bus is in-process); else move to Postgres `LISTEN/NOTIFY` |
-| Trolls in the audience | Moderation (F19) is part of the show; commander can also hide echoes |
+| Venue Wi-Fi / tunnel down | Phones on the laptop's hotspot; the simulator alone still carries the demo |
+| AI latency (~3s per CLI call) or outage | Calls are queued with a concurrency cap; timeout → heuristics; `AI_PROVIDER=off` forces heuristics |
+| CLI not logged in on the demo laptop | Check `claude -p` works before presenting; `/oracle` badge shows AI online/offline |
+| Trolls in the audience | Moderation (F19) is part of the show; commander can move or hide echoes |
+| Radio audio too loud/noisy for speech recognition | Set walkie volume low (line level), test the level meter on `/radio`, fall back to the phone report form |
 
-**Open questions:** hackathon length / presentation time; Anthropic API key availability (and whether the team prefers a cheaper `AI_MODEL`); Optis specifics (Node version, env vars, websocket/SSE support); teammates' strengths for WP assignment.
+**Open questions:** reference repository for the visual overhaul (F32).

@@ -1,6 +1,6 @@
 /**
  * @file PostgreSQL connection pool (node-postgres) wrapped in Drizzle. SERVER-ONLY.
- * Reads DATABASE_URL (Optis in production, docker-compose locally).
+ * Reads DATABASE_URL (default: the docker-compose database).
  * All queries are async: `await db.select()...`, use `.returning()` for inserted rows.
  * @exports db, DEFAULT_DATABASE_URL
  */

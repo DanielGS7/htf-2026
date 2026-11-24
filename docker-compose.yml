@@ -1,4 +1,4 @@
-# Local dev database. Production uses the Optis-hosted PostgreSQL via DATABASE_URL.
+# Local dev database (the demo runs on the presenter's laptop).
 services:
   db:
     image: postgres:17-alpine
