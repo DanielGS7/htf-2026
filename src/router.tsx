@@ -1,3 +1,6 @@
+/**
+ * @file TanStack Router factory (getRouter) used by TanStack Start.
+ */
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
 

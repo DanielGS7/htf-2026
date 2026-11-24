@@ -1,7 +1,7 @@
 import { defineConfig } from 'drizzle-kit'
 
 export default defineConfig({
-  dialect: 'sqlite',
+  dialect: 'postgresql',
   schema: './src/db/schema.ts',
-  dbCredentials: { url: process.env.DB_FILE_NAME ?? 'local.db' },
+  dbCredentials: { url: process.env.DATABASE_URL ?? 'postgres://guardian:guardian@localhost:5432/achrona' },
 })

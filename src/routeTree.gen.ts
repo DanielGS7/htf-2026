@@ -10,33 +10,167 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as CouncilRouteImport } from './routes/council'
+import { Route as JoinRouteImport } from './routes/join'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as MissionRouteImport } from './routes/mission'
+import { Route as OracleRouteImport } from './routes/oracle'
+import { Route as ReportRouteImport } from './routes/report'
+import { Route as ApiEventsRouteImport } from './routes/api/events'
+import { Route as GlitchesGlitchIdRouteImport } from './routes/glitches.$glitchId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CouncilRoute = CouncilRouteImport.update({
+  id: '/council',
+  path: '/council',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MissionRoute = MissionRouteImport.update({
+  id: '/mission',
+  path: '/mission',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OracleRoute = OracleRouteImport.update({
+  id: '/oracle',
+  path: '/oracle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportRoute = ReportRouteImport.update({
+  id: '/report',
+  path: '/report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEventsRoute = ApiEventsRouteImport.update({
+  id: '/api/events',
+  path: '/api/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GlitchesGlitchIdRoute = GlitchesGlitchIdRouteImport.update({
+  id: '/glitches/$glitchId',
+  path: '/glitches/$glitchId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/council': typeof CouncilRoute
+  '/join': typeof JoinRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
+  '/mission': typeof MissionRoute
+  '/oracle': typeof OracleRoute
+  '/report': typeof ReportRoute
+  '/api/events': typeof ApiEventsRoute
+  '/glitches/$glitchId': typeof GlitchesGlitchIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/council': typeof CouncilRoute
+  '/join': typeof JoinRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
+  '/mission': typeof MissionRoute
+  '/oracle': typeof OracleRoute
+  '/report': typeof ReportRoute
+  '/api/events': typeof ApiEventsRoute
+  '/glitches/$glitchId': typeof GlitchesGlitchIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/council': typeof CouncilRoute
+  '/join': typeof JoinRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
+  '/mission': typeof MissionRoute
+  '/oracle': typeof OracleRoute
+  '/report': typeof ReportRoute
+  '/api/events': typeof ApiEventsRoute
+  '/glitches/$glitchId': typeof GlitchesGlitchIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/council'
+    | '/join'
+    | '/leaderboard'
+    | '/login'
+    | '/mission'
+    | '/oracle'
+    | '/report'
+    | '/api/events'
+    | '/glitches/$glitchId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/council'
+    | '/join'
+    | '/leaderboard'
+    | '/login'
+    | '/mission'
+    | '/oracle'
+    | '/report'
+    | '/api/events'
+    | '/glitches/$glitchId'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/council'
+    | '/join'
+    | '/leaderboard'
+    | '/login'
+    | '/mission'
+    | '/oracle'
+    | '/report'
+    | '/api/events'
+    | '/glitches/$glitchId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  CouncilRoute: typeof CouncilRoute
+  JoinRoute: typeof JoinRoute
+  LeaderboardRoute: typeof LeaderboardRoute
+  LoginRoute: typeof LoginRoute
+  MissionRoute: typeof MissionRoute
+  OracleRoute: typeof OracleRoute
+  ReportRoute: typeof ReportRoute
+  ApiEventsRoute: typeof ApiEventsRoute
+  GlitchesGlitchIdRoute: typeof GlitchesGlitchIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +182,91 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/council': {
+      id: '/council'
+      path: '/council'
+      fullPath: '/council'
+      preLoaderRoute: typeof CouncilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mission': {
+      id: '/mission'
+      path: '/mission'
+      fullPath: '/mission'
+      preLoaderRoute: typeof MissionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oracle': {
+      id: '/oracle'
+      path: '/oracle'
+      fullPath: '/oracle'
+      preLoaderRoute: typeof OracleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/report': {
+      id: '/report'
+      path: '/report'
+      fullPath: '/report'
+      preLoaderRoute: typeof ReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/events': {
+      id: '/api/events'
+      path: '/api/events'
+      fullPath: '/api/events'
+      preLoaderRoute: typeof ApiEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/glitches/$glitchId': {
+      id: '/glitches/$glitchId'
+      path: '/glitches/$glitchId'
+      fullPath: '/glitches/$glitchId'
+      preLoaderRoute: typeof GlitchesGlitchIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  CouncilRoute: CouncilRoute,
+  JoinRoute: JoinRoute,
+  LeaderboardRoute: LeaderboardRoute,
+  LoginRoute: LoginRoute,
+  MissionRoute: MissionRoute,
+  OracleRoute: OracleRoute,
+  ReportRoute: ReportRoute,
+  ApiEventsRoute: ApiEventsRoute,
+  GlitchesGlitchIdRoute: GlitchesGlitchIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

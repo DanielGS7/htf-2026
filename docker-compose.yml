@@ -1,0 +1,14 @@
+# Local dev database. Production uses the Optis-hosted PostgreSQL via DATABASE_URL.
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: guardian
+      POSTGRES_PASSWORD: guardian
+      POSTGRES_DB: achrona
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:

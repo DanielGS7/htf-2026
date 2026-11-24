@@ -1,9 +1,17 @@
-import Database from 'better-sqlite3'
-import { drizzle } from 'drizzle-orm/better-sqlite3'
+/**
+ * @file PostgreSQL connection pool (node-postgres) wrapped in Drizzle. SERVER-ONLY.
+ * Reads DATABASE_URL (Optis in production, docker-compose locally).
+ * All queries are async: `await db.select()...`, use `.returning()` for inserted rows.
+ * @exports db, DEFAULT_DATABASE_URL
+ */
+import { Pool } from 'pg'
+import { drizzle } from 'drizzle-orm/node-postgres'
 import * as schema from './schema.ts'
 
-// Server-only: never import this from client code.
-const sqlite = new Database(process.env.DB_FILE_NAME ?? 'local.db')
-sqlite.pragma('journal_mode = WAL')
+export const DEFAULT_DATABASE_URL = 'postgres://guardian:guardian@localhost:5432/achrona'
 
-export const db = drizzle(sqlite, { schema })
+// globalThis keeps one pool across Vite HMR reloads.
+const g = globalThis as unknown as { __ggPool?: Pool }
+const pool = (g.__ggPool ??= new Pool({ connectionString: process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL, max: 10 }))
+
+export const db = drizzle(pool, { schema })
