@@ -71,7 +71,7 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 | [x] | Visual V1: shell, UI primitives, login/join, toasts, lockdown chrome | F32 | Claude (agent) | lockdown strip not screenshot-checked yet |
 | [x] | Visual V2: overview + glitch detail + badges | F32 | Claude (agent) | |
 | [x] | Visual V3: /mission, /admin, map, gauge (+ /mission layout fix) | F32 | Claude (agent) | good at 1920×1080 + 1440×900 |
-| [ ] | /mission fits small projectors (1280×720, 1024×768) | F30 | Claude (agent) | in progress: rows overlap, lockdown plate truncated at 1280×720 |
+| [x] | /mission fits small projectors (1280×720, 1024×768) | F30 | Claude (agent) | checked at 1024×768 → 1920×1080, calm + lockdown |
 | [x] | Visual V4: /report, /leaderboard, /council, /oracle | F32 | Claude (agent) | |
 | [ ] | Radio desk: walkie-talkie → speech-to-text → echoes | F31 | | hardware: walkie audio out → laptop mic in |
 

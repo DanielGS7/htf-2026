@@ -31,8 +31,8 @@ export const Route = createFileRoute('/mission')({
 
 function Panel({ title, icon, children, className = '', hud = false }: { title: string; icon?: ReactNode; children: ReactNode; className?: string; hud?: boolean }) {
   return (
-    <section className={`glass flex shrink-0 flex-col rounded-md p-4 lg:min-h-0 lg:shrink ${hud ? 'hud' : ''} ${className}`}>
-      <h2 className="label mb-3 flex items-center gap-2 text-sm! font-semibold">
+    <section className={`glass flex shrink-0 flex-col rounded-md p-4 lg:min-h-0 lg:shrink [@media(max-height:800px)]:p-3 ${hud ? 'hud' : ''} ${className}`}>
+      <h2 className="label mb-3 flex items-center gap-2 text-sm! font-semibold [@media(max-height:800px)]:mb-1.5">
         {icon}
         {title}
       </h2>
@@ -49,7 +49,7 @@ function Clock() {
     const i = setInterval(f, 1000)
     return () => clearInterval(i)
   }, [])
-  return <span className="font-mono text-2xl tabular-nums text-muted">{t}</span>
+  return <span className="font-mono text-2xl tabular-nums text-muted [@media(max-height:800px)]:text-xl">{t}</span>
 }
 
 /** Purple voxel lightning creeping in from the screen edges (attack = partly in, lockdown = further in). Sits BEHIND the panels (z-0), so it never covers data. */
@@ -74,7 +74,7 @@ function MissionControl() {
   // QR size follows the screen height so the glitch list below keeps its room (180px at 900p, 216px at 1080p).
   const [qrSize, setQrSize] = useState(200)
   useEffect(() => {
-    const f = () => setQrSize(Math.max(160, Math.min(260, Math.round(window.innerHeight * 0.2))))
+    const f = () => setQrSize(Math.max(120, Math.min(260, Math.round(window.innerHeight * 0.2))))
     f()
     window.addEventListener('resize', f)
     return () => window.removeEventListener('resize', f)
@@ -140,17 +140,19 @@ function MissionControl() {
       <div className="starfield pointer-events-none absolute inset-0 opacity-60" aria-hidden />
       <EdgeLightning level={lock ? 2 : attack ? 1 : 0} />
 
-      <header className="relative z-10 flex flex-wrap items-center gap-x-5 gap-y-2 px-4 pt-3 pb-1 lg:px-9">
-        <Link to="/" title="Back to the overview" className="flex items-center gap-1.5 rounded-md px-2 py-1 text-base text-muted hover:bg-subtle hover:text-fg">
+      <header className="relative z-10 flex flex-wrap items-center gap-x-4 gap-y-1 px-4 pt-3 pb-1 lg:px-5 xl:gap-x-5 xl:px-9 [@media(max-height:800px)]:pt-1.5">
+        <Link to="/" title="Back to the overview" aria-label="Overview" className="flex items-center gap-1.5 rounded-md px-2 py-1 text-base text-muted hover:bg-subtle hover:text-fg">
           <ArrowLeft className="size-5" />
-          Overview
+          <span className="max-xl:hidden">Overview</span>
         </Link>
-        <h1 className="flex items-center gap-4">
-          <img src="/htf/curse-of-achrona.avif" alt="The Curse of Achrona" className="h-16 w-auto 2xl:h-20" width={156} height={80} />
-          <span className="font-display text-3xl font-bold tracking-[0.18em] text-fg uppercase 2xl:text-4xl">Mission Control</span>
+        <h1 className="flex shrink-0 items-center gap-4">
+          <img src="/htf/curse-of-achrona.avif" alt="The Curse of Achrona" className="h-16 w-auto 2xl:h-20 [@media(max-height:800px)]:h-11" width={156} height={80} />
+          <span className="font-display text-3xl font-bold tracking-[0.18em] text-fg uppercase max-xl:sr-only 2xl:text-4xl [@media(max-height:800px)]:text-2xl">Mission Control</span>
         </h1>
-        <SimStatus sim={snap.sim} />
-        <div className="flex min-w-0 flex-1 justify-center">
+        <div className={alarm ? 'max-[1400px]:hidden [@media(max-height:800px)]:hidden' : ''}>
+          <SimStatus sim={snap.sim} />
+        </div>
+        <div className="flex min-w-fit flex-1 justify-center">
           {lock ? (
             <LockdownPlate reason={reason} />
           ) : attack ? (
@@ -173,18 +175,18 @@ function MissionControl() {
         </div>
       </header>
 
-      <main className="relative z-10 grid shrink-0 gap-4 px-4 py-4 lg:px-9 lg:min-h-0 lg:flex-1 lg:shrink lg:grid-cols-[clamp(20rem,24vw,32rem)_minmax(0,1fr)_clamp(21rem,24vw,32rem)] lg:grid-rows-1">
+      <main className="relative z-10 grid shrink-0 gap-4 [@media(max-height:800px)]:gap-3 px-4 py-4 lg:px-5 xl:px-9 [@media(max-height:800px)]:py-2.5 lg:min-h-0 lg:flex-1 lg:shrink lg:grid-cols-[clamp(15rem,24vw,32rem)_minmax(0,1fr)_clamp(16rem,24vw,32rem)] lg:grid-rows-1">
         {/* left: gauge + sensors */}
-        <div className="flex flex-col gap-4 lg:min-h-0">
+        <div className="flex flex-col gap-4 lg:min-h-0 [@media(max-height:800px)]:gap-2.5">
           <Panel title="Magic level" hud className="items-stretch">
             <MagicGauge level={snap.magic} size="lg" />
-            <div className="mt-3 grid grid-cols-3 gap-2">
+            <div className="mt-3 grid grid-cols-3 gap-2 [@media(max-height:800px)]:mt-1.5">
               <Stat label="Glitches" value={snap.glitches.length} tone={snap.glitches.length ? 'text-warning' : 'text-success'} />
               <Stat label="At risk" value={atRisk} tone={atRisk ? 'text-danger' : 'text-success'} />
               <Stat label="Guardians" value={snap.guardianCount} />
             </div>
           </Panel>
-          <Panel title="Sensor grid" className="min-h-[18rem] flex-1 overflow-hidden">
+          <Panel title="Sensor grid" className="min-h-[18rem] flex-1 overflow-hidden [@media(max-height:800px)]:min-h-0">
             <div className="min-h-0 flex-1">
               <DistrictSparklines latest={snap.latest} history={snap.history} large />
             </div>
@@ -192,15 +194,15 @@ function MissionControl() {
         </div>
 
         {/* centre: alert plate, map, echo feed (no overlays on the map) */}
-        <div className="flex min-w-0 flex-col gap-4 lg:min-h-0">
+        <div className="flex min-w-0 flex-col gap-4 lg:min-h-0 [@media(max-height:800px)]:gap-2.5">
           <AchronaMap glitches={snap.glitches} readings={snap.latest} className="w-full shrink-0 aspect-[10/7]" onSelect={open} />
-          <Panel title="Live echoes" className="min-h-[10rem] flex-1 overflow-hidden">
+          <Panel title="Live echoes" className="min-h-[10rem] flex-1 overflow-hidden [@media(max-height:800px)]:min-h-0">
             <EchoFeed echoes={snap.echoes} limit={3} />
           </Panel>
         </div>
 
         {/* right: join + glitches */}
-        <div className="flex flex-col gap-4 lg:min-h-0">
+        <div className="flex flex-col gap-4 lg:min-h-0 [@media(max-height:800px)]:gap-2.5">
           <Panel title="Join the defense" hud={!alarm}>
             {alarm ? (
               <div className="flex items-center gap-4">
@@ -241,19 +243,19 @@ function Guardians({ n, small = false }: { n: number; small?: boolean }) {
 function Stat({ label, value, tone = 'text-fg' }: { label: string; value: number; tone?: string }) {
   return (
     <div className="border border-line bg-subtle/60 px-1 py-1.5 text-center">
-      <div className={`font-display text-4xl leading-none font-extrabold tabular-nums 2xl:text-5xl ${tone}`}>{value}</div>
-      <div className="label mt-1 text-xs! tracking-wider">{label}</div>
+      <div className={`font-display text-4xl leading-none font-extrabold tabular-nums 2xl:text-5xl [@media(max-height:800px)]:text-3xl ${tone}`}>{value}</div>
+      <div className="label mt-1 text-xs! tracking-wider whitespace-nowrap max-xl:tracking-normal max-xl:text-[0.65rem]! [@media(max-height:800px)]:mt-0.5">{label}</div>
     </div>
   )
 }
 
 function LockdownPlate({ reason }: { reason: string | null }) {
   return (
-    <div className="hazard-strip flex min-w-0 items-center gap-3 px-5 py-2 text-[#160f1f]" role="alert">
-      <ShieldAlert className="size-10 shrink-0 animate-pulse" />
-      <div className="min-w-0">
-        <div className="font-display text-4xl leading-none font-black tracking-[0.28em] uppercase 2xl:text-5xl">Lockdown</div>
-        {reason && <div className="mt-0.5 truncate text-base font-bold">{reason}</div>}
+    <div className="hazard-strip flex max-w-full min-w-0 shrink-0 items-center gap-3 px-5 py-2 text-[#160f1f] [@media(max-height:800px)]:gap-2 [@media(max-height:800px)]:px-3 [@media(max-height:800px)]:py-1" role="alert">
+      <ShieldAlert className="size-10 shrink-0 animate-pulse [@media(max-height:800px)]:size-8" />
+      <div className="min-w-0 shrink-0">
+        <div className="font-display text-4xl leading-none font-black tracking-[0.28em] uppercase 2xl:text-5xl [@media(max-height:800px)]:text-3xl [@media(max-height:800px)]:tracking-[0.2em]">Lockdown</div>
+        {reason && <div className="mt-0.5 max-w-[22rem] truncate text-base font-bold [@media(max-height:800px)]:text-sm">{reason}</div>}
       </div>
     </div>
   )
