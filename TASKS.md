@@ -61,7 +61,7 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 ## Integration and polish
 | Done | Task | Ref | Owner | Notes |
 |:---:|---|---|---|---|
-| [x] | Headless E2E suite (15 flows, incl. hydration check + SSE fallback) | Phase 2 | Claude | `npm run e2e` (Playwright, reseeds DB) |
+| [x] | Headless E2E suite (17 flows: app + game engine + full game round) | Phase 2 | Claude | `npm run e2e` (Playwright, reseeds DB) |
 | [x] | AI via `claude -p --model haiku` (no API key) | §2 | Claude | ~4s per echo; live-tested triage, grouping, moderation, auto-close, Oracle, runbook |
 | [ ] | Show AI assignment pick + AI badge in the app | F22 | Claude | assignment pick done (glitch detail); AI badge only on /oracle |
 | [ ] | Send photos through moderation too | F19 | Claude | |
@@ -92,8 +92,9 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 |:---:|---|---|---|---|
 | [x] | Spec in PRD + shared contracts (types, server fns, schema: hidden/sabotage glitches, echo source/flag) | F33 | Claude | after pulling: `npm run db:push` |
 | [x] | G1 Engine: roles, silent sabotage, discovery, fixes, meetings + votes, win/lose, quota prefilter | F33 | Claude (agent) | `e2e/game.spec.ts` covers the full loop |
-| [ ] | G2 Phone: role card, hidden sabotage console, fix mini-task, emergency meeting + voting | F33 | Claude (agent) | in progress |
-| [ ] | G3 Projector + admin: lobby, round HUD, meeting/vote screen, ejection reveal, end screen, spoken announcements | F33 | Claude (agent) | in progress |
+| [x] | G2 Phone: role card, hidden sabotage console, fix mini-task, emergency meeting + voting | F33 | Claude (agent) | |
+| [x] | G3 Projector + admin: lobby, round HUD, meeting/vote screen, ejection reveal, end screen, spoken announcements | F33 | Claude (agent) | voice not heard yet (headless): test on the real projector |
+| [x] | Full round through the real UI: 5 browsers (admin, projector, 2 crew phones, audience) | F33 | Claude | `e2e/game-ui.spec.ts`, screenshots in test-results/screens/game-*.png |
 | [x] | G4 Radio desk `/radio`: walkie → speech-to-text → echoes ("over"), level meter | F31 | Claude (agent) | real speech path untested (needs Chrome + real mic): test with the walkie |
 
 ## Demo day

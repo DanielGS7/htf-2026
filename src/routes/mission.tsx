@@ -4,13 +4,22 @@
  * below it, right = QR "Scan to join the defense" (large while calm, compact under attack) + top glitches.
  * Attack/lockdown: purple voxel lightning creeps in from both screen edges and a big alert plate sits
  * above the map (never over it). After an attack a short "Achrona holds" plate appears when magic recovers.
+ * Game layer (F33, phase !== idle): lobby / meeting / ended takeovers replace the grid, a round HUD strip sits above it
+ * while playing, a 3s "sabotage discovered" banner overlays it, and Mission Control speaks (mute + "Enable voice" in the header).
  * Eye-orb cursor on this page only. Press `f` for fullscreen; `?host=https://venue.example` overrides the QR base URL.
  * @usedBy router
  */
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, Maximize2, Minimize2, ShieldAlert, ShieldCheck, Skull, Users } from 'lucide-react'
+import { ArrowLeft, Maximize2, Minimize2, ShieldAlert, ShieldCheck, Skull, Users, Volume2, VolumeX } from 'lucide-react'
 import { AchronaMap } from '#/components/map/AchronaMap.tsx'
+import { DiscoveryBanner } from '#/components/game/projector/DiscoveryBanner.tsx'
+import { EndedTakeover } from '#/components/game/projector/EndedTakeover.tsx'
+import { GameStrip } from '#/components/game/projector/GameStrip.tsx'
+import { LobbyTakeover } from '#/components/game/projector/LobbyTakeover.tsx'
+import { MeetingTakeover } from '#/components/game/projector/MeetingTakeover.tsx'
+import { useAnnouncer } from '#/components/game/projector/useAnnouncer.ts'
+import { useGameLive } from '#/components/game/projector/useGameLive.ts'
 import { DistrictSparklines } from '#/components/mission/DistrictSparklines.tsx'
 import { EchoFeed } from '#/components/mission/EchoFeed.tsx'
 import { JoinQr } from '#/components/mission/JoinQr.tsx'
@@ -19,13 +28,18 @@ import { SimStatus } from '#/components/mission/SimStatus.tsx'
 import { TopGlitches } from '#/components/mission/TopGlitches.tsx'
 import { useOpsLive } from '#/components/mission/useOpsLive.ts'
 import { useTheme } from '#/components/layout/AppProviders.tsx'
+import { getGameState } from '#/lib/game.functions.ts'
+import { IDLE_GAME_STATE } from '#/lib/game.ts'
 import { getOpsSnapshot } from '#/lib/ops.functions.ts'
 
 export const Route = createFileRoute('/mission')({
   validateSearch: (s: Record<string, unknown>): { host?: string } => ({
     host: typeof s.host === 'string' && /^https?:\/\//.test(s.host) ? s.host : undefined,
   }),
-  loader: () => getOpsSnapshot(),
+  loader: async () => {
+    const [snap, game] = await Promise.all([getOpsSnapshot(), getGameState().catch(() => IDLE_GAME_STATE)])
+    return { snap, game }
+  },
   component: MissionControl,
 })
 
@@ -65,7 +79,10 @@ function EdgeLightning({ level }: { level: 0 | 1 | 2 }) {
 }
 
 function MissionControl() {
-  const snap = useOpsLive(Route.useLoaderData(), 4000)
+  const loaded = Route.useLoaderData()
+  const snap = useOpsLive(loaded.snap, 4000)
+  const { state: game, discovery } = useGameLive(loaded.game)
+  const voice = useAnnouncer(game, discovery, snap.magic)
   const { host } = Route.useSearch()
   const navigate = useNavigate()
   const [full, setFull] = useState(false)
@@ -161,6 +178,23 @@ function MissionControl() {
           ) : null}
         </div>
         <div className="flex items-center gap-4">
+          {voice.needsEnable && (
+            <button type="button" onClick={voice.enable} className="rounded-md border border-accent bg-accent/15 px-3 py-1.5 text-sm font-semibold tracking-wide text-fg uppercase hover:bg-accent/30">
+              Enable voice
+            </button>
+          )}
+          {voice.supported && (
+            <button
+              type="button"
+              onClick={voice.toggleMuted}
+              aria-pressed={voice.muted}
+              title={voice.muted ? 'Unmute Mission Control' : 'Mute Mission Control'}
+              aria-label={voice.muted ? 'Unmute voice' : 'Mute voice'}
+              className="rounded-md border border-line p-2 text-muted hover:bg-subtle hover:text-fg"
+            >
+              {voice.muted ? <VolumeX className="size-5" /> : <Volume2 className="size-5" />}
+            </button>
+          )}
           <Clock />
           <button
             type="button"
@@ -174,6 +208,14 @@ function MissionControl() {
         </div>
       </header>
 
+      {game.phase === 'playing' && <GameStrip game={game} />}
+      {game.phase === 'lobby' ? (
+        <LobbyTakeover game={game} host={host} guardianCount={snap.guardianCount} qrSize={Math.max(150, Math.min(300, qrSize + 40))} />
+      ) : game.phase === 'meeting' ? (
+        <MeetingTakeover game={game} />
+      ) : game.phase === 'ended' ? (
+        <EndedTakeover game={game} />
+      ) : (
       <main className="relative z-10 grid shrink-0 gap-4 [@media(max-height:800px)]:gap-3 px-4 py-4 lg:px-5 xl:px-9 [@media(max-height:800px)]:py-2.5 lg:min-h-0 lg:flex-1 lg:shrink lg:grid-cols-[clamp(15rem,24vw,32rem)_minmax(0,1fr)_clamp(16rem,24vw,32rem)] lg:grid-rows-1">
         {/* left: gauge + sensors */}
         <div className="flex flex-col gap-4 lg:min-h-0 [@media(max-height:800px)]:gap-2.5">
@@ -226,6 +268,8 @@ function MissionControl() {
           </Panel>
         </div>
       </main>
+      )}
+      <DiscoveryBanner discovery={discovery} />
     </div>
   )
 }

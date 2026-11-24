@@ -2,16 +2,17 @@
  * @file Route /admin — Command deck (commander only; defenders see a "forbidden" state).
  * PageHeader + HUD panels: simulator start/stop and Desync "war plan" cards (banner accent, danger plate
  * Launch buttons), reset demo (two-step confirm), lockdown control with a reason, live magic gauge +
- * sensor bars, and the guardian table with role change.
+ * sensor bars, the "Desync Protocol" game lobby panel (GameLobbyPanel), and the guardian table with role change.
  * @usedBy router
  */
 import { useMemo, useState, type ReactNode } from 'react'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Lock, Monitor, Play, RotateCcw, ShieldAlert, ShieldCheck, Square, Swords, Users } from 'lucide-react'
+import { Gamepad2, Lock, Monitor, Play, RotateCcw, ShieldAlert, ShieldCheck, Square, Swords, Users } from 'lucide-react'
 import { Badge } from '#/components/ui/Badge.tsx'
 import { Button } from '#/components/ui/Button.tsx'
 import { PageHeader } from '#/components/ui/PageHeader.tsx'
 import { Input } from '#/components/ui/Input.tsx'
+import { GameLobbyPanel } from '#/components/game/admin/GameLobbyPanel.tsx'
 import { MagicGauge } from '#/components/mission/MagicGauge.tsx'
 import { DistrictSparklines } from '#/components/mission/DistrictSparklines.tsx'
 import { SimStatus } from '#/components/mission/SimStatus.tsx'
@@ -125,6 +126,10 @@ function Deck({ snap: initial, guardians: initialGuardians }: { snap: Awaited<Re
         </div>
 
         <div className="grid content-start gap-5">
+          <Section title="Desync Protocol" hud icon={<Gamepad2 className="size-5" />}>
+            <GameLobbyPanel />
+          </Section>
+
           <Section title="Command deck" hud icon={<Play className="size-5" />}>
             <div className="flex flex-wrap items-center gap-3">
               <Badge tone={snap.sim.running ? 'success' : 'neutral'}>{snap.sim.running ? 'Running: tick every 3s' : 'Stopped'}</Badge>

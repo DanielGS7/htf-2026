@@ -32,6 +32,51 @@
 - `src/components/field/useEchoQueue.ts` — Offline queue for echoes (F16). Stores unsent echoes in localStorage (all access in try/catch) and auto-flushes when the live stream reconnects, the browser comes online, or every 15s while queued.
   - @exports useEchoQueue, isNetworkError, QueuedEcho (type)
   - @usedBy src/components/field/EchoComposer.tsx
+- `src/components/game/admin/GameLobbyPanel.tsx` — Commander panel "Desync Protocol" for /admin: pick the crew (checkboxes from listCrewCandidates, pre-checked when there are exactly 3), choose the round length (2-8 min), "Set up crew" -> big "Start round", and "End game". Shows the live phase, countdown and counters. Buttons only offer the step that makes sense for the current phase, and ending a running game asks for a second click.
+  - @exports GameLobbyPanel
+  - @usedBy src/routes/admin.tsx
+- `src/components/game/phone/EndScreen.tsx` — End-of-round overlay for the phone: winner, the Desync revealed, the player's points.
+  - @exports EndScreen
+  - @usedBy src/routes/report.tsx
+- `src/components/game/phone/FixTasks.tsx` — "Fix a glitch" section for /report during a round: lists `listFixable()` and runs the ~5s mini-task (hold a button while a rune ring fills 2.5s, then tap 3 runes in the shown order) before calling `completeFix`. The Desync sees identical UI and a "+10" success (no points are awarded server-side).
+  - @exports FixTasks
+  - @usedBy src/routes/report.tsx
+- `src/components/game/phone/Meeting.tsx` — Emergency meeting UI for the phone: `MeetingCallButton` (danger plate + confirm step) and `VoteScreen` (full-screen vote: crew cards + Skip, own vote highlighted, countdown, votes cast; after the vote closes it shows the ejection reveal; ejected players see a muted state and cannot vote).
+  - @exports MeetingCallButton, VoteScreen
+  - @usedBy src/routes/report.tsx
+- `src/components/game/phone/RoleReveal.tsx` — Full-screen role card shown when a round starts (tap to dismiss, auto-closes after 7s) plus the discreet role chip that lets the player peek at their role again. Defender = archer art; Desync = purple voxel lightning + witch. Art stands on the bottom edge (docs/DESIGN.md).
+  - @exports RoleReveal, RoleChip
+  - @usedBy src/routes/report.tsx
+- `src/components/game/phone/RoundBanner.tsx` — Round banner on top of /report while a round is playing: countdown to `roundEndsAt` and the "Defend Achrona" line. Also the lobby "waiting" card.
+  - @exports RoundBanner, LobbyCard
+  - @usedBy src/routes/report.tsx
+- `src/components/game/phone/SabotageConsole.tsx` — Hidden sabotage console for the Desync: `useHoldGesture` (1s long-press with a subtle progress bar, only active for the Desync) and the bottom sheet to pick a district + catastrophe, a cooldown ring and the list of own sabotages with "discovered" marks.
+  - @exports useHoldGesture, SabotageSheet
+  - @usedBy src/routes/report.tsx
+- `src/components/game/phone/useCountdown.ts` — Countdown hook for the game UI: seconds left until an ISO time (ticks 4x/s, clamps at 0).
+  - @exports useCountdown, fmtClock
+  - @usedBy src/components/game/phone/*
+- `src/components/game/projector/DiscoveryBanner.tsx` — The 3-second full-width "SABOTAGE DISCOVERED in <district>" moment on the projector, with the reporter's codename, `.glitch` jitter and purple voxel lightning on both edges (behind the plate).
+  - @exports DiscoveryBanner
+  - @usedBy src/routes/mission.tsx
+- `src/components/game/projector/EndedTakeover.tsx` — Projector end screen (phase ended). Defenders win: "ACHRONA HOLDS" with the lightning title art (as its own header image, no text over art) and the lion warrior on the bottom edge. Desync wins: "THE DESYNC WINS" in dark with purple voxel lightning. Unmasks the Desync and lists the top defenders (leaderboard minus the Desync).
+  - @exports EndedTakeover
+  - @usedBy src/routes/mission.tsx
+- `src/components/game/projector/GameStrip.tsx` — Projector HUD for a running round (phase playing): big countdown, crew strip (ejected struck through) and the counters hidden threats / discovered / fixed. Never shows roles.
+  - @exports GameStrip
+  - @usedBy src/routes/mission.tsx
+- `src/components/game/projector/LobbyTakeover.tsx` — Projector lobby (phase lobby): "Desync Protocol" title moment, the prominent join QR, the crew listed as suspects and "Waiting for the commander". Replaces the mission grid.
+  - @exports LobbyTakeover
+  - @usedBy src/routes/mission.tsx
+- `src/components/game/projector/MeetingTakeover.tsx` — Projector emergency meeting (phase meeting): full-screen takeover "EMERGENCY MEETING called by X", the crew as large cards with live vote bars (meeting.tally), a Skip bar, countdown and votes cast. When meeting.result arrives the voted-out card flips to "X WAS THE DESYNC" (purple) or "X was not the Desync".
+  - @exports MeetingTakeover
+  - @usedBy src/routes/mission.tsx
+- `src/components/game/projector/useAnnouncer.ts` — Mission Control's voice: browser speechSynthesis (English voice, slightly slow) announces the key game moments: round started, sabotage discovered, meeting called, ejection result, critical magic (once per drop below 40) and the winner. Mute choice persists in localStorage. Browsers need a user gesture first, so `needsEnable` drives a small "Enable voice" button (any click/key also enables it). The first state seen is the baseline: loading the page mid-game never replays old moments.
+  - @exports useAnnouncer
+  - @usedBy src/routes/mission.tsx
+- `src/components/game/projector/useGameLive.ts` — Live game state for the projector and the admin lobby panel: starts from `initial`, applies `game.state` events, re-syncs via getGameState every few seconds. Also tracks the latest `game.discovered` moment (auto-clears after 3.2s) and a ticking `now` for countdowns.
+  - @exports useGameLive, useNow, formatClock, districtName
+  - @usedBy src/routes/mission.tsx, src/components/game/admin/GameLobbyPanel.tsx
 - `src/components/glitches/CommanderPanel.tsx` — Commander-only controls on the glitch detail: advance status, status dropdown, assign defender (with the suggested defender = fewest open assignments highlighted).
   - @exports CommanderPanel
   - @usedBy src/routes/glitches.$glitchId.tsx
@@ -121,6 +166,18 @@
 - `src/components/mission/useOpsLive.ts` — Hook that keeps an `OpsSnapshot` live: applies sensor/magic/echo/glitch/lockdown events as they arrive and re-syncs from the server every few seconds (self-heals after resets or drops). Also `useMagicLevel` (just the overall level) and `useDistrictMagic` (latest value per district), used by the self-subscribing MagicGauge and AchronaMap.
   - @exports useOpsLive, useMagicLevel, useDistrictMagic
   - @usedBy src/routes/mission.tsx, src/routes/admin.tsx, src/components/mission/MagicGauge.tsx, src/components/map/AchronaMap.tsx
+- `src/components/radio/LevelMeter.tsx` — Segmented VU meter for the radio desk: green/amber/red LED bar with a peak marker, plus "too loud" and "no signal" warnings.
+  - @exports LevelMeter
+  - @usedBy src/routes/radio.tsx
+- `src/components/radio/TransmissionLog.tsx` — Log of transmissions sent from the radio desk: heard text, trigger, district and outcome. The newest entry uses the full OutcomeCard, older ones a compact line.
+  - @exports TransmissionLog
+  - @usedBy src/routes/radio.tsx
+- `src/components/radio/parse.ts` — Pure helpers for the radio desk: detect the end-of-transmission word ("over", "over and out"), strip it, count words (squelch filter) and guess the district from the spoken text. No imports from React or the browser so it can be unit-checked in Node.
+  - @exports stripOver, wordCount, detectDistrict, MIN_WORDS
+  - @usedBy src/lib/useRadio.ts
+- `src/components/radio/useLevelMeter.ts` — Live input level meter for the radio desk: getUserMedia + AnalyserNode, sampled per animation frame. Reports a smoothed level and a peak (0..1), `clipping` (peaks near 1.0 for more than 10% of the last ~2s of frames) and `silentFor` (seconds without signal). Also lists audio input devices. Note: Chrome speech recognition always uses the system default mic, whatever device is metered here.
+  - @exports useLevelMeter
+  - @usedBy src/routes/radio.tsx
 - `src/components/ui/Badge.tsx` — Badge primitive: squared status tag (tight radius, uppercase, tracked), tinted by tone.
   - @exports Badge
 - `src/components/ui/Button.tsx` — Button primitive in the HTF look: chunky plates, uppercase Saira, a darker bottom edge instead of a glow. Variants: primary (blue plate), secondary (outlined), ghost, danger (orange-red plate).
@@ -148,7 +205,7 @@
   - @exports guardians, sessions, glitches, echoes, sensorReadings (drizzle tables)
   - @usedBy src/db/index.ts, src/db/seed.ts, src/server/*
   - @note Apply changes with `npm run db:push`. Timestamps are ISO 8601 text (UTC), so lexical order is chronological order and they serialize as-is.
-- `src/db/seed.ts` — `npm run db:seed` — wipe + refill the DB with demo guardians, glitches, echoes and healthy sensor readings. Safe to re-run. Logins: commander "Nova" / password "achrona", defender "Ember" / "achrona".
+- `src/db/seed.ts` — `npm run db:seed` — wipe + refill the DB with demo guardians, glitches, echoes and healthy sensor readings. Safe to re-run. Also clears game artefacts: hidden sabotage glitches (F33) go with the glitches wipe; the in-memory game state lives in the server process and is reset by gameStop / a server restart. Logins: commander "Nova" / password "achrona", defender "Ember" / "achrona".
 - `src/lib/ai.functions.ts` — Server functions for the AI layer: status, runbook generation (commander, saved to the glitch), Oracle chat (any guardian) and AI assignee suggestion (commander, F22). All fall back to offline heuristics when Claude is unavailable.
   - @exports getAiStatus, generateRunbookFn, askOracleFn, suggestAssigneeFn, AiStatus, AssigneeSuggestionResult
   - @usedBy src/components/ai/*, src/routes/oracle.tsx
@@ -184,10 +241,17 @@
 - `src/lib/theme.ts` — Client theme helpers: dark/light preference in localStorage and the <html> data attributes. `THEME_INIT_SCRIPT` is inlined in the root shell to avoid a flash of the wrong theme.
   - @exports Theme, THEME_KEY, THEME_INIT_SCRIPT, readTheme, writeTheme, applyTheme, applyLockdown
   - @usedBy src/components/layout/AppProviders.tsx, src/routes/__root.tsx
+- `src/lib/useGame.ts` — Client hook for the "Desync Protocol" game (F33): public game state plus the caller's private view, kept fresh through live events. Loads on mount; `game.state` events replace `state` and trigger a refetch of the private view; `resync` / `game.discovered` refetch both. Server-fn failures (signed out, engine not ready) leave the last known value, so the idle UI never breaks.
+  - @exports useGame, UseGame
+  - @usedBy src/routes/report.tsx, src/components/game/**
+  - @example const { state, view, refresh } = useGame()  // state.phase, view?.role, await refresh()
 - `src/lib/useLiveEvents.ts` — Client hook: subscribe to live events from the server. Transport: Server-Sent Events (/api/events) first. If the stream doesn't deliver its `hello` event within 4s, or goes silent for 25s (no `ping`), it falls back to long-polling (/api/events/poll), which works through proxies that buffer SSE (e.g. Cloudflare quick tunnels). Events carry a sequence number, so switching transports never loses or repeats events; a gap triggers a `resync` event. ONE connection per browser, not per tab: the tab holding the `gg-live-leader` Web Lock runs the transport and relays events + status to other tabs over BroadcastChannel (keeps us under the 6-connections-per-host limit). Falls back to one transport per tab without Web Locks.
   - @exports useLiveEvents(handler), useConnectionStatus(), LiveEvent (re-exported type)
   - @usedBy any component that must update in real time
   - @example useLiveEvents((e) => { if (e.type === 'glitch.created') router.invalidate() })
+- `src/lib/useRadio.ts` — Radio desk engine (F31). Continuous Web Speech recognition that auto-restarts while "on air", with backoff on errors. A transmission ends when the final text ends with "over" / "over and out" (if `autoOver`), after `silenceSec` seconds without new speech, or on manual `sendNow()`. Each transmission with 3+ words becomes an echo via createEchoField({ source: 'radio' }); the district is guessed from the text. Optionally replies over the air with speechSynthesis.
+  - @exports useRadio, RADIO_LANGS, RadioStatus, RadioEntry
+  - @usedBy src/routes/radio.tsx
 - `src/lib/useShortcuts.ts` — Keyboard shortcut hook. Ignores keys while typing in inputs/textareas/selects or with modifiers. Supports single keys ('j', '?') and two-key sequences ('g m').
   - @exports useShortcuts, SHORTCUT_HELP
   - @usedBy src/routes/index.tsx, src/routes/glitches.$glitchId.tsx
@@ -196,7 +260,7 @@
   - @usedBy src/components/field/EchoComposer.tsx
 - `src/router.tsx` — TanStack Router factory (getRouter) used by TanStack Start.
 - `src/routes/__root.tsx` — Root route: HTML shell (theme init script, no-flash) + app layout. beforeLoad fetches the current guardian (`getMe`) and exposes it as route context `{ me }` (read with `useMe()` from #/lib/auth.functions.ts or `useRouteContext({ from: '__root__' })`). Redirects logged-out users to /login?next=..., and logged-in users away from /login. Public paths: /login, /join, /api/*. Public pages render without the sidebar/tab bar.
-- `src/routes/admin.tsx` — Route /admin — Command deck (commander only; defenders see a "forbidden" state). PageHeader + HUD panels: simulator start/stop and Desync "war plan" cards (banner accent, danger plate Launch buttons), reset demo (two-step confirm), lockdown control with a reason, live magic gauge + sensor bars, and the guardian table with role change.
+- `src/routes/admin.tsx` — Route /admin — Command deck (commander only; defenders see a "forbidden" state). PageHeader + HUD panels: simulator start/stop and Desync "war plan" cards (banner accent, danger plate Launch buttons), reset demo (two-step confirm), lockdown control with a reason, live magic gauge + sensor bars, the "Desync Protocol" game lobby panel (GameLobbyPanel), and the guardian table with role change.
   - @usedBy router
 - `src/routes/api/events.poll.ts` — GET /api/events/poll?since=<seq> — long-poll fallback for the live stream, for networks where SSE is buffered (e.g. Cloudflare quick tunnels). Returns `{ latest, events, gap }` immediately if anything happened after `since`; otherwise waits up to 20s for the next event (then answers empty). `since=-1` just returns the current `latest` (initial sync).
   - @usedBy src/lib/useLiveEvents.ts (fallback mode)
@@ -212,12 +276,13 @@
 - `src/routes/leaderboard.tsx` — Route /leaderboard: top-3 podium on hanging banners, ranked list with badges and tooltips, live refresh on echo.created / glitch.updated (debounced), current user highlighted.
   - @usedBy router
 - `src/routes/login.tsx` — Route /login: codename + password form; wrong credentials show an inline error. Optional `?next=` path to return to after login. Links to /join (quick-join).
-- `src/routes/mission.tsx` — Route /mission — full-screen mission control for the projector (fixed, full-height grid, no dead zones): left = huge magic gauge + stats + sensor grid, centre = Achrona map with the live echo feed below it, right = QR "Scan to join the defense" (large while calm, compact under attack) + top glitches. Attack/lockdown: purple voxel lightning creeps in from both screen edges and a big alert plate sits above the map (never over it). After an attack a short "Achrona holds" plate appears when magic recovers. Eye-orb cursor on this page only. Press `f` for fullscreen; `?host=https://venue.example` overrides the QR base URL.
+- `src/routes/mission.tsx` — Route /mission — full-screen mission control for the projector (fixed, full-height grid, no dead zones): left = huge magic gauge + stats + sensor grid, centre = Achrona map with the live echo feed below it, right = QR "Scan to join the defense" (large while calm, compact under attack) + top glitches. Attack/lockdown: purple voxel lightning creeps in from both screen edges and a big alert plate sits above the map (never over it). After an attack a short "Achrona holds" plate appears when magic recovers. Game layer (F33, phase !== idle): lobby / meeting / ended takeovers replace the grid, a round HUD strip sits above it while playing, a 3s "sabotage discovered" banner overlays it, and Mission Control speaks (mute + "Enable voice" in the header). Eye-orb cursor on this page only. Press `f` for fullscreen; `?host=https://venue.example` overrides the QR base URL.
   - @usedBy router
 - `src/routes/oracle.tsx` — Route /oracle: scrying terminal to chat with the Oracle of Achrona (AI grounded in live glitch data). PageHeader with the AI status tag; the witch lurks beside the chat on wide screens.
   - @usedBy router
-- `src/routes/radio.tsx` — Route /radio — walkie-talkie radio desk (F31). PLACEHOLDER: owned and replaced by G4 (see PRD.md).
-- `src/routes/report.tsx` — Route /report: mobile-first field report (the audience's phone screen). Codename + big points readout, EchoComposer hero (text/voice/photo, offline queue), critical-alert opt-in and a live feed of the latest glitches. Refreshes on live events.
+- `src/routes/radio.tsx` — Route /radio: walkie-talkie radio desk (F31). A walkie's audio out is wired into this laptop's mic input; the page listens continuously (Web Speech, Chrome/Edge), shows a live level meter and transcript, and sends each transmission (ended by "over" or a pause) as a radio echo from the logged-in guardian. Optional spoken replies for a second walkie on VOX.
+  - @usedBy router
+- `src/routes/report.tsx` — Route /report: mobile-first field report (the audience's phone screen). Codename + big points readout, EchoComposer hero (text/voice/photo, offline queue), critical-alert opt-in and a live feed of the latest glitches. Refreshes on live events. During a "Desync Protocol" game (F33) it adds the lobby card, role reveal + chip, round banner, fix tasks, emergency meeting, vote screen, end screen and (Desync only) the hidden sabotage console behind a 1s long-press on the points tile. Idle = unchanged.
   - @usedBy router (QR/quick-join landing page)
 - `src/server/ai/claude-cli.ts` — Claude Code CLI provider (AI_PROVIDER=cli, the default): runs `claude -p --model haiku` as a subprocess on the presenter's logged-in subscription, so no API key is needed. SERVER-ONLY. Each call: no tools, no settings/CLAUDE.md, no MCP servers, no session files, cwd = OS temp dir. User text goes over stdin (never argv). Structured output via --json-schema (`structured_output`). At most AI_CLI_CONCURRENCY (default 3) calls run at once; the rest queue. Env: CLAUDE_BIN (default `claude`), AI_MODEL (default `haiku`).
   - @exports triageClaude, runbookClaude, oracleClaude, assigneeClaude, cliAvailable
@@ -227,7 +292,7 @@
   - @usedBy src/server/ai/index.ts (dynamic import)
 - `src/server/ai/heuristics.ts` — Offline fallback for the AI layer: keyword rules, no network. Used when ANTHROPIC_API_KEY is missing, the call fails or times out.
   - @exports triageHeuristic, runbookHeuristic, oracleHeuristic, assigneeHeuristic
-- `src/server/ai/index.ts` — Public entry point of the AI layer. SERVER-ONLY. Provider via AI_PROVIDER: `cli` (default: `claude -p --model haiku`, claude-cli.ts), `api` (Anthropic SDK + ANTHROPIC_API_KEY, claude.ts) or `off`. AI_DISABLED=1 also forces `off`. Every function falls back to heuristics.ts on unavailable provider / error / timeout, so the demo never breaks.
+- `src/server/ai/index.ts` — Public entry point of the AI layer. SERVER-ONLY. Provider via AI_PROVIDER: `cli` (default: `claude -p --model haiku`, claude-cli.ts), `api` (Anthropic SDK + ANTHROPIC_API_KEY, claude.ts) or `off`. AI_DISABLED=1 also forces `off`. Every function falls back to heuristics.ts on unavailable provider / error / timeout, so the demo never breaks. triageEcho first runs the heuristic as a quota prefilter: clear junk is rejected without calling the CLI.
   - @exports triageEcho, generateRunbook, askOracle, suggestAssignee, aiEnabled, aiModel, aiProvider
   - @usedBy src/server/echo-pipeline.ts, src/lib/ai.functions.ts
 - `src/server/ai/prompts.ts` — Shared prompts, output schemas and post-processing for both Claude providers (claude.ts = Anthropic SDK, claude-cli.ts = `claude -p` CLI). SERVER-ONLY.
@@ -240,15 +305,15 @@
 - `src/server/bus.ts` — In-process pub/sub that feeds the live transports. SERVER-ONLY. Call `publish()` after every DB mutation that clients should see live. Every event gets a sequence number and is kept in a ring buffer, so the long-poll fallback (/api/events/poll, used when a proxy such as a Cloudflare quick tunnel buffers SSE) can resume.
   - @exports publish, subscribe, eventsSince, latestSeq, LiveEvent (type), SequencedEvent (type)
   - @usedBy src/server/*, src/lib/*.functions.ts handlers, src/routes/api/events.ts, src/routes/api/events.poll.ts
-- `src/server/echo-pipeline.ts` — The heart of the app: turn a raw echo into glitch state. SERVER-ONLY. Flow: AI triage -> moderation (reject) -> attach to matching glitch OR open a new LEAKED glitch -> auto-close when the echo says "resolved" -> reopen FIXED glitches on a new similar echo -> award points -> publish live events.
+- `src/server/echo-pipeline.ts` — The heart of the app: turn a raw echo into glitch state. SERVER-ONLY. Flow: AI triage -> moderation (reject) -> attach to matching glitch OR open a new LEAKED glitch -> auto-close when the echo says "resolved" -> reopen FIXED glitches on a new similar echo -> award points -> publish live events. Game mode (F33): while a round runs, this round's hidden sabotage glitches are triage candidates; a match reveals them (`onEchoMatchedHidden`), and reports about a healthy, unsabotaged district are flagged `unconfirmed`.
   - @exports ingestEcho, addScore, IngestInput, IngestResult
   - @usedBy src/lib/echoes.functions.ts (createEcho), src/server/simulator.ts
-- `src/server/game.ts` — "Desync Protocol" game engine (F33). SERVER-ONLY. In-memory state on globalThis (single process). STATUS: STUB with the final signatures. Implemented by work package G1 (see PRD.md F33 + TASKS.md).
-  - @exports getPublicState, getPlayerView, listCrewCandidates, setup, start, stop, sabotage, listFixable, completeFix, callMeeting, castVote, isSabotaged, onSimulatorTick, onEchoMatchedHidden
+- `src/server/game.ts` — "Desync Protocol" game engine (F33). SERVER-ONLY. In-memory state on globalThis (single process, survives Vite HMR). Every state change publishes `game.state`; the public state never names the Desync before `phase === 'ended'`. A 1s engine timer closes meetings and ends the round; the simulator tick (3s) applies the sabotage drain (via `isSabotaged`) and calls `onSimulatorTick` for win checks. Sabotage glitches are real glitch rows with `hidden = true, sabotage = true`; they are created silently (no glitch events) and revealed by `echo-pipeline.ts` when a report matches them.
+  - @exports getPublicState, getPlayerView, listCrewCandidates, setup, start, stop, sabotage, listFixable, completeFix, callMeeting, castVote, isSabotaged, isGameActive, activeHiddenSabotageIds, onSimulatorTick, onEchoMatchedHidden
   - @usedBy src/lib/game.functions.ts, src/server/simulator.ts, src/server/echo-pipeline.ts
 - `src/server/repo.ts` — Read helpers shared by server functions: DB rows -> domain types, glitch/echo queries and the overall magic level. SERVER-ONLY, all async.
   - @exports listGlitches (visible only), getGlitch (incl. hidden), listEchoes, computeMagicLevel, newId
   - @usedBy src/server/echo-pipeline.ts, src/server/simulator.ts, src/lib/*.functions.ts
-- `src/server/simulator.ts` — The Achrona simulator. SERVER-ONLY. State lives on `globalThis` so it survives Vite HMR. Every 3s it writes one `sensor_readings` row per district (calm: 92-100 with noise), publishes `sensor.reading` + `magic.level`, runs the F21 anomaly detector (a district falling >25 points in 30s opens a predictive glitch through `ingestEcho`, reporter = system guardian "Sentinel") and handles lockdown (auto below 40, lifted above 60; commanders can also toggle it by hand). Scenarios ("Clocktower Cascade", "Total Desync") script ~90s of staged district drains, Sentinel echoes and toasts. When a scenario ends the districts heal slowly. `resetDemo()` restores the seed data (glitches, echoes, scores, readings) and clears lockdown.
-  - @exports startSimulator, stopSimulator, getSimulatorState, triggerDesync, resetDemo, setLockdown, getLockdown, getSentinelId, SCENARIOS, SCENARIO_IDS, ScenarioId, SimulatorState
+- `src/server/simulator.ts` — The Achrona simulator. SERVER-ONLY. State lives on `globalThis` so it survives Vite HMR. Every 3s it writes one `sensor_readings` row per district (calm: 92-100 with noise), publishes `sensor.reading` + `magic.level`, runs the F21 anomaly detector (a district falling >25 points in 30s opens a predictive glitch through `ingestEcho`, reporter = system guardian "Sentinel") and handles lockdown (auto below 40, lifted above 60; commanders can also toggle it by hand). Scenarios ("Clocktower Cascade", "Total Desync") script ~90s of staged district drains, Sentinel echoes and toasts. When a scenario ends the districts heal slowly. Game mode (F33): a sabotaged district (`isSabotaged`) loses `GAME_RULES.sabotageDrainPerTick` every tick and never heals until fixed; `onSimulatorTick()` runs at the end of each tick; `prepareSimulatorForRound()` drops any scenario and resets the sensors to calm. `resetDemo()` restores the seed data (glitches, echoes, scores, readings) and clears lockdown.
+  - @exports startSimulator, stopSimulator, prepareSimulatorForRound, getSimulatorState, triggerDesync, resetDemo, setLockdown, getLockdown, getSentinelId, SCENARIOS, SCENARIO_IDS, ScenarioId, SimulatorState
   - @usedBy src/lib/ops.functions.ts
