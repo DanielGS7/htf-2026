@@ -1,6 +1,8 @@
 /**
  * @file Desktop (md+) left icon rail: logo, nav to every route (commander items hidden for defenders),
  * theme toggle and user menu. Mobile uses TabBar instead.
+ * z-40: the sticky rail is its own stacking context, so it must sit above page content for the
+ * hover labels to show over it (modals are z-50, toasts z-[70]).
  * @usedBy src/routes/__root.tsx
  */
 import { Link } from '@tanstack/react-router'
@@ -18,7 +20,7 @@ export function Sidebar() {
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <aside className="no-print sticky top-0 hidden h-screen w-20 shrink-0 flex-col items-center border-r border-line bg-sidebar py-5 md:flex">
+    <aside className="no-print sticky top-0 z-40 hidden h-screen w-20 shrink-0 flex-col items-center border-r border-line bg-sidebar py-5 md:flex">
       <Link to="/" aria-label="Achrona Mission Control" title="Achrona Mission Control" className="mb-6">
         <div className="relative flex size-12 items-center justify-center rounded-2xl bg-linear-to-br from-accent-from to-accent-to text-on-accent shadow-[0_0_28px_-4px_var(--glow)]">
           <Hexagon className="size-7" strokeWidth={2} />
@@ -31,7 +33,6 @@ export function Sidebar() {
             key={to}
             to={to}
             aria-label={label}
-            title={label}
             className={itemClass}
             activeOptions={{ exact: to === '/' }}
             activeProps={{ className: 'bg-white/10 !text-white shadow-[inset_3px_0_0_var(--accent),0_0_20px_-6px_var(--glow)]' }}
