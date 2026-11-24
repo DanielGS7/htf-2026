@@ -9,6 +9,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { ShieldAlert, WifiOff } from 'lucide-react'
 import { ToastProvider } from '#/components/ui/Toast.tsx'
 import { useConnectionStatus, useLiveEvents } from '#/lib/useLiveEvents.ts'
+import { getLockdownState } from '#/lib/ops.functions.ts'
 import { applyLockdown, applyTheme, readTheme, writeTheme, type Theme } from '#/lib/theme.ts'
 
 type ThemeCtx = { theme: Theme; toggleTheme: () => void; lockdown: boolean }
@@ -24,6 +25,12 @@ export function AppProviders({ children, signedIn }: { children: ReactNode; sign
 
   // Read the stored preference after hydration (the inline script already set the attribute).
   useEffect(() => setTheme(readTheme()), [])
+  // Seed lockdown from the server so late joiners see an ongoing lockdown (live events only cover changes).
+  useEffect(() => {
+    getLockdownState()
+      .then((s) => setManual(s))
+      .catch(() => {})
+  }, [])
 
   const lockdown = manual.active || lowMagic
   useEffect(() => applyLockdown(lockdown), [lockdown])
