@@ -1,11 +1,13 @@
 /**
- * @file Route /glitches/$glitchId — Glitch detail: status stepper, echo timeline, district mini-map,
- * commander controls, runbook slot. Live-refreshes on glitch/echo events. j/k are not used here; `Esc`/`b` go back.
+ * @file Route /glitches/$glitchId — Glitch detail (PageHeader, status stepper, echo timeline, district mini-map,
+ * commander panel with AI assignee suggestion, runbook slot). Live-refreshes on glitch/echo events. j/k are not used here; `Esc`/`b` go back.
  * @usedBy router
  */
 import { useState } from 'react'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Plus } from 'lucide-react'
+import { Button } from '#/components/ui/Button.tsx'
+import { PageHeader } from '#/components/ui/PageHeader.tsx'
 import { RunbookPanel } from '#/components/ai/RunbookPanel.tsx'
 import { CommanderPanel } from '#/components/glitches/CommanderPanel.tsx'
 import { DistrictMiniMap } from '#/components/glitches/DistrictMiniMap.tsx'
@@ -43,9 +45,9 @@ function GlitchDetailPage() {
 
   if (!detail) {
     return (
-      <div className="space-y-3">
-        <h1 className="text-2xl font-semibold text-fg">Glitch not found</h1>
-        <Link to="/" className="text-accent underline">
+      <div>
+        <PageHeader label="Glitch" title="Not found" subtitle="This glitch does not exist or was removed." />
+        <Link to="/" className="text-accent-ink underline">
           Back to overview
         </Link>
       </div>
@@ -54,50 +56,55 @@ function GlitchDetailPage() {
   const { glitch, echoes, assignee, me } = detail
   const isCommander = me?.role === 'commander'
   const district = DISTRICTS.find((d) => d.id === glitch.districtId)
+  const typeMeta = GLITCH_TYPE_META[glitch.type]
 
   return (
     <div className="flex flex-col gap-5">
-      <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg">
+      <Link to="/" className="-mb-2 inline-flex w-fit items-center gap-1 text-sm text-muted hover:text-fg">
         <ArrowLeft className="size-4" /> Overview
       </Link>
-      <header className="space-y-2">
-        <div className="flex flex-wrap items-center gap-2">
+      <PageHeader
+        label={`${glitch.glitchId} · ${typeMeta.label}`}
+        title={typeMeta.label}
+        subtitle={<span className="text-lg text-fg">{glitch.description}</span>}
+        actions={
+          <Button variant="secondary" onClick={() => setReportOpen(true)} title="Report an echo (n)">
+            <Plus className="size-4" /> Report echo
+          </Button>
+        }
+      />
+
+      <section className="glass rounded-lg p-4 sm:p-5">
+        <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-2">
           <GlitchTypeIcon type={glitch.type} className="size-6" />
-          <span className="font-mono text-sm text-muted">{glitch.glitchId}</span>
+          <span className="font-mono text-sm text-fg">{glitch.glitchId}</span>
           <StatusBadge status={glitch.status} />
           <SeverityBadge severity={glitch.severity} />
-          <span className="text-sm text-muted">{GLITCH_TYPE_META[glitch.type].label}</span>
+          <span className="text-muted">
+            {district?.name ?? 'Unknown district'} · opened {timeAgo(glitch.timestamp)} ago · {glitch.echoCount ?? 0} {glitch.echoCount === 1 ? 'echo' : 'echoes'} ·{' '}
+            {assignee ? (
+              <>
+                assigned to <span className="font-semibold text-fg">{assignee.guardianId === me?.guardianId ? 'you' : assignee.codename}</span>
+              </>
+            ) : (
+              'unassigned'
+            )}
+          </span>
         </div>
-        <h1 className="text-2xl font-semibold text-fg">{glitch.description}</h1>
-        <p className="text-sm text-muted">
-          {district?.name ?? 'Unknown district'} · opened {timeAgo(glitch.timestamp)} ago · {glitch.echoCount ?? 0} echoes ·{' '}
-          {assignee ? (
-            <>
-              assigned to <span className="font-semibold text-fg">{assignee.guardianId === me?.guardianId ? 'you' : assignee.codename}</span>
-            </>
-          ) : (
-            'unassigned'
-          )}
-        </p>
-      </header>
+        <StatusStepper status={glitch.status} />
+      </section>
 
-      <StatusStepper status={glitch.status} />
-
-      <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
-        <div className="space-y-5">
-          {isCommander && <CommanderPanel glitch={glitch} />}
-          <section className="rounded-2xl border border-line p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Echo timeline</h2>
-              <button type="button" onClick={() => setReportOpen(true)} title="Report an echo (n)" className="rounded-lg bg-subtle px-2.5 py-1 text-xs text-fg hover:bg-subtle-hover">
-                Report echo
-              </button>
-            </div>
-            <EchoTimeline echoes={echoes} isCommander={isCommander} />
-          </section>
-        </div>
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <section className="glass h-fit rounded-lg p-4 sm:p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-display text-sm font-semibold tracking-wide uppercase text-fg">Echo timeline</h2>
+            <span className="label">{echoes.length} echoes</span>
+          </div>
+          <EchoTimeline echoes={echoes} isCommander={isCommander} />
+        </section>
         <aside className="space-y-5">
-          <DistrictMiniMap districtId={glitch.districtId} color={GLITCH_TYPE_META[glitch.type].color} />
+          {isCommander && <CommanderPanel glitch={glitch} />}
+          <DistrictMiniMap districtId={glitch.districtId} color={typeMeta.color} />
           <RunbookPanel glitch={glitch} canGenerate={me?.role === 'commander'} />
         </aside>
       </div>

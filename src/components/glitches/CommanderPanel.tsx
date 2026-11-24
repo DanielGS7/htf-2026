@@ -6,7 +6,9 @@
  */
 import { useEffect, useState } from 'react'
 import { useRouter } from '@tanstack/react-router'
-import { ChevronsRight, Sparkles } from 'lucide-react'
+import { ChevronsRight } from 'lucide-react'
+import { AssigneeSuggestion } from '#/components/ai/AssigneeSuggestion.tsx'
+import { Button } from '#/components/ui/Button.tsx'
 import { assignGlitch, listDefenders, setGlitchStatus, type DefenderOption } from '#/lib/glitches.functions.ts'
 import { GLITCH_STATUSES, nextStatus, type Glitch, type GlitchStatus } from '#/lib/glitch.ts'
 
@@ -35,29 +37,27 @@ export function CommanderPanel({ glitch }: { glitch: Glitch }) {
   }
   const setStatus = (status: GlitchStatus) => run(() => setGlitchStatus({ data: { glitchId: glitch.glitchId, status } }))
   const assign = (assigneeId: string | null) => run(() => assignGlitch({ data: { glitchId: glitch.glitchId, assigneeId } }))
-  const suggested = defs?.defenders.find((d) => d.guardianId === defs.suggestedId)
-  const field = 'rounded-lg border border-line bg-card px-2 py-1.5 text-sm text-fg'
+  const field = 'w-full rounded-md border border-line bg-app px-2.5 py-2 text-sm text-fg outline-none focus:border-accent disabled:opacity-60'
 
   return (
-    <section className="space-y-3 rounded-2xl border border-line p-4">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Commander controls</h2>
-      <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          disabled={busy || !next}
-          onClick={() => next && void setStatus(next)}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-white disabled:opacity-40"
-        >
+    <section className="glass hud space-y-4 rounded-lg p-4">
+      <h2 className="font-display text-sm font-semibold tracking-wide uppercase text-fg">Commander controls</h2>
+
+      <div className="space-y-2">
+        <p className="label">Status</p>
+        <Button className="w-full" disabled={busy || !next} onClick={() => next && void setStatus(next)}>
           <ChevronsRight className="size-4" />
           {next ? `Advance to ${next}` : 'Fixed'}
-        </button>
+        </Button>
         <select aria-label="Set status" disabled={busy} value={glitch.status} onChange={(e) => void setStatus(e.target.value as GlitchStatus)} className={field}>
           {GLITCH_STATUSES.map((s) => (
             <option key={s}>{s}</option>
           ))}
         </select>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
+
+      <div className="space-y-2 border-t border-line pt-3">
+        <p className="label">Defender</p>
         <select aria-label="Assign defender" disabled={busy || !defs} value={glitch.assigneeId ?? ''} onChange={(e) => void assign(e.target.value || null)} className={field}>
           <option value="">Unassigned</option>
           {defs?.defenders.map((d) => (
@@ -66,19 +66,9 @@ export function CommanderPanel({ glitch }: { glitch: Glitch }) {
             </option>
           ))}
         </select>
-        {suggested && glitch.assigneeId !== suggested.guardianId && (
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => void assign(suggested.guardianId)}
-            title="Fewest open assignments, then most fixes of this type"
-            className="inline-flex items-center gap-1 rounded-lg border border-accent/50 px-2.5 py-1.5 text-sm text-accent hover:bg-accent/10"
-          >
-            <Sparkles className="size-3.5" /> Assign {suggested.codename}
-          </button>
-        )}
+        <AssigneeSuggestion glitchId={glitch.glitchId} onPick={(id) => void assign(id)} />
       </div>
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-danger">{error}</p>}
     </section>
   )
 }

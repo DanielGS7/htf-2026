@@ -1,11 +1,14 @@
 /**
- * @file Route / — Overview: live glitch list with search/filter/sort in URL params, "assigned to me",
+ * @file Route / — Overview (PageHeader, ops strip, filter toolbar, glitch table): live glitch list with search/filter/sort in URL params, "assigned to me",
  * keyboard navigation (j/k/Enter, / search, n new echo, ? help), compact ops widgets.
  * @usedBy router
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus, Search, X } from 'lucide-react'
+import { Button } from '#/components/ui/Button.tsx'
+import { Kbd } from '#/components/ui/Kbd.tsx'
+import { PageHeader } from '#/components/ui/PageHeader.tsx'
 import { GlitchList } from '#/components/glitches/GlitchList.tsx'
 import { OverviewOps } from '#/components/glitches/OverviewOps.tsx'
 import { ReportEchoDialog } from '#/components/glitches/ReportEchoDialog.tsx'
@@ -110,32 +113,31 @@ function OverviewPage() {
 
   const open = glitches.filter((g) => g.status !== 'FIXED').length
   const filtered = Boolean(search.q || search.status || search.type || search.district || search.severity || search.mine)
-  const sel = 'rounded-lg border border-line bg-card px-2 py-1.5 text-sm text-fg'
+  const sel =
+    'h-9 rounded-md border border-line bg-subtle px-2 text-sm text-fg outline-none hover:border-accent/60 focus:border-accent'
 
   return (
     <div className="flex flex-col gap-5">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-3xl font-semibold text-fg">Overview</h1>
-          <p className="text-sm text-muted">
-            {open} open of {glitches.length} glitches. Press <kbd className="rounded border border-line px-1 text-xs">?</kbd> for shortcuts.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => setReportOpen(true)}
-          title="Report an echo (n)"
-          className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white"
-        >
-          <Plus className="size-4" /> Report echo
-        </button>
-      </header>
+      <PageHeader
+        label="Mission log"
+        title="Overview"
+        subtitle={
+          <>
+            {open} open of {glitches.length} glitches. Press <Kbd>?</Kbd> for shortcuts.
+          </>
+        }
+        actions={
+          <Button size="lg" onClick={() => setReportOpen(true)} title="Report an echo (n)">
+            <Plus className="size-4" /> Report echo
+          </Button>
+        }
+      />
 
       <OverviewOps glitches={glitches} onSelect={(id) => void navigate({ to: '/glitches/$glitchId', params: { glitchId: id } })} />
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="glass flex flex-wrap items-center gap-2 rounded-lg p-2">
         <label className="relative">
-          <Search className="pointer-events-none absolute left-2.5 top-2 size-4 text-muted" />
+          <Search className="pointer-events-none absolute top-2.5 left-2.5 size-4 text-muted" />
           <input
             ref={searchRef}
             value={qDraft}
@@ -143,7 +145,7 @@ function OverviewPage() {
             onKeyDown={(e) => e.key === 'Escape' && e.currentTarget.blur()}
             placeholder="Search glitches ( / )"
             aria-label="Search glitches"
-            className="w-56 rounded-lg border border-line bg-card py-1.5 pl-8 pr-2 text-sm text-fg outline-none focus:border-accent"
+            className="h-9 w-56 rounded-md border border-line bg-app pr-2 pl-8 text-sm text-fg outline-none focus:border-accent"
           />
         </label>
         <select aria-label="Status" className={sel} value={search.status ?? ''} onChange={(e) => set({ status: pick(e.target.value, GLITCH_STATUSES) })}>
@@ -184,7 +186,7 @@ function OverviewPage() {
             type="button"
             onClick={() => set({ mine: search.mine ? undefined : true })}
             aria-pressed={!!search.mine}
-            className={`rounded-lg border px-3 py-1.5 text-sm ${search.mine ? 'border-accent bg-accent/15 text-accent' : 'border-line text-muted hover:text-fg'}`}
+            className={`h-9 rounded-md border px-3 text-sm font-semibold ${search.mine ? 'border-accent bg-accent/20 text-accent-ink' : 'border-line text-muted hover:text-fg'}`}
           >
             Assigned to me
           </button>
@@ -193,12 +195,12 @@ function OverviewPage() {
           <button
             type="button"
             onClick={() => void navigate({ search: {}, replace: true })}
-            className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
+            className="inline-flex h-9 items-center gap-1 px-2 text-sm text-muted hover:text-fg"
           >
             <X className="size-3.5" /> Clear
           </button>
         )}
-        <span className="ml-auto text-xs text-muted">{rows.length} shown</span>
+        <span className="label ml-auto pr-2">{rows.length} shown</span>
       </div>
 
       <GlitchList glitches={rows} names={names} flash={flash} selectedId={selected} meId={me?.guardianId ?? null} />

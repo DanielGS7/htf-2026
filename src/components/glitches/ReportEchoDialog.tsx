@@ -1,11 +1,13 @@
 /**
- * @file Desktop "Report echo" dialog (key `n`). Submits via createEcho and shows what the AI did with it.
+ * @file Desktop "Report echo" dialog (key `n`). Submits via createEcho and shows what the AI did with it. Built on the shared Modal.
  * @exports ReportEchoDialog
  * @usedBy src/routes/index.tsx
  */
 import { useEffect, useRef, useState } from 'react'
 import { Link, useRouter } from '@tanstack/react-router'
-import { Loader2, Send, X } from 'lucide-react'
+import { Loader2, Send } from 'lucide-react'
+import { Button } from '#/components/ui/Button.tsx'
+import { Modal } from '#/components/ui/Modal.tsx'
 import { createEcho } from '#/lib/echoes.functions.ts'
 import { DISTRICTS, type DistrictId } from '#/lib/glitch.ts'
 
@@ -31,12 +33,7 @@ export function ReportEchoDialog({ open, onClose }: { open: boolean; onClose: ()
     setResult(null)
     setError(null)
     setTimeout(() => area.current?.focus(), 30)
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open, onClose])
-
-  if (!open) return null
+  }, [open])
 
   async function submit() {
     setBusy(true)
@@ -53,92 +50,69 @@ export function ReportEchoDialog({ open, onClose }: { open: boolean; onClose: ()
     }
   }
 
+  const field = 'mt-1 w-full rounded-md border border-line bg-app p-2.5 text-fg outline-none focus:border-accent'
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose} role="presentation">
-      <div
-        role="dialog"
-        aria-label="Report an echo"
-        className="w-full max-w-lg rounded-2xl border border-line bg-card p-5 shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-fg">Report an echo</h2>
-          <button type="button" onClick={onClose} title="Close (Esc)" aria-label="Close" className="text-muted hover:text-fg">
-            <X className="size-5" />
-          </button>
-        </div>
-        {result ? (
-          <div className="space-y-3">
-            <div className={`rounded-xl border p-3 text-sm ${result.outcome === 'rejected' ? 'border-red-500/40 text-red-500' : 'border-emerald-500/40 text-emerald-500'}`}>
-              <div className="font-semibold">{OUTCOME[result.outcome]}</div>
-              {result.outcome === 'rejected' && result.echo.moderationReason && (
-                <div className="mt-1 text-muted">{result.echo.moderationReason}</div>
-              )}
-              {result.glitch && (
-                <Link to="/glitches/$glitchId" params={{ glitchId: result.glitch.glitchId }} onClick={onClose} className="mt-1 block underline">
-                  {result.glitch.glitchId}: {result.glitch.description}
-                </Link>
-              )}
-            </div>
-            <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setResult(null)} className="rounded-lg bg-subtle px-3 py-1.5 text-sm text-fg hover:bg-subtle-hover">
-                Report another
-              </button>
-              <button type="button" onClick={onClose} className="rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-white">
-                Done
-              </button>
-            </div>
+    <Modal open={open} onClose={onClose} title="Report an echo">
+      {result ? (
+        <div className="space-y-4">
+          <div className={`rounded-md border p-3 ${result.outcome === 'rejected' ? 'border-danger/50 bg-danger/10 text-danger' : 'border-success/50 bg-success/10 text-success'}`}>
+            <p className="label !text-current">Oracle verdict</p>
+            <div className="font-display text-lg font-bold">{OUTCOME[result.outcome]}</div>
+            {result.outcome === 'rejected' && result.echo.moderationReason && <div className="mt-1 text-fg">{result.echo.moderationReason}</div>}
+            {result.glitch && (
+              <Link to="/glitches/$glitchId" params={{ glitchId: result.glitch.glitchId }} onClick={onClose} className="mt-1 block text-fg underline">
+                <span className="font-mono">{result.glitch.glitchId}</span>: {result.glitch.description}
+              </Link>
+            )}
           </div>
-        ) : (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              if (text.trim().length >= 3 && !busy) void submit()
-            }}
-            className="space-y-3"
-          >
-            <label className="block text-sm text-muted">
-              What did you see, hear or feel?
-              <textarea
-                ref={area}
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                onKeyDown={(e) => (e.metaKey || e.ctrlKey) && e.key === 'Enter' && text.trim().length >= 3 && void submit()}
-                rows={4}
-                placeholder="The clock tower bells keep ringing the same hour..."
-                className="mt-1 w-full resize-none rounded-xl border border-line bg-app p-3 text-fg outline-none focus:border-accent"
-              />
-            </label>
-            <label className="block text-sm text-muted">
-              District (optional, AI guesses if empty)
-              <select
-                value={district}
-                onChange={(e) => setDistrict(e.target.value as DistrictId | '')}
-                className="mt-1 w-full rounded-xl border border-line bg-app p-2 text-fg"
-              >
-                <option value="">Unknown</option>
-                {DISTRICTS.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {error && <p className="text-sm text-red-500">{error}</p>}
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted">Ctrl+Enter to send</span>
-              <button
-                type="submit"
-                disabled={busy || text.trim().length < 3}
-                className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-              >
-                {busy ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
-                Send echo
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
-    </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setResult(null)}>
+              Report another
+            </Button>
+            <Button onClick={onClose}>Done</Button>
+          </div>
+        </div>
+      ) : (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (text.trim().length >= 3 && !busy) void submit()
+          }}
+          className="space-y-4"
+        >
+          <label className="block">
+            <span className="label">What did you see, hear or feel?</span>
+            <textarea
+              ref={area}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={(e) => (e.metaKey || e.ctrlKey) && e.key === 'Enter' && text.trim().length >= 3 && void submit()}
+              rows={4}
+              placeholder="The clock tower bells keep ringing the same hour..."
+              className={`${field} resize-none`}
+            />
+          </label>
+          <label className="block">
+            <span className="label">District (optional, AI guesses if empty)</span>
+            <select value={district} onChange={(e) => setDistrict(e.target.value as DistrictId | '')} className={field}>
+              <option value="">Unknown</option>
+              {DISTRICTS.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          {error && <p className="text-danger">{error}</p>}
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted">Ctrl+Enter to send</span>
+            <Button type="submit" disabled={busy || text.trim().length < 3}>
+              {busy ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+              Send echo
+            </Button>
+          </div>
+        </form>
+      )}
+    </Modal>
   )
 }

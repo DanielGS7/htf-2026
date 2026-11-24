@@ -1,10 +1,18 @@
 /**
- * @file Horizontal LEAKED -> ASSESSING -> CONTAINING -> FIXED stepper. Commanders can click a step to jump.
+ * @file Horizontal LEAKED -> ASSESSING -> CONTAINING -> FIXED track in the DESIGN.md status colours: reached
+ * stages are filled, the current stage is lit with its colour, later stages are hollow. Commanders can click a step to jump.
  * @exports StatusStepper
  * @usedBy src/routes/glitches.$glitchId.tsx
  */
 import { Check } from 'lucide-react'
 import { GLITCH_STATUSES, type GlitchStatus } from '#/lib/glitch.ts'
+
+const COLOR: Record<GlitchStatus, { text: string; bg: string; border: string; outline: string }> = {
+  LEAKED: { text: 'text-danger', bg: 'bg-danger', border: 'border-danger', outline: 'outline-danger' },
+  ASSESSING: { text: 'text-warning', bg: 'bg-warning', border: 'border-warning', outline: 'outline-warning' },
+  CONTAINING: { text: 'text-accent-ink', bg: 'bg-accent', border: 'border-accent', outline: 'outline-accent' },
+  FIXED: { text: 'text-success', bg: 'bg-success', border: 'border-success', outline: 'outline-success' },
+}
 
 export function StatusStepper({
   status,
@@ -17,26 +25,39 @@ export function StatusStepper({
 }) {
   const current = GLITCH_STATUSES.indexOf(status)
   return (
-    <ol className="flex items-center gap-1" aria-label="Status progress">
+    <ol className="flex items-start" aria-label="Status progress">
       {GLITCH_STATUSES.map((s, i) => {
-        const done = i < current || status === 'FIXED'
+        const reached = i <= current
         const active = i === current
-        const cls = active
-          ? 'border-accent bg-accent text-white'
-          : done
-            ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-500'
-            : 'border-line text-muted'
+        const c = COLOR[s]
+        const canPick = !!onPick && !disabled && !active
         return (
-          <li key={s} className="flex flex-1 items-center gap-1">
+          <li key={s} className="relative flex flex-1 flex-col items-center">
+            {i > 0 && (
+              <span
+                aria-hidden="true"
+                className={`absolute top-[15px] right-1/2 h-0.5 w-full ${i <= current ? COLOR[GLITCH_STATUSES[i - 1]].bg : 'bg-line'}`}
+              />
+            )}
             <button
               type="button"
-              disabled={!onPick || disabled || active}
+              disabled={!canPick}
               onClick={() => onPick?.(s)}
               title={onPick ? `Set status to ${s}` : s}
-              className={`flex w-full items-center justify-center gap-1.5 rounded-lg border px-2 py-1.5 text-xs font-semibold ${cls} ${onPick && !active ? 'hover:brightness-110' : 'cursor-default'}`}
+              className="group relative flex flex-col items-center gap-1.5 disabled:cursor-default"
             >
-              {done && <Check className="size-3.5" />}
-              {s}
+              <span
+                className={`flex size-8 items-center justify-center rounded-sm border-2 ${
+                  active
+                    ? `${c.bg} ${c.border} ${c.outline} text-white outline-2 outline-offset-2`
+                    : reached
+                      ? `${c.border} bg-card ${c.text}`
+                      : 'border-line bg-card text-muted group-enabled:group-hover:border-fg'
+                }`}
+              >
+                {reached && !active ? <Check className="size-4" /> : <span className={`font-mono text-xs font-bold ${active ? 'text-white' : ''}`}>{i + 1}</span>}
+              </span>
+              <span className={`font-mono text-[11px] font-semibold tracking-[0.12em] uppercase ${active ? c.text : reached ? 'text-fg' : 'text-muted'}`}>{s}</span>
             </button>
           </li>
         )
