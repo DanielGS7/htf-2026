@@ -115,7 +115,7 @@ test('leaderboard ranks guardians', async ({ page }) => {
   await login(page, 'Ember')
   await page.goto('/leaderboard')
   await expect(page.getByText('Nova').first()).toBeVisible()
-  await expect(page.getByText('Sentinel')).toHaveCount(0)
+  await expect(page.getByText('Sentinel', { exact: true })).toHaveCount(0)
   await page.screenshot({ path: 'test-results/screens/leaderboard.png', fullPage: true })
 })
 
@@ -178,4 +178,20 @@ test('a Desync attack drains magic live and the scripted echoes land on glitches
 
   await admin.getByRole('button', { name: 'Stop' }).click()
   await ctx.close()
+})
+
+test('no hydration mismatches or invalid HTML nesting on any page', async ({ page }) => {
+  test.setTimeout(90_000)
+  const problems: string[] = []
+  page.on('console', (m) => {
+    if ((m.type() === 'error' || m.type() === 'warning') && /hydrat|cannot be a descendant|cannot contain a nested/i.test(m.text())) {
+      problems.push(`${page.url()}: ${m.text().slice(0, 300)}`)
+    }
+  })
+  await login(page, 'Nova')
+  for (const url of ['/', '/glitches/GL-0142', '/mission', '/admin', '/report', '/leaderboard', '/oracle', '/council']) {
+    await gotoReady(page, url)
+    await page.waitForTimeout(500)
+  }
+  expect(problems).toEqual([])
 })

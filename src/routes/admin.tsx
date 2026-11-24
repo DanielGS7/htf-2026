@@ -1,7 +1,8 @@
 /**
  * @file Route /admin — Command deck (commander only; defenders see a "forbidden" state).
- * Simulator start/stop, Desync scenario buttons, reset demo (two-step confirm), lockdown toggle
- * with a reason, live magic gauge + sensor bars, and a guardian list with role change.
+ * PageHeader + HUD panels: simulator start/stop and Desync "war plan" cards (banner accent, danger plate
+ * Launch buttons), reset demo (two-step confirm), lockdown control with a reason, live magic gauge +
+ * sensor bars, and the guardian table with role change.
  * @usedBy router
  */
 import { useMemo, useState, type ReactNode } from 'react'
@@ -9,6 +10,8 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import { Lock, Monitor, Play, RotateCcw, ShieldAlert, ShieldCheck, Square, Swords, Users } from 'lucide-react'
 import { Badge } from '#/components/ui/Badge.tsx'
 import { Button } from '#/components/ui/Button.tsx'
+import { PageHeader } from '#/components/ui/PageHeader.tsx'
+import { Input } from '#/components/ui/Input.tsx'
 import { MagicGauge } from '#/components/mission/MagicGauge.tsx'
 import { DistrictSparklines } from '#/components/mission/DistrictSparklines.tsx'
 import { SimStatus } from '#/components/mission/SimStatus.tsx'
@@ -37,11 +40,11 @@ export const Route = createFileRoute('/admin')({
   component: AdminPage,
 })
 
-function Section({ title, icon, children, className = '' }: { title: string; icon: ReactNode; children: ReactNode; className?: string }) {
+function Section({ title, icon, children, className = '', hud = false }: { title: string; icon: ReactNode; children: ReactNode; className?: string; hud?: boolean }) {
   return (
-    <section className={`glass rounded-2xl p-5 ${className}`}>
-      <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold tracking-[0.18em] text-muted uppercase">
-        {icon}
+    <section className={`glass rounded-md p-5 ${hud ? 'hud' : ''} ${className}`}>
+      <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-semibold tracking-[0.12em] text-fg uppercase">
+        <span className="text-accent-ink">{icon}</span>
         {title}
       </h2>
       {children}
@@ -59,7 +62,7 @@ function Forbidden() {
   return (
     <div className="mx-auto mt-16 max-w-md text-center">
       <Lock className="mx-auto size-12 text-muted" />
-      <h1 className="mt-4 text-2xl font-bold text-fg">Commanders only</h1>
+      <h1 className="mt-4 font-display text-3xl font-bold tracking-wide text-fg uppercase">Commanders only</h1>
       <p className="mt-2 text-muted">The command deck controls the simulator and lockdown. Ask a commander to promote you, or head back to the overview.</p>
       <Link to="/" className="mt-5 inline-block text-accent underline">
         Back to the overview
@@ -95,27 +98,34 @@ function Deck({ snap: initial, guardians: initialGuardians }: { snap: Awaited<Re
 
   return (
     <div className="mx-auto max-w-6xl">
-      <header className="mb-6 flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl font-bold text-fg">Command deck</h1>
-        <SimStatus sim={snap.sim} />
-        <Link to="/mission" className="ml-auto inline-flex items-center gap-2 rounded-xl border border-line px-3 py-2 text-sm font-semibold text-fg hover:bg-subtle">
-          <Monitor className="size-4" />
-          Open big screen
-        </Link>
-      </header>
+      <PageHeader
+        label="Commander console"
+        title="Command"
+        subtitle={
+          <span className="flex flex-wrap items-center gap-3">
+            <SimStatus sim={snap.sim} />
+          </span>
+        }
+        actions={
+          <Link to="/mission" className="inline-flex h-10 items-center gap-2 rounded-md border border-line bg-subtle px-4 text-sm font-semibold tracking-wide text-fg uppercase [font-stretch:92%] hover:border-accent/60 hover:bg-subtle-hover">
+            <Monitor className="size-4" />
+            Open big screen
+          </Link>
+        }
+      />
 
       <div className="grid gap-5 lg:grid-cols-[22rem_1fr]">
         <div className="grid content-start gap-5">
-          <Section title="Magic" icon={<Swords className="size-4" />}>
+          <Section title="Magic" hud icon={<Swords className="size-5" />}>
             <MagicGauge level={snap.magic} size="lg" />
           </Section>
-          <Section title="Sensors" icon={<Monitor className="size-4" />}>
+          <Section title="Sensors" icon={<Monitor className="size-5" />}>
             <DistrictSparklines latest={snap.latest} history={snap.history} />
           </Section>
         </div>
 
         <div className="grid content-start gap-5">
-          <Section title="Simulator" icon={<Play className="size-4" />}>
+          <Section title="Command deck" hud icon={<Play className="size-5" />}>
             <div className="flex flex-wrap items-center gap-3">
               <Badge tone={snap.sim.running ? 'success' : 'neutral'}>{snap.sim.running ? 'Running: tick every 3s' : 'Stopped'}</Badge>
               {snap.sim.running ? (
@@ -130,14 +140,18 @@ function Deck({ snap: initial, guardians: initialGuardians }: { snap: Awaited<Re
             </div>
             <p className="mt-3 text-sm text-muted">Writes one sensor reading per district every 3 seconds. Nothing moves while it is stopped. Triggering a Desync starts it automatically.</p>
 
-            <h3 className="mt-6 mb-2 text-sm font-semibold text-fg">Trigger a Desync</h3>
+            <div className="ornament mt-6 mb-4">
+              <span className="size-1.5 rotate-45 bg-magic" />
+            </div>
+            <h3 className="label mb-3 text-fg!">Trigger a Desync: choose a war plan</h3>
             <div className="grid gap-3 md:grid-cols-2">
               {snap.sim.scenarios.map((s) => (
-                <div key={s.id} className="rounded-xl border border-danger/30 bg-danger/5 p-4">
-                  <div className="font-display text-lg font-bold text-fg">{s.name}</div>
-                  <p className="mt-1 min-h-[3.5rem] text-sm text-muted">{s.description}</p>
-                  <Button variant="danger" className="mt-3 w-full" disabled={busy !== null || attack} onClick={() => run(`sc-${s.id}`, () => simTrigger({ data: { scenario: s.id } }), `${s.name} launched`)}>
-                    <Swords className="size-4" /> {attack ? 'Attack in progress' : 'Launch'}
+                <div key={s.id} className="relative flex flex-col overflow-hidden border border-danger/40 bg-danger/5 p-4">
+                  <img src="/htf/banner-orange.avif" alt="" aria-hidden width={64} height={67} className="pointer-events-none absolute -top-1 right-3 h-[4.5rem] w-auto" />
+                  <div className="pr-16 font-display text-xl font-bold tracking-wide text-fg uppercase">{s.name}</div>
+                  <p className="mt-1 min-h-[3.5rem] pr-16 text-sm text-fg/80">{s.description}</p>
+                  <Button variant="danger" size="lg" className="mt-3 w-full" disabled={busy !== null || attack} onClick={() => run(`sc-${s.id}`, () => simTrigger({ data: { scenario: s.id } }), `${s.name} launched`)}>
+                    <Swords className="size-5" /> {attack ? 'Attack in progress' : 'Launch'}
                   </Button>
                 </div>
               ))}
@@ -145,18 +159,18 @@ function Deck({ snap: initial, guardians: initialGuardians }: { snap: Awaited<Re
           </Section>
 
           <div className="grid gap-5 md:grid-cols-2">
-            <Section title="Lockdown" icon={snap.lockdown.active ? <ShieldAlert className="size-4 text-danger" /> : <ShieldCheck className="size-4" />}>
-              <p className={`text-lg font-semibold ${snap.lockdown.active ? 'text-danger' : 'text-success'}`}>
+            <Section title="Lockdown" icon={snap.lockdown.active ? <ShieldAlert className="size-5 text-danger" /> : <ShieldCheck className="size-5" />}>
+              <p className={`font-display text-xl font-bold tracking-wide uppercase ${snap.lockdown.active ? 'text-danger' : 'text-success'}`}>
                 {snap.lockdown.active ? `Lockdown active${snap.lockdown.reason ? `: ${snap.lockdown.reason}` : ''}` : 'No lockdown'}
               </p>
               {!snap.lockdown.active && (
-                <input
+                <Input
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   maxLength={120}
                   placeholder="Reason (optional), e.g. Desync detected"
                   aria-label="Lockdown reason"
-                  className="mt-3 h-10 w-full rounded-xl border border-line bg-subtle px-3 text-sm text-fg placeholder:text-muted focus:outline-2 focus:outline-accent"
+                  className="mt-3"
                 />
               )}
               <Button
@@ -170,7 +184,7 @@ function Deck({ snap: initial, guardians: initialGuardians }: { snap: Awaited<Re
               <p className="mt-2 text-xs text-muted">Also engages automatically when magic drops below 40% and lifts above 60%.</p>
             </Section>
 
-            <Section title="Reset demo" icon={<RotateCcw className="size-4" />}>
+            <Section title="Reset demo" icon={<RotateCcw className="size-5" />}>
               <p className="text-sm text-muted">Restores the seed glitches and echoes, resets scores, heals every district and lifts the lockdown. Echoes from the audience are deleted.</p>
               {confirmReset ? (
                 <div className="mt-3 flex gap-2">
@@ -197,17 +211,11 @@ function Deck({ snap: initial, guardians: initialGuardians }: { snap: Awaited<Re
             </Section>
           </div>
 
-          <Section title={`Guardians (${guardians.length})`} icon={<Users className="size-4" />}>
-            <input
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              placeholder="Filter by codename"
-              aria-label="Filter guardians"
-              className="mb-3 h-10 w-full rounded-xl border border-line bg-subtle px-3 text-sm text-fg placeholder:text-muted focus:outline-2 focus:outline-accent"
-            />
-            <div className="max-h-96 overflow-y-auto rounded-xl border border-line">
+          <Section title={`Guardians (${guardians.length})`} icon={<Users className="size-5" />}>
+            <Input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filter by codename" aria-label="Filter guardians" className="mb-3" />
+            <div className="max-h-96 overflow-y-auto border border-line">
               <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-card-strong text-left text-xs tracking-wider text-muted uppercase">
+                <thead className="sticky top-0 bg-card-strong text-left font-mono text-xs tracking-[0.16em] text-muted uppercase">
                   <tr>
                     <th className="px-3 py-2">Codename</th>
                     <th className="px-3 py-2">Points</th>
@@ -227,7 +235,7 @@ function Deck({ snap: initial, guardians: initialGuardians }: { snap: Awaited<Re
                           onChange={(e) =>
                             void run(`role-${g.guardianId}`, async () => setGuardians(await setGuardianRole({ data: { guardianId: g.guardianId, role: e.target.value as Role } })))
                           }
-                          className="h-8 rounded-lg border border-line bg-subtle px-2 text-fg focus:outline-2 focus:outline-accent"
+                          className="h-9 rounded-md border border-line bg-subtle px-2 text-fg focus:outline-2 focus:outline-accent"
                         >
                           <option value="defender">defender</option>
                           <option value="commander">commander</option>

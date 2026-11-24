@@ -1,5 +1,5 @@
 /**
- * @file The phone echo form for /report: big textarea, district chips, mic (F25), photo (F26),
+ * @file The phone echo form for /report: big textarea, district tags, mic (F25), photo (F26),
  * haptic submit, animated outcome card and the offline queue (F16).
  * Network failures queue the echo in localStorage; it auto-sends when the connection returns.
  * @exports EchoComposer
@@ -10,6 +10,7 @@ import { useRouter } from '@tanstack/react-router'
 import { Camera, Loader2, Mic, MicOff, Send, X } from 'lucide-react'
 import { OutcomeCard, type Outcome } from '#/components/field/OutcomeCard.tsx'
 import { isNetworkError, useEchoQueue } from '#/components/field/useEchoQueue.ts'
+import { Button } from '#/components/ui/Button.tsx'
 import { useToast } from '#/components/ui/Toast.tsx'
 import { createEchoField } from '#/lib/field.functions.ts'
 import { DISTRICTS } from '#/lib/glitch.ts'
@@ -103,13 +104,13 @@ export function EchoComposer({ onScore }: { onScore: (score: number) => void }) 
     <div className="flex flex-col gap-4">
       {outcome && <OutcomeCard key={shown?.n} outcome={outcome} />}
       {queue.length > 0 && outcome?.kind !== 'queued' && (
-        <p className="rounded-xl border border-warning/40 bg-warning/10 px-3 py-2 text-sm text-warning">
+        <p className="rounded-md border border-warning/40 bg-warning/10 px-3 py-2 text-sm text-warning">
           {queue.length} echo{queue.length === 1 ? '' : 'es'} waiting for the connection. They will send automatically.
         </p>
       )}
 
-      <div className="glass rounded-2xl p-3">
-        <label htmlFor="echo-text" className="mb-1.5 block px-1 text-sm font-medium">
+      <div className="glass hud rounded-lg p-3">
+        <label htmlFor="echo-text" className="mb-2 block px-1 font-display text-lg leading-snug font-semibold">
           What do you see or hear in Achrona?
         </label>
         <textarea
@@ -122,7 +123,7 @@ export function EchoComposer({ onScore }: { onScore: (score: number) => void }) 
           maxLength={1000}
           rows={5}
           placeholder="The clock tower bells ring backwards and the shadows are late..."
-          className="min-h-36 w-full resize-y rounded-xl border border-line bg-subtle p-3 text-base text-fg placeholder:text-muted/70 focus:border-accent focus:outline-none"
+          className="min-h-40 w-full resize-y rounded-md border border-line bg-app p-3 text-base text-fg placeholder:text-muted/80 focus:border-accent focus:outline-none"
         />
         <div className="mt-2 flex items-center gap-2">
           {speech.supported && (
@@ -131,7 +132,7 @@ export function EchoComposer({ onScore }: { onScore: (score: number) => void }) 
               onClick={() => (speech.listening ? speech.stop() : speech.start(text))}
               aria-pressed={speech.listening}
               title={speech.listening ? 'Stop listening' : 'Speak your echo'}
-              className={`inline-flex min-h-11 items-center gap-2 rounded-xl border px-4 text-sm font-medium transition ${speech.listening ? 'animate-pulse border-danger bg-danger/15 text-danger' : 'border-line bg-subtle hover:bg-subtle-hover'}`}
+              className={`inline-flex min-h-11 items-center gap-2 rounded-md border px-3.5 text-sm font-semibold transition ${speech.listening ? 'animate-pulse border-danger bg-danger/15 text-danger' : 'border-line bg-subtle text-fg hover:border-accent/60 hover:bg-subtle-hover'}`}
             >
               {speech.listening ? <MicOff className="size-5" /> : <Mic className="size-5" />}
               {speech.listening ? 'Listening...' : 'Speak'}
@@ -142,18 +143,18 @@ export function EchoComposer({ onScore }: { onScore: (score: number) => void }) 
             onClick={() => fileRef.current?.click()}
             disabled={photoBusy}
             title="Attach a photo"
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line bg-subtle px-4 text-sm font-medium transition hover:bg-subtle-hover disabled:opacity-60"
+            className="inline-flex min-h-11 items-center gap-2 rounded-md border border-line bg-subtle px-3.5 text-sm font-semibold text-fg transition hover:border-accent/60 hover:bg-subtle-hover disabled:opacity-60"
           >
             {photoBusy ? <Loader2 className="size-5 animate-spin" /> : <Camera className="size-5" />}
             Photo
           </button>
           <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={(e) => void pickPhoto(e.target.files?.[0])} />
-          <span className="ml-auto text-xs text-muted tabular-nums">{text.length}/1000</span>
+          <span className="label ml-auto tabular-nums">{text.length}/1000</span>
         </div>
         {speech.error && <p className="mt-2 px-1 text-xs text-danger">{speech.error}</p>}
         {photo && (
           <div className="relative mt-3 w-fit">
-            <img src={photo} alt="Attached preview" className="max-h-40 rounded-xl border border-line" />
+            <img src={photo} alt="Attached preview" className="max-h-40 rounded-md border border-line" />
             <button
               type="button"
               onClick={() => {
@@ -162,7 +163,7 @@ export function EchoComposer({ onScore }: { onScore: (score: number) => void }) 
               }}
               aria-label="Remove photo"
               title="Remove photo"
-              className="absolute -top-2 -right-2 flex size-9 items-center justify-center rounded-full bg-danger text-white shadow-lg"
+              className="absolute -top-2 -right-2 flex size-9 items-center justify-center rounded-md bg-danger text-white shadow-lg"
             >
               <X className="size-5" />
             </button>
@@ -171,8 +172,8 @@ export function EchoComposer({ onScore }: { onScore: (score: number) => void }) 
       </div>
 
       <div>
-        <p className="mb-2 px-1 text-sm font-medium">
-          Where? <span className="font-normal text-muted">(optional)</span>
+        <p className="label mb-2 px-1">
+          Where? <span className="normal-case tracking-normal">(optional)</span>
         </p>
         <div className="flex flex-wrap gap-2" role="group" aria-label="District">
           {DISTRICTS.map((d) => (
@@ -181,7 +182,7 @@ export function EchoComposer({ onScore }: { onScore: (score: number) => void }) 
               type="button"
               aria-pressed={district === d.id}
               onClick={() => setDistrict(district === d.id ? null : d.id)}
-              className={`min-h-11 rounded-full border px-4 text-sm transition ${district === d.id ? 'border-accent bg-accent/20 font-semibold text-accent' : 'border-line bg-subtle text-muted hover:text-fg'}`}
+              className={`min-h-11 rounded-sm border px-3.5 text-sm font-semibold tracking-wide uppercase transition [font-stretch:92%] ${district === d.id ? 'border-accent bg-accent/20 text-accent-ink' : 'border-line bg-subtle text-muted hover:border-accent/50 hover:text-fg'}`}
             >
               {d.name}
             </button>
@@ -189,15 +190,10 @@ export function EchoComposer({ onScore }: { onScore: (score: number) => void }) 
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={() => void submit()}
-        disabled={!canSend}
-        className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-br from-accent-from to-accent-to text-lg font-bold text-on-accent shadow-[0_0_28px_-4px_var(--glow)] transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-      >
+      <Button type="button" size="lg" onClick={() => void submit()} disabled={!canSend} className="h-14 w-full text-lg">
         {sending ? <Loader2 className="size-6 animate-spin" /> : <Send className="size-6" />}
         {sending ? 'Sending...' : 'Send echo'}
-      </button>
+      </Button>
     </div>
   )
 }

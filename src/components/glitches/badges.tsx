@@ -1,6 +1,6 @@
 /**
- * @file Reusable glitch badges: type icon, status pill, severity pill.
- * @exports GlitchTypeIcon, StatusBadge, SeverityBadge, STATUS_STYLE, SEVERITY_STYLE, timeAgo
+ * @file Reusable glitch badges: type icon (in its type colour), squared status and severity tags on the DESIGN.md scales.
+ * @exports GlitchTypeIcon, StatusBadge, SeverityBadge, STATUS_STYLE, SEVERITY_STYLE, timeAgo, TimeAgo
  * @usedBy src/components/glitches/*, src/routes/index.tsx, other work packages
  */
 import { BatteryLow, CircleDashed, Droplets, Hourglass, HelpCircle, Radio, Zap, type LucideIcon } from 'lucide-react'
@@ -14,39 +14,35 @@ export function GlitchTypeIcon({ type, className = 'size-4', withLabel = false }
   return (
     <span className="inline-flex items-center gap-1.5" title={meta.label}>
       <Icon className={className} style={{ color: meta.color }} aria-label={meta.label} />
-      {withLabel && <span className="text-xs text-muted">{meta.label}</span>}
+      {withLabel && <span className="text-xs font-semibold uppercase tracking-wide text-fg">{meta.label}</span>}
     </span>
   )
 }
 
+/** Squared tag: tinted fill + border in the status colour (DESIGN.md status scale). */
 export const STATUS_STYLE: Record<GlitchStatus, string> = {
-  LEAKED: 'bg-red-500/15 text-red-500 border-red-500/30',
-  ASSESSING: 'bg-amber-500/15 text-amber-500 border-amber-500/30',
-  CONTAINING: 'bg-sky-500/15 text-sky-500 border-sky-500/30',
-  FIXED: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30',
+  LEAKED: 'bg-danger/15 text-danger border-danger/50',
+  ASSESSING: 'bg-warning/15 text-warning border-warning/50',
+  CONTAINING: 'bg-accent/15 text-accent-ink border-accent/50',
+  FIXED: 'bg-success/15 text-success border-success/50',
 }
+
+const TAG = 'inline-flex items-center rounded-sm border px-1.5 py-0.5 font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.1em]'
 
 export function StatusBadge({ status }: { status: GlitchStatus }) {
-  return (
-    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold tracking-wide ${STATUS_STYLE[status]}`}>
-      {status}
-    </span>
-  )
+  return <span className={`${TAG} ${STATUS_STYLE[status]}`}>{status}</span>
 }
 
+/** Severity scale: low = muted, medium = accent, high = warning, critical = danger + pulse. */
 export const SEVERITY_STYLE: Record<Severity, string> = {
-  low: 'bg-zinc-500/15 text-muted border-zinc-500/30',
-  medium: 'bg-yellow-500/15 text-yellow-600 border-yellow-500/30',
-  high: 'bg-orange-500/15 text-orange-500 border-orange-500/30',
-  critical: 'bg-red-600/20 text-red-500 border-red-500/40 font-bold',
+  low: 'bg-muted/10 text-muted border-muted/40',
+  medium: 'bg-accent/15 text-accent-ink border-accent/50',
+  high: 'bg-warning/15 text-warning border-warning/50',
+  critical: 'bg-danger/20 text-danger border-danger/60 animate-pulse',
 }
 
 export function SeverityBadge({ severity }: { severity: Severity }) {
-  return (
-    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] uppercase tracking-wide ${SEVERITY_STYLE[severity]}`}>
-      {severity}
-    </span>
-  )
+  return <span className={`${TAG} ${SEVERITY_STYLE[severity]}`}>{severity}</span>
 }
 
 /** Compact relative time: 12s, 5m, 3h, 2d. */
@@ -56,4 +52,17 @@ export function timeAgo(iso: string, now = Date.now()): string {
   if (s < 3600) return `${Math.floor(s / 60)}m`
   if (s < 86400) return `${Math.floor(s / 3600)}h`
   return `${Math.floor(s / 86400)}d`
+}
+
+/**
+ * Relative time as a <time> element. Server and browser render it a moment apart ("44s" vs "45s"),
+ * so the mismatch is expected and suppressed. Use this in JSX instead of calling timeAgo() inline.
+ */
+export function TimeAgo({ iso, suffix = '' }: { iso: string; suffix?: string }) {
+  return (
+    <time dateTime={iso} suppressHydrationWarning>
+      {timeAgo(iso)}
+      {suffix}
+    </time>
+  )
 }

@@ -1,19 +1,19 @@
 /**
- * @file Shared magic-level colour scale: violet (healthy) -> pink -> amber -> orange -> red (critical),
- * plus a status word per level. Used by the gauge, the map and the sparklines.
+ * @file Shared magic-level colour scale (HTF palette): blue/teal (healthy) -> purple -> orange -> red
+ * (critical), plus a status word per level. Used by the gauge, the map and the sparklines.
  * @exports magicColor, magicRgb, magicStatus
  * @usedBy src/components/mission/*, src/components/map/AchronaMap.tsx
  */
 
 type Stop = [level: number, rgb: [number, number, number]]
 const STOPS: Stop[] = [
-  [0, [255, 45, 85]],
-  [22, [255, 72, 60]],
-  [40, [255, 140, 40]],
-  [55, [250, 192, 60]],
-  [70, [236, 112, 196]],
-  [85, [170, 112, 255]],
-  [100, [140, 118, 255]],
+  [0, [255, 61, 52]],
+  [22, [255, 90, 60]],
+  [40, [244, 141, 48]],
+  [55, [212, 84, 160]],
+  [68, [165, 43, 217]],
+  [82, [74, 125, 255]],
+  [100, [60, 190, 220]],
 ]
 
 export function magicRgb(level: number): [number, number, number] {

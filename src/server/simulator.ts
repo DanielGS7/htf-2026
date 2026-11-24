@@ -296,7 +296,7 @@ async function runTick(): Promise<void> {
 function updateLockdown(level: number): void {
   if (level >= LOCKDOWN_OFF) sim.suppressAuto = false
   if (!sim.lockdown.active && !sim.suppressAuto && level < LOCKDOWN_ON) {
-    setLockdown(true, `Magic level critical (${level}%)`, true)
+    setLockdown(true, 'Magic level critical', true) // no number: it would freeze while the live gauge keeps moving
   } else if (sim.lockdown.active && sim.lockdown.auto && level > LOCKDOWN_OFF) {
     setLockdown(false)
   }

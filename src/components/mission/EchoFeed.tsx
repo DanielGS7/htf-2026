@@ -1,5 +1,5 @@
 /**
- * @file Live echo feed for the big screen: newest first, district tag, reporter, relative time.
+ * @file Live echo feed for the big screen: newest first, district tag, reporter, relative time, big type.
  * Echoes rejected by AI moderation are shown struck-through with the reason.
  * @exports EchoFeed
  * @usedBy src/routes/mission.tsx
@@ -19,31 +19,30 @@ export function EchoFeed({ echoes, limit = 12 }: { echoes: Echo[]; limit?: numbe
 
   if (!echoes.length) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 py-8 text-center text-muted">
-        <Radio className="size-8 opacity-60" />
-        <p className="text-lg">Listening for echoes...</p>
-        <p className="text-sm">Reports from guardians appear here live.</p>
+      <div className="flex h-full items-center justify-center gap-4 text-muted">
+        <Radio className="size-9 opacity-70" />
+        <p className="font-display text-2xl font-semibold">Listening for echoes. Guardian reports appear here live.</p>
       </div>
     )
   }
   return (
-    <ul className="flex flex-col gap-2 overflow-hidden">
-      {echoes.slice(0, limit).map((e) => {
+    <ul className="flex min-h-0 flex-col gap-2 overflow-hidden">
+      {echoes.slice(0, limit).map((e, i) => {
         const district = DISTRICTS.find((d) => d.id === e.districtId)?.name
         const rejected = e.moderation === 'rejected'
         return (
           <li
             key={e.echoId}
-            className={`float-in rounded-xl border px-3 py-2 ${rejected ? 'border-danger/30 bg-danger/5' : 'border-line bg-subtle/60'}`}
+            className={`float-in border-l-4 py-1 pr-2 pl-3 ${rejected ? 'border-danger bg-danger/5' : i === 0 ? 'border-magic bg-magic/10' : 'border-line'}`}
           >
-            <div className="flex items-center gap-2 text-xs text-muted">
-              {rejected ? <Ban className="size-3.5 text-danger" /> : <Radio className="size-3.5 text-accent" />}
-              <span className="font-semibold text-fg">{e.reporterCodename ?? 'Guardian'}</span>
+            <div className="flex items-center gap-2 text-sm text-muted">
+              {rejected ? <Ban className="size-4 text-danger" /> : <Radio className="size-4 text-accent" />}
+              <span className="font-display text-base font-bold tracking-wide text-fg uppercase">{e.reporterCodename ?? 'Guardian'}</span>
               {district && <span className="truncate">in {district}</span>}
               <span className="ml-auto shrink-0 font-mono">{now ? timeAgo(e.timestamp, now) : ''}</span>
             </div>
-            <p className={`mt-0.5 line-clamp-2 text-base leading-snug ${rejected ? 'text-muted line-through' : 'text-fg'}`}>{e.description}</p>
-            {rejected && <p className="mt-0.5 text-xs font-semibold text-danger">Rejected by moderation{e.moderationReason ? `: ${e.moderationReason}` : ''}</p>}
+            <p className={`line-clamp-2 text-xl leading-snug font-medium ${rejected ? 'text-muted line-through' : 'text-fg'}`}>{e.description}</p>
+            {rejected && <p className="text-sm font-semibold text-danger">Rejected by moderation{e.moderationReason ? `: ${e.moderationReason}` : ''}</p>}
           </li>
         )
       })}

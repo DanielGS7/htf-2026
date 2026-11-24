@@ -1,13 +1,15 @@
 /**
- * @file Route /mission — full-screen mission control for the projector: live Achrona map in the
- * centre, magic gauge, district sensor sparklines, live echo feed, top glitches and a big QR code
- * ("Scan to join the defense"). Lockdown takes over the map with a huge pulsing banner.
- * Press `f` for browser fullscreen. Optional `?host=https://venue.example` overrides the QR base URL.
+ * @file Route /mission — full-screen mission control for the projector (fixed, full-height grid, no dead
+ * zones): left = huge magic gauge + stats + sensor grid, centre = Achrona map with the live echo feed
+ * below it, right = QR "Scan to join the defense" (large while calm, compact under attack) + top glitches.
+ * Attack/lockdown: purple voxel lightning creeps in from both screen edges and a big alert plate sits
+ * above the map (never over it). After an attack a short "Achrona holds" plate appears when magic recovers.
+ * Eye-orb cursor on this page only. Press `f` for fullscreen; `?host=https://venue.example` overrides the QR base URL.
  * @usedBy router
  */
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, Maximize2, Minimize2, ShieldAlert, Users } from 'lucide-react'
+import { ArrowLeft, Maximize2, Minimize2, ShieldAlert, ShieldCheck, Skull, Users } from 'lucide-react'
 import { AchronaMap } from '#/components/map/AchronaMap.tsx'
 import { DistrictSparklines } from '#/components/mission/DistrictSparklines.tsx'
 import { EchoFeed } from '#/components/mission/EchoFeed.tsx'
@@ -27,10 +29,10 @@ export const Route = createFileRoute('/mission')({
   component: MissionControl,
 })
 
-function Panel({ title, icon, children, className = '' }: { title: string; icon?: ReactNode; children: ReactNode; className?: string }) {
+function Panel({ title, icon, children, className = '', hud = false }: { title: string; icon?: ReactNode; children: ReactNode; className?: string; hud?: boolean }) {
   return (
-    <section className={`glass flex shrink-0 flex-col rounded-2xl p-4 lg:min-h-0 lg:shrink ${className}`}>
-      <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold tracking-[0.2em] text-muted uppercase">
+    <section className={`glass flex shrink-0 flex-col rounded-md p-4 lg:min-h-0 lg:shrink ${hud ? 'hud' : ''} ${className}`}>
+      <h2 className="label mb-3 flex items-center gap-2 text-sm! font-semibold">
         {icon}
         {title}
       </h2>
@@ -47,7 +49,19 @@ function Clock() {
     const i = setInterval(f, 1000)
     return () => clearInterval(i)
   }, [])
-  return <span className="font-mono text-lg tabular-nums text-muted">{t}</span>
+  return <span className="font-mono text-2xl tabular-nums text-muted">{t}</span>
+}
+
+/** Purple voxel lightning creeping in from the screen edges (attack = partly in, lockdown = further in). Sits BEHIND the panels (z-0), so it never covers data. */
+function EdgeLightning({ level }: { level: 0 | 1 | 2 }) {
+  const shift = level === 2 ? 42 : level === 1 ? 62 : 110
+  const common = 'pointer-events-none absolute z-0 h-auto w-[min(22vw,26rem)] max-w-none transition-[transform,opacity] duration-[1400ms] ease-out'
+  return (
+    <>
+      <img src="/htf/lightning-left.avif" alt="" aria-hidden className={`${common} top-0 left-0 ${level === 2 ? 'glitch' : ''}`} style={{ transform: `translateX(-${shift}%)`, opacity: level ? 0.8 : 0, maskImage: 'linear-gradient(to right, #000 50%, transparent)' }} />
+      <img src="/htf/lightning-right.avif" alt="" aria-hidden className={`${common} right-0 bottom-0 ${level === 2 ? 'glitch' : ''}`} style={{ transform: `translateX(${shift}%)`, opacity: level ? 0.8 : 0, maskImage: 'linear-gradient(to left, #000 50%, transparent)' }} />
+    </>
+  )
 }
 
 function MissionControl() {
@@ -56,6 +70,15 @@ function MissionControl() {
   const navigate = useNavigate()
   const [full, setFull] = useState(false)
   const { lockdown } = useTheme()
+  const [holds, setHolds] = useState(false)
+  // QR size follows the screen height so the glitch list below keeps its room (180px at 900p, 216px at 1080p).
+  const [qrSize, setQrSize] = useState(200)
+  useEffect(() => {
+    const f = () => setQrSize(Math.max(160, Math.min(260, Math.round(window.innerHeight * 0.2))))
+    f()
+    window.addEventListener('resize', f)
+    return () => window.removeEventListener('resize', f)
+  }, [])
 
   // The overlay is fixed: stop the page behind it from scrolling.
   useEffect(() => {
@@ -85,84 +108,120 @@ function MissionControl() {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
+  const attack = snap.sim.phase === 'attack'
   const lock = snap.lockdown.active || snap.magic < 40
   const reason = snap.lockdown.reason ?? (snap.magic < 40 ? `Magic level critical (${snap.magic}%)` : null)
+  const alarm = attack || lock
+
+  // "Achrona holds": once an attack/lockdown is over and magic is healthy again, show a plate for a few seconds.
+  const wasAlarm = useRef(false)
+  useEffect(() => {
+    if (alarm) {
+      wasAlarm.current = true
+      setHolds(false)
+      return
+    }
+    if (wasAlarm.current && snap.magic >= 70) {
+      wasAlarm.current = false
+      setHolds(true)
+      const t = setTimeout(() => setHolds(false), 9000)
+      return () => clearTimeout(t)
+    }
+  }, [alarm, snap.magic])
+
+  const open = (id: string) => void navigate({ to: '/glitches/$glitchId', params: { glitchId: id } })
+  const atRisk = snap.latest.filter((r) => r.magic < 60).length
 
   return (
-    <div className={`fixed inset-0 z-50 flex flex-col overflow-y-auto bg-app lg:overflow-hidden ${lockdown ? 'pt-9' : ''}`}>
+    <div
+      className={`fixed inset-0 z-50 flex flex-col overflow-y-auto bg-app lg:overflow-hidden ${lockdown ? 'pt-11' : ''}`}
+      style={{ cursor: 'url(/htf/cursor-32.png) 16 16, auto' }}
+    >
       <div className="starfield pointer-events-none absolute inset-0 opacity-60" aria-hidden />
+      <EdgeLightning level={lock ? 2 : attack ? 1 : 0} />
 
-      <header className="relative z-10 flex flex-wrap items-center gap-3 px-5 pt-4 pb-1">
-        <Link to="/" title="Back to the overview" className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-muted hover:bg-subtle hover:text-fg">
-          <ArrowLeft className="size-4" />
+      <header className="relative z-10 flex flex-wrap items-center gap-x-5 gap-y-2 px-4 pt-3 pb-1 lg:px-9">
+        <Link to="/" title="Back to the overview" className="flex items-center gap-1.5 rounded-md px-2 py-1 text-base text-muted hover:bg-subtle hover:text-fg">
+          <ArrowLeft className="size-5" />
           Overview
         </Link>
-        <h1 className="font-display text-2xl font-extrabold tracking-wide">
-          <span className="glow-text">ACHRONA</span> <span className="text-fg">MISSION CONTROL</span>
+        <h1 className="flex items-center gap-4">
+          <img src="/htf/curse-of-achrona.avif" alt="The Curse of Achrona" className="h-16 w-auto 2xl:h-20" width={156} height={80} />
+          <span className="font-display text-3xl font-bold tracking-[0.18em] text-fg uppercase 2xl:text-4xl">Mission Control</span>
         </h1>
-        <div className="ml-2">
-          <SimStatus sim={snap.sim} />
+        <SimStatus sim={snap.sim} />
+        <div className="flex min-w-0 flex-1 justify-center">
+          {lock ? (
+            <LockdownPlate reason={reason} />
+          ) : attack ? (
+            <AttackPlate name={snap.sim.scenario?.name ?? 'Desync'} />
+          ) : holds ? (
+            <HoldsPlate />
+          ) : null}
         </div>
-        <div className="ml-auto flex items-center gap-4">
+        <div className="flex items-center gap-4">
           <Clock />
           <button
             type="button"
             onClick={toggleFull}
             title={full ? 'Exit fullscreen (f)' : 'Fullscreen (f)'}
             aria-label={full ? 'Exit fullscreen' : 'Enter fullscreen'}
-            className="rounded-lg border border-line p-2 text-muted hover:bg-subtle hover:text-fg"
+            className="rounded-md border border-line p-2 text-muted hover:bg-subtle hover:text-fg"
           >
-            {full ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
+            {full ? <Minimize2 className="size-5" /> : <Maximize2 className="size-5" />}
           </button>
         </div>
       </header>
 
-      <main className="relative z-10 grid shrink-0 gap-4 p-4 lg:min-h-0 lg:flex-1 lg:shrink lg:grid-cols-[minmax(17rem,22rem)_minmax(0,1fr)_minmax(19rem,27rem)] lg:grid-rows-1">
+      <main className="relative z-10 grid shrink-0 gap-4 px-4 py-4 lg:px-9 lg:min-h-0 lg:flex-1 lg:shrink lg:grid-cols-[clamp(20rem,24vw,32rem)_minmax(0,1fr)_clamp(21rem,24vw,32rem)] lg:grid-rows-1">
         {/* left: gauge + sensors */}
         <div className="flex flex-col gap-4 lg:min-h-0">
-          <Panel title="Magic level" className="items-stretch">
+          <Panel title="Magic level" hud className="items-stretch">
             <MagicGauge level={snap.magic} size="lg" />
-            <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-              <Stat label="Open glitches" value={snap.glitches.length} tone={snap.glitches.length ? 'text-warning' : 'text-success'} />
-              <Stat label="Districts at risk" value={snap.latest.filter((r) => r.magic < 60).length} tone={snap.latest.some((r) => r.magic < 60) ? 'text-danger' : 'text-success'} />
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              <Stat label="Glitches" value={snap.glitches.length} tone={snap.glitches.length ? 'text-warning' : 'text-success'} />
+              <Stat label="At risk" value={atRisk} tone={atRisk ? 'text-danger' : 'text-success'} />
               <Stat label="Guardians" value={snap.guardianCount} />
             </div>
           </Panel>
-          <Panel title="Sensor grid" className="flex-1">
-            <DistrictSparklines latest={snap.latest} history={snap.history} large />
-          </Panel>
-        </div>
-
-        {/* centre: map */}
-        <div className="relative h-[26rem] min-w-0 lg:h-auto lg:min-h-[22rem]">
-          <AchronaMap
-            glitches={snap.glitches}
-            readings={snap.latest}
-            className="h-full w-full"
-            onSelect={(id) => void navigate({ to: '/glitches/$glitchId', params: { glitchId: id } })}
-          />
-          {lock && <LockdownOverlay reason={reason} />}
-        </div>
-
-        {/* right: join + glitches + feed */}
-        <div className="flex flex-col gap-4 lg:min-h-0">
-          <Panel title="Join the defense">
-            <div className="flex items-center gap-4">
-              <JoinQr base={host} size={150} />
-              <div className="min-w-0">
-                <p className="font-display text-2xl leading-tight font-bold text-fg">Scan to join the defense</p>
-                <p className="mt-2 flex items-center gap-2 text-lg text-accent">
-                  <Users className="size-5" />
-                  <span className="font-mono font-bold tabular-nums">{snap.guardianCount}</span> guardians
-                </p>
-              </div>
+          <Panel title="Sensor grid" className="min-h-[18rem] flex-1 overflow-hidden">
+            <div className="min-h-0 flex-1">
+              <DistrictSparklines latest={snap.latest} history={snap.history} large />
             </div>
           </Panel>
-          <Panel title="Top glitches">
-            <TopGlitches glitches={snap.glitches} limit={4} onSelect={(id) => void navigate({ to: '/glitches/$glitchId', params: { glitchId: id } })} />
+        </div>
+
+        {/* centre: alert plate, map, echo feed (no overlays on the map) */}
+        <div className="flex min-w-0 flex-col gap-4 lg:min-h-0">
+          <AchronaMap glitches={snap.glitches} readings={snap.latest} className="w-full shrink-0 aspect-[10/7]" onSelect={open} />
+          <Panel title="Live echoes" className="min-h-[10rem] flex-1 overflow-hidden">
+            <EchoFeed echoes={snap.echoes} limit={3} />
           </Panel>
-          <Panel title="Live echoes" className="min-h-[14rem] flex-1 overflow-hidden">
-            <EchoFeed echoes={snap.echoes} limit={8} />
+        </div>
+
+        {/* right: join + glitches */}
+        <div className="flex flex-col gap-4 lg:min-h-0">
+          <Panel title="Join the defense" hud={!alarm}>
+            {alarm ? (
+              <div className="flex items-center gap-4">
+                <JoinQr base={host} size={104} showUrl={false} />
+                <div className="min-w-0">
+                  <p className="font-display text-xl leading-tight font-bold text-fg 2xl:text-2xl">Scan to join the defense</p>
+                  <Guardians n={snap.guardianCount} small />
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-3 text-center">
+                <p className="font-display text-3xl leading-none font-bold tracking-wide text-fg uppercase 2xl:text-4xl">Scan to join the defense</p>
+                <JoinQr base={host} size={qrSize} />
+                <Guardians n={snap.guardianCount} />
+              </div>
+            )}
+          </Panel>
+          <Panel title="Top glitches" className="flex-1 overflow-hidden">
+            <div className="min-h-0 flex-1">
+              <TopGlitches glitches={snap.glitches} limit={alarm ? 5 : 4} onSelect={open} />
+            </div>
           </Panel>
         </div>
       </main>
@@ -170,26 +229,50 @@ function MissionControl() {
   )
 }
 
+function Guardians({ n, small = false }: { n: number; small?: boolean }) {
+  return (
+    <p className={`flex items-center gap-2 text-accent-ink ${small ? 'mt-1 text-lg' : 'text-2xl'}`}>
+      <Users className={small ? 'size-5' : 'size-6'} />
+      <span className={`font-display font-bold tabular-nums ${small ? 'text-2xl' : 'text-3xl'}`}>{n}</span> guardians
+    </p>
+  )
+}
+
 function Stat({ label, value, tone = 'text-fg' }: { label: string; value: number; tone?: string }) {
   return (
-    <div className="rounded-xl border border-line bg-subtle/60 px-2 py-2">
-      <div className={`font-display text-3xl font-extrabold tabular-nums ${tone}`}>{value}</div>
-      <div className="text-[11px] tracking-wider text-muted uppercase">{label}</div>
+    <div className="border border-line bg-subtle/60 px-1 py-1.5 text-center">
+      <div className={`font-display text-4xl leading-none font-extrabold tabular-nums 2xl:text-5xl ${tone}`}>{value}</div>
+      <div className="label mt-1 text-xs! tracking-wider">{label}</div>
     </div>
   )
 }
 
-function LockdownOverlay({ reason }: { reason: string | null }) {
+function LockdownPlate({ reason }: { reason: string | null }) {
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex flex-col items-center px-6 pt-5" role="alert">
-      <div className="flex items-center gap-4 rounded-2xl border-2 border-danger bg-danger/20 px-8 py-3 shadow-[0_0_80px_-10px_var(--danger)] backdrop-blur-sm">
-        <ShieldAlert className="size-12 animate-pulse text-danger" />
-        <div className="text-center">
-          <div className="font-display text-5xl leading-none font-black tracking-[0.25em] text-danger uppercase animate-pulse">Lockdown</div>
-          {reason && <div className="mt-1 text-lg font-semibold text-fg">{reason}</div>}
-        </div>
-        <ShieldAlert className="size-12 animate-pulse text-danger" />
+    <div className="hazard-strip flex min-w-0 items-center gap-3 px-5 py-2 text-[#160f1f]" role="alert">
+      <ShieldAlert className="size-10 shrink-0 animate-pulse" />
+      <div className="min-w-0">
+        <div className="font-display text-4xl leading-none font-black tracking-[0.28em] uppercase 2xl:text-5xl">Lockdown</div>
+        {reason && <div className="mt-0.5 truncate text-base font-bold">{reason}</div>}
       </div>
+    </div>
+  )
+}
+
+function AttackPlate({ name }: { name: string }) {
+  return (
+    <div className="glitch flex min-w-0 items-center gap-3 border-2 border-magic bg-magic/25 px-5 py-2" role="status">
+      <Skull className="size-9 shrink-0 text-magic-soft" />
+      <div className="truncate font-display text-3xl leading-none font-black tracking-[0.18em] text-fg uppercase 2xl:text-4xl">Desync: {name}</div>
+    </div>
+  )
+}
+
+function HoldsPlate() {
+  return (
+    <div className="float-in flex items-center gap-3 border-2 border-success bg-success/15 px-5 py-2" role="status">
+      <ShieldCheck className="size-9 shrink-0 text-success" />
+      <div className="font-display text-3xl leading-none font-black tracking-[0.18em] text-success uppercase 2xl:text-4xl">Achrona holds</div>
     </div>
   )
 }

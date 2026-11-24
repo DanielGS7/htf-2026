@@ -1,5 +1,5 @@
 /**
- * @file Modal dialog primitive: backdrop, Escape to close, click outside to close.
+ * @file Modal dialog primitive: HUD panel on a dark scrim (no blur), Escape / click outside to close.
  * @exports Modal
  */
 import { useEffect, type ReactNode } from 'react'
@@ -27,12 +27,12 @@ export function Modal({
   if (!open) return null
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/75 p-4 sm:items-center"
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div role="dialog" aria-modal="true" aria-label={title} className="glass float-in w-full max-w-lg rounded-2xl p-5">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">{title}</h2>
+      <div role="dialog" aria-modal="true" aria-label={title} className="glass hud float-in w-full max-w-lg rounded-lg p-5">
+        <div className="mb-4 flex items-center justify-between border-b border-line pb-3">
+          <h2 className="text-lg font-semibold tracking-wide uppercase">{title}</h2>
           <IconButton label="Close" onClick={onClose} className="size-8">
             <X className="size-5" />
           </IconButton>

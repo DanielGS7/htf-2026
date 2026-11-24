@@ -31,16 +31,16 @@ export function AssigneeSuggestion({ glitchId, onPick }: { glitchId: string; onP
         type="button"
         onClick={ask}
         disabled={busy}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-subtle px-2.5 py-1.5 font-medium text-fg transition hover:bg-subtle-hover disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 min-h-8 rounded-sm border border-line bg-subtle px-2.5 font-semibold tracking-wide text-fg uppercase transition [font-stretch:92%] hover:border-accent/60 hover:bg-subtle-hover disabled:opacity-60"
       >
-        <Sparkles className={`size-3.5 text-accent ${busy ? 'animate-pulse' : ''}`} />
+        <Sparkles className={`size-3.5 text-magic-soft ${busy ? 'animate-pulse' : ''}`} />
         {busy ? 'Thinking...' : 'Suggest assignee'}
       </button>
       {result?.guardianId && (
         <p className="text-muted">
-          <span className="font-semibold text-fg">{result.codename}</span> · {result.reason}
+          <span className="font-display font-bold text-fg">{result.codename}</span> · {result.reason}
           {onPick && (
-            <button type="button" onClick={() => onPick(result.guardianId!)} className="ml-2 text-accent underline">
+            <button type="button" onClick={() => onPick(result.guardianId!)} className="ml-2 text-accent-ink font-semibold underline">
               Assign
             </button>
           )}

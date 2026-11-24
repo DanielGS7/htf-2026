@@ -1,16 +1,32 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap");
+@import "@fontsource/grenze-gotisch/700.css";
+@import "@fontsource/grenze-gotisch/900.css";
+@import "@fontsource-variable/saira/wdth.css";
+@import "@fontsource-variable/jetbrains-mono/index.css";
 @import "tailwindcss";
 
 /*
- * @file Global styles and theme tokens (WP-A).
- * Light = :root, dark = [data-theme="dark"] (default, set by the inline script in __root.tsx),
- * lockdown = [data-lockdown="true"] on <html> (red alert, overrides accent + surfaces in both themes).
+ * @file Global styles and theme tokens. Visual language: docs/DESIGN.md (derived from the official
+ * Hack The Future 2026 "Curse of Achrona" branding: plum-black, extruded blue blackletter, purple voxel
+ * lightning, cloth banners). Dark = default ([data-theme="dark"]); light = :root ("parchment");
+ * lockdown = [data-lockdown="true"] on <html> (orange-red alert, overrides accent + surfaces).
+ * Fonts are self-hosted (@fontsource): Grenze Gotisch (titles only), Saira (UI + numbers), JetBrains Mono.
  */
 
 @theme inline {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Sora", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-sans: "Saira Variable", ui-sans-serif, system-ui, sans-serif;
+  /* Numbers, names, labels: Saira, slightly condensed and heavy (HTF uses Etna Condensed for figures). */
+  --font-display: "Saira Variable", ui-sans-serif, system-ui, sans-serif;
+  /* Titles only. Never for body text, numbers or anything smaller than ~28px. */
+  --font-gothic: "Grenze Gotisch", "Saira Variable", serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  /* Tighter corners than Tailwind's defaults: panels, not bubbles. */
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 10px;
+  --radius-3xl: 14px;
 
   --color-app: var(--app);
   --color-sidebar: var(--sidebar);
@@ -25,6 +41,9 @@
   --color-accent: var(--accent);
   --color-accent-from: var(--accent-from);
   --color-accent-to: var(--accent-to);
+  --color-accent-ink: var(--accent-ink);
+  --color-magic: var(--magic);
+  --color-magic-soft: var(--magic-soft);
   --color-glow: var(--glow);
   --color-success: var(--success);
   --color-warning: var(--warning);
@@ -32,74 +51,81 @@
   --color-on-accent: var(--on-accent);
 }
 
+/* Light theme: parchment and ink (the scroll banner), same blue + purple accents. */
 :root {
-  --app: #f6f5fb;
-  --sidebar: #1b1340;
-  --panel: #ffffff;
-  --card: #ffffff;
-  --card-strong: #efedf8;
-  --line: #e2dff0;
-  --fg: #12102a;
-  --muted: #6b6788;
-  --subtle: #efedf8;
-  --subtle-hover: #e2dff0;
-  --accent: #6d4aff;
-  --accent-from: #a995ff;
-  --accent-to: #6d4aff;
-  --glow: rgb(109 74 255 / 0.2);
-  --success: #12a37a;
-  --warning: #c98a0a;
-  --danger: #e0364f;
+  --app: #ece3cf;
+  --sidebar: #160f1f;
+  --panel: #f6efdf;
+  --card: #f9f4e8;
+  --card-strong: #efe5cf;
+  --line: #d3c39f;
+  --fg: #1d1427;
+  --muted: #6e6152;
+  --subtle: #eee4cc;
+  --subtle-hover: #e4d7b8;
+  --accent: #004fe2;
+  --accent-from: #3d7bff;
+  --accent-to: #004fe2;
+  /* Accent as readable text on the page background. */
+  --accent-ink: #0042bd;
+  --magic: #8a22b8;
+  --magic-soft: #a52bd9;
+  --glow: rgb(0 79 226 / 0.18);
+  --success: #0f8a74;
+  --warning: #b8620f;
+  --danger: #c7361b;
   --on-accent: #ffffff;
-  --bg-glow-1: rgb(109 74 255 / 0.1);
-  --bg-glow-2: rgb(34 211 238 / 0.08);
+  --grain-opacity: 0.07;
   color-scheme: light;
 }
 
+/* Dark theme (default): the HTF 2026 site palette. */
 [data-theme="dark"] {
-  --app: #0a0820;
-  --sidebar: #0d0a2b;
-  --panel: #120e33;
-  --card: #17123f;
-  --card-strong: #1f1950;
-  --line: #2c2563;
-  --fg: #ece9ff;
-  --muted: #9b95c9;
-  --subtle: #1b1546;
-  --subtle-hover: #261f5c;
-  --accent: #8f73ff;
-  --accent-from: #c1b2ff;
-  --accent-to: #7a52ff;
-  --glow: rgb(143 115 255 / 0.35);
-  --success: #34e0a8;
-  --warning: #ffc14d;
-  --danger: #ff5c7a;
-  --on-accent: #0a0820;
-  --bg-glow-1: rgb(122 82 255 / 0.22);
-  --bg-glow-2: rgb(34 211 238 / 0.1);
+  --app: #160f1f;
+  --sidebar: #100a17;
+  --panel: #1c1428;
+  --card: #20172e;
+  --card-strong: #2a1f3c;
+  --line: #3a2d50;
+  --fg: #e1e7ff;
+  --muted: #a3a1bb;
+  --subtle: #261b36;
+  --subtle-hover: #32254a;
+  /* #4a7dff, not the brand #004fe2: readable as text on plum (4.9:1). The brand blue stays in gradients + titles. */
+  --accent: #4a7dff;
+  --accent-from: #5b8cff;
+  --accent-to: #004fe2;
+  --accent-ink: #8fb0ff;
+  --magic: #a52bd9;
+  --magic-soft: #e292f4;
+  --glow: rgb(74 125 255 / 0.28);
+  --success: #3ccfb4;
+  --warning: #f48d30;
+  --danger: #ff5a3c;
+  --on-accent: #ffffff;
+  --grain-opacity: 0.05;
   color-scheme: dark;
 }
 
-/* Lockdown: red alert. Overrides both themes. */
+/* Lockdown: the Desync broke through. Orange-red alarm, both themes. */
 [data-lockdown="true"] {
-  --accent: #ff3b4e;
-  --accent-from: #ff8a95;
-  --accent-to: #e0102a;
-  --glow: rgb(255 59 78 / 0.4);
-  --line: #5a1f33;
-  --bg-glow-1: rgb(255 40 70 / 0.28);
-  --bg-glow-2: rgb(255 120 40 / 0.12);
+  --accent: #eb4c2d;
+  --accent-from: #f48d30;
+  --accent-to: #d2341b;
+  --accent-ink: #ff8a6a;
+  --glow: rgb(235 76 45 / 0.4);
+  --line: #5c2a2a;
   --on-accent: #ffffff;
 }
 [data-lockdown="true"][data-theme="dark"] {
-  --app: #16060f;
-  --sidebar: #1d0912;
-  --panel: #220a16;
-  --card: #2b0d1b;
-  --card-strong: #38112a;
-  --subtle: #2e0f1d;
-  --subtle-hover: #411428;
-  --muted: #cf9aae;
+  --app: #1a0b10;
+  --sidebar: #120609;
+  --panel: #220e14;
+  --card: #271018;
+  --card-strong: #341620;
+  --subtle: #2e121b;
+  --subtle-hover: #401a26;
+  --muted: #d2a9a9;
 }
 
 html,
@@ -110,51 +136,157 @@ body {
 }
 
 body {
-  background-image:
-    radial-gradient(60rem 40rem at 85% -10%, var(--bg-glow-1), transparent 60%),
-    radial-gradient(50rem 36rem at -10% 110%, var(--bg-glow-2), transparent 60%);
-  background-attachment: fixed;
+  font-family: var(--font-sans);
   transition: background-color 0.4s ease;
 }
 
+/* Film grain over everything, like the HTF artwork. Pure decoration, never intercepts input. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: var(--magic);
+  color: #fff;
+}
+
+/* UI headings: Saira, a little condensed, firm. Page titles use .font-gothic / <GothicTitle>. */
 h1, h2, h3, .font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.01em;
+  font-stretch: 92%;
+  letter-spacing: 0.005em;
 }
 
-/* Frosted card surface with a faint inner highlight. */
-.glass {
-  background: color-mix(in srgb, var(--card) 82%, transparent);
-  backdrop-filter: blur(14px);
-  border: 1px solid var(--line);
-  box-shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 12px 40px -18px rgb(0 0 0 / 0.5);
-}
-
+/*
+ * The HTF title treatment: pale blue blackletter with a royal-blue outline, a stepped extrusion
+ * and a hard plum drop shadow. Use for page titles and hero moments only.
+ */
+.font-gothic,
 .glow-text {
-  background: linear-gradient(120deg, var(--accent-from), var(--accent-to) 60%, #22d3ee);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  font-family: var(--font-gothic);
+  font-stretch: normal;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  color: #e1e7ff;
+  -webkit-text-stroke: 0.09em #004fe2;
+  paint-order: stroke fill;
+  text-shadow:
+    0.02em 0.04em 0 #004fe2,
+    0.04em 0.08em 0 #01296a,
+    0.06em 0.12em 0 #01296a,
+    0.08em 0.16em 0 rgb(10 6 16 / 0.9);
+  line-height: 1.05;
+}
+:root:not([data-theme="dark"]) .font-gothic,
+:root:not([data-theme="dark"]) .glow-text {
+  color: #f3f6ff;
+}
+[data-lockdown="true"] .font-gothic,
+[data-lockdown="true"] .glow-text {
+  -webkit-text-stroke-color: #d2341b;
+  text-shadow:
+    0.02em 0.04em 0 #d2341b,
+    0.04em 0.08em 0 #6e1608,
+    0.06em 0.12em 0 #6e1608,
+    0.08em 0.16em 0 rgb(10 6 16 / 0.9);
+}
+
+/* Solid panel (the old frosted "glass" class keeps its name so every page picks this up). */
+.glass {
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 10px 30px -20px rgb(0 0 0 / 0.6);
+}
+
+/* HUD panel: a .glass panel with targeting brackets on two corners. For the key panels per screen. */
+.hud {
+  position: relative;
+}
+.hud::before,
+.hud::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 0 solid var(--accent);
+  pointer-events: none;
+}
+.hud::before {
+  top: -1px;
+  left: -1px;
+  border-width: 2px 0 0 2px;
+}
+.hud::after {
+  right: -1px;
+  bottom: -1px;
+  border-width: 0 2px 2px 0;
+}
+
+/* Small uppercase data label above a value (HUD readout pattern). */
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .glow-ring {
-  box-shadow: 0 0 0 1px var(--accent), 0 0 24px -2px var(--glow);
+  box-shadow: 0 0 0 1px var(--accent), 0 0 22px -4px var(--glow);
 }
 
-/* Tiny starfield for the auth screens. */
+/* Auth/hero backdrop: plum vignette with the voxel lightning on both edges (see AuthShell). */
 .starfield {
-  background-image:
-    radial-gradient(1px 1px at 20% 30%, rgb(255 255 255 / 0.7), transparent),
-    radial-gradient(1px 1px at 70% 20%, rgb(255 255 255 / 0.5), transparent),
-    radial-gradient(1.5px 1.5px at 40% 75%, rgb(180 160 255 / 0.8), transparent),
-    radial-gradient(1px 1px at 85% 65%, rgb(255 255 255 / 0.5), transparent),
-    radial-gradient(1px 1px at 10% 85%, rgb(255 255 255 / 0.4), transparent);
-  background-size: 340px 340px;
+  background-image: radial-gradient(ellipse 70% 55% at 50% 40%, rgb(53 39 167 / 0.22), transparent 70%);
+}
+
+/* Voxel glitch: three cubes breaking off an element's corner (purple, like the HTF lightning). */
+.glitch-cubes {
+  position: relative;
+}
+.glitch-cubes::after {
+  content: "";
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  width: 6px;
+  height: 6px;
+  background: var(--magic);
+  box-shadow:
+    8px -6px 0 -1px var(--magic-soft),
+    3px -12px 0 -2px var(--magic),
+    -6px -4px 0 -2px var(--magic-soft);
+  pointer-events: none;
+}
+
+/* Ornamental divider: line, cube, line. */
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--line);
+}
+.ornament::before,
+.ornament::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--line));
+}
+.ornament::after {
+  background: linear-gradient(to left, transparent, var(--line));
 }
 
 @keyframes gg-lockdown-pulse {
-  0%, 100% { box-shadow: inset 0 0 0 2px rgb(255 59 78 / 0.25), inset 0 0 120px rgb(255 30 60 / 0.12); }
-  50% { box-shadow: inset 0 0 0 2px rgb(255 59 78 / 0.7), inset 0 0 160px rgb(255 30 60 / 0.3); }
+  0%, 100% { box-shadow: inset 0 0 0 3px rgb(235 76 45 / 0.3), inset 0 0 120px rgb(235 76 45 / 0.12); }
+  50% { box-shadow: inset 0 0 0 3px rgb(235 76 45 / 0.75), inset 0 0 160px rgb(235 76 45 / 0.28); }
 }
 .lockdown-frame {
   position: fixed;
@@ -165,22 +297,48 @@ h1, h2, h3, .font-display {
 }
 
 @keyframes gg-float-in {
-  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
 }
-.float-in { animation: gg-float-in 0.25s ease-out both; }
+.float-in { animation: gg-float-in 0.22s ease-out both; }
 
 @keyframes gg-drift {
-  from { transform: translateY(0) rotate(0); }
-  50% { transform: translateY(-10px) rotate(2deg); }
-  to { transform: translateY(0) rotate(0); }
+  from { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+  to { transform: translateY(0); }
 }
 .drift { animation: gg-drift 7s ease-in-out infinite; }
 
+/* Glitch jitter for new/critical items: a short stepped shake with a purple/blue split. */
+@keyframes gg-glitch {
+  0%, 100% { transform: none; text-shadow: none; }
+  20% { transform: translate(-2px, 1px); text-shadow: 2px 0 var(--magic), -2px 0 var(--accent); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, 0); text-shadow: -2px 0 var(--magic), 2px 0 var(--accent); }
+  80% { transform: translate(1px, 1px); }
+}
+.glitch { animation: gg-glitch 0.45s steps(2, end) 2; }
+
 @media (prefers-reduced-motion: reduce) {
-  .lockdown-frame, .drift, .float-in { animation: none; }
+  .lockdown-frame, .drift, .float-in, .glitch { animation: none; }
 }
 
 @media print {
   .no-print { display: none !important; }
+  body::after { display: none; }
+}
+
+/* Lockdown alert strip: orange-red plate with stepped hazard edges (see AppProviders). */
+.hazard-strip {
+  background:
+    repeating-linear-gradient(135deg, rgb(0 0 0 / 0.22) 0 10px, transparent 10px 20px) bottom / 100% 6px no-repeat,
+    repeating-linear-gradient(135deg, rgb(0 0 0 / 0.22) 0 10px, transparent 10px 20px) top / 100% 4px no-repeat,
+    linear-gradient(180deg, #f9a040, #f48d30 45%, #ee5f33);
+  box-shadow: 0 6px 0 -2px rgb(10 6 16 / 0.55);
+}
+
+/* Left-rail accent: a thin vertical line with a diamond, for the sidebar. */
+.rail-line {
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--line), transparent);
 }
