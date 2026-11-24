@@ -37,7 +37,7 @@ export function StatusStepper({
             {i > 0 && (
               <span
                 aria-hidden="true"
-                className={`absolute top-[15px] right-1/2 h-0.5 w-full ${i <= current ? COLOR[GLITCH_STATUSES[i - 1]].bg : 'bg-line'}`}
+                className={`absolute top-[15px] right-1/2 z-0 h-0.5 w-full ${i <= current ? COLOR[GLITCH_STATUSES[i - 1]].bg : 'bg-line'}`}
               />
             )}
             <button
@@ -45,18 +45,18 @@ export function StatusStepper({
               disabled={!canPick}
               onClick={() => onPick?.(s)}
               title={onPick ? `Set status to ${s}` : s}
-              className="group relative flex flex-col items-center gap-1.5 disabled:cursor-default"
+              className="group relative z-10 flex flex-col items-center gap-1.5 disabled:cursor-default"
             >
               <span
                 className={`flex size-8 items-center justify-center rounded-sm border-2 ${
                   active
-                    ? `${c.bg} ${c.border} ${c.outline} text-[#160f1f] outline-2 outline-offset-2`
+                    ? `${c.bg} ${c.border} ${c.outline} text-panel outline-2 outline-offset-2`
                     : reached
                       ? `${c.border} bg-card ${c.text}`
                       : 'border-line bg-card text-muted group-enabled:group-hover:border-fg'
                 }`}
               >
-                {reached && !active ? <Check className="size-4" /> : <span className={`font-mono text-sm font-bold ${active ? 'text-[#160f1f]' : ''}`}>{i + 1}</span>}
+                {reached && !active ? <Check className="size-4" /> : <span className={`font-mono text-sm font-bold ${active ? 'text-panel' : ''}`}>{i + 1}</span>}
               </span>
               <span className={`font-mono text-[12px] font-semibold tracking-[0.12em] uppercase ${active ? '' : 'max-sm:hidden'} ${active ? c.text : reached ? 'text-fg' : 'text-muted'}`}>{s}</span>
             </button>
