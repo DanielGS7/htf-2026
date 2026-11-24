@@ -42,10 +42,10 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 ## WP-D — AI layer
 | Done | Task | Ref | Owner | Notes |
 |:---:|---|---|---|---|
-| [ ] | Claude triage (grouping, type, severity, moderation) | F17–F20 | Claude (agent) | in progress; needs `ANTHROPIC_API_KEY` |
-| [ ] | Runbook generation + panel | F23 | Claude (agent) | in progress |
-| [ ] | Oracle chatbot page | F24 | Claude (agent) | in progress |
-| [ ] | Auto-assignment suggestion via AI | F22 | Claude (agent) | in progress; heuristic version exists in WP-B |
+| [x] | Claude triage (grouping, type, severity, moderation) | F17–F20 | Claude (agent) | live Claude untested: needs `ANTHROPIC_API_KEY` |
+| [x] | Runbook generation + panel | F23 | Claude (agent) | |
+| [x] | Oracle chatbot page | F24 | Claude (agent) | |
+| [x] | Auto-assignment suggestion via AI | F22 | Claude (agent) | `AssigneeSuggestion` not mounted on detail page yet |
 
 ## WP-E — Field and engagement
 | Done | Task | Ref | Owner | Notes |
@@ -63,7 +63,7 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 |:---:|---|---|---|---|
 | [ ] | Check Optis: Node version, env vars, SSE support | §10 | | do this early |
 | [ ] | Deploy to Optis + public URL for the QR | §10 | | |
-| [ ] | Get an Anthropic API key and set `ANTHROPIC_API_KEY` | WP-D | | |
+| [ ] | Get an Anthropic API key and set `ANTHROPIC_API_KEY` | WP-D | | then smoke-test triage, runbook, Oracle |
 | [ ] | Load test: 50 simulated phones | Phase 2 | | |
 | [ ] | Demo script + timings | §9 | | |
 | [ ] | Slides (story, architecture, who built what) | §9 | | |

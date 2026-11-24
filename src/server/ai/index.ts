@@ -2,13 +2,15 @@
  * @file Public entry point of the AI layer. SERVER-ONLY.
  * Every function tries Claude (src/server/ai/claude.ts) and falls back to
  * heuristics.ts on missing key / error / timeout, so the demo never breaks.
- * @exports triageEcho, generateRunbook, askOracle, aiEnabled
+ * @exports triageEcho, generateRunbook, askOracle, suggestAssignee, aiEnabled, aiModel
  * @usedBy src/server/echo-pipeline.ts, src/lib/ai.functions.ts
  */
-import { oracleHeuristic, runbookHeuristic, triageHeuristic } from './heuristics.ts'
-import type { OracleInput, RunbookInput, TriageInput, TriageResult } from './types.ts'
+import { assigneeHeuristic, oracleHeuristic, runbookHeuristic, triageHeuristic } from './heuristics.ts'
+import type { AssigneeInput, AssigneeResult, OracleInput, RunbookInput, TriageInput, TriageResult } from './types.ts'
 
 export const aiEnabled = () => Boolean(process.env.ANTHROPIC_API_KEY) && process.env.AI_DISABLED !== '1'
+
+export const aiModel = () => process.env.AI_MODEL || 'claude-opus-5-5'
 
 /** Resolves the Claude implementation lazily so a missing SDK/key never crashes boot. */
 async function claude() {
@@ -38,4 +40,8 @@ export function generateRunbook(input: RunbookInput): Promise<string> {
 
 export function askOracle(input: OracleInput): Promise<string> {
   return withFallback('oracle', async () => (await claude()).oracleClaude(input), () => oracleHeuristic(input), 45_000)
+}
+
+export function suggestAssignee(input: AssigneeInput): Promise<AssigneeResult> {
+  return withFallback('assignee', async () => (await claude()).assigneeClaude(input), () => assigneeHeuristic(input), 15_000)
 }

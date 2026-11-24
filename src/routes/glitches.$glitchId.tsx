@@ -6,6 +6,7 @@
 import { useState } from 'react'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
+import { RunbookPanel } from '#/components/ai/RunbookPanel.tsx'
 import { CommanderPanel } from '#/components/glitches/CommanderPanel.tsx'
 import { DistrictMiniMap } from '#/components/glitches/DistrictMiniMap.tsx'
 import { EchoTimeline } from '#/components/glitches/EchoTimeline.tsx'
@@ -97,11 +98,7 @@ function GlitchDetailPage() {
         </div>
         <aside className="space-y-5">
           <DistrictMiniMap districtId={glitch.districtId} color={GLITCH_TYPE_META[glitch.type].color} />
-          {/* TODO(WP-D): replace with <RunbookPanel glitch={glitch} canGenerate={isCommander} /> from #/components/ai/RunbookPanel.tsx */}
-          <section className="rounded-2xl border border-dashed border-line p-4 text-sm">
-            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">Runbook</h2>
-            {glitch.runbook ? <pre className="whitespace-pre-wrap text-fg">{glitch.runbook}</pre> : <p className="text-muted">No runbook yet.</p>}
-          </section>
+          <RunbookPanel glitch={glitch} canGenerate={me?.role === 'commander'} />
         </aside>
       </div>
 

@@ -1,7 +1,8 @@
 /**
  * @file Contracts for the AI layer. Both implementations (claude.ts, heuristics.ts)
  * satisfy these; callers only use src/server/ai/index.ts.
- * @exports TriageInput, TriageResult, OpenGlitchSummary, RunbookInput, OracleInput
+ * @exports TriageInput, TriageResult, OpenGlitchSummary, RunbookInput, OracleInput, OracleTurn,
+ * AssigneeCandidate, AssigneeInput, AssigneeResult
  */
 import type { DistrictId, GlitchType, Severity } from '#/lib/glitch.ts'
 
@@ -47,4 +48,23 @@ export type OracleInput = {
   question: string
   /** Compact JSON-ish text of the current situation (open glitches, magic level...). */
   context: string
+  /** Earlier turns of the conversation (oldest first), excluding `question`. */
+  history?: OracleTurn[]
 }
+
+export type OracleTurn = { role: 'user' | 'assistant'; content: string }
+
+export type AssigneeCandidate = {
+  guardianId: string
+  codename: string
+  openCount: number
+  /** Glitches of the same type this guardian already fixed. */
+  fixedOfType: number
+}
+
+export type AssigneeInput = {
+  glitch: { description: string; type: GlitchType; severity: Severity; districtName: string | null }
+  candidates: AssigneeCandidate[]
+}
+
+export type AssigneeResult = { guardianId: string | null; reason: string }

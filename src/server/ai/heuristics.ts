@@ -1,10 +1,10 @@
 /**
  * @file Offline fallback for the AI layer: keyword rules, no network.
  * Used when ANTHROPIC_API_KEY is missing, the call fails or times out.
- * @exports triageHeuristic, runbookHeuristic, oracleHeuristic
+ * @exports triageHeuristic, runbookHeuristic, oracleHeuristic, assigneeHeuristic
  */
 import { DISTRICTS, type GlitchType, type Severity } from '#/lib/glitch.ts'
-import type { OracleInput, RunbookInput, TriageInput, TriageResult } from './types.ts'
+import type { AssigneeInput, AssigneeResult, OracleInput, RunbookInput, TriageInput, TriageResult } from './types.ts'
 
 const TYPE_KEYWORDS: [GlitchType, RegExp][] = [
   ['TIME_LOOP', /\b(loop|repeat|again and again|déjà|deja|clock|time)\b/i],
@@ -79,4 +79,16 @@ export function runbookHeuristic(input: RunbookInput): string {
 
 export function oracleHeuristic(input: OracleInput): string {
   return `The Oracle is offline (no AI connection). Current situation:\n\n${input.context}`
+}
+
+/** Fewest open assignments wins; ties go to the most experienced with this glitch type. */
+export function assigneeHeuristic(input: AssigneeInput): AssigneeResult {
+  const best = [...input.candidates].sort(
+    (a, b) => a.openCount - b.openCount || b.fixedOfType - a.fixedOfType || a.codename.localeCompare(b.codename),
+  )[0]
+  if (!best) return { guardianId: null, reason: 'No defenders available.' }
+  return {
+    guardianId: best.guardianId,
+    reason: `${best.codename} has the lightest load (${best.openCount} open)${best.fixedOfType ? ` and fixed ${best.fixedOfType} similar glitch(es)` : ''}.`,
+  }
 }
