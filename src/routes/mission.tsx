@@ -29,7 +29,7 @@ export const Route = createFileRoute('/mission')({
 
 function Panel({ title, icon, children, className = '' }: { title: string; icon?: ReactNode; children: ReactNode; className?: string }) {
   return (
-    <section className={`glass flex min-h-0 flex-col rounded-2xl p-4 ${className}`}>
+    <section className={`glass flex shrink-0 flex-col rounded-2xl p-4 lg:min-h-0 lg:shrink ${className}`}>
       <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold tracking-[0.2em] text-muted uppercase">
         {icon}
         {title}
@@ -117,9 +117,9 @@ function MissionControl() {
         </div>
       </header>
 
-      <main className="relative z-10 grid min-h-0 flex-1 gap-4 p-4 lg:grid-cols-[minmax(17rem,22rem)_minmax(0,1fr)_minmax(19rem,27rem)] lg:grid-rows-1">
+      <main className="relative z-10 grid shrink-0 gap-4 p-4 lg:min-h-0 lg:flex-1 lg:shrink lg:grid-cols-[minmax(17rem,22rem)_minmax(0,1fr)_minmax(19rem,27rem)] lg:grid-rows-1">
         {/* left: gauge + sensors */}
-        <div className="flex min-h-0 flex-col gap-4">
+        <div className="flex flex-col gap-4 lg:min-h-0">
           <Panel title="Magic level" className="items-stretch">
             <MagicGauge level={snap.magic} size="lg" />
             <div className="mt-3 grid grid-cols-3 gap-2 text-center">
@@ -134,7 +134,7 @@ function MissionControl() {
         </div>
 
         {/* centre: map */}
-        <div className="relative min-h-[22rem] min-w-0">
+        <div className="relative h-[26rem] min-w-0 lg:h-auto lg:min-h-[22rem]">
           <AchronaMap
             glitches={snap.glitches}
             readings={snap.latest}
@@ -145,7 +145,7 @@ function MissionControl() {
         </div>
 
         {/* right: join + glitches + feed */}
-        <div className="flex min-h-0 flex-col gap-4">
+        <div className="flex flex-col gap-4 lg:min-h-0">
           <Panel title="Join the defense">
             <div className="flex items-center gap-4">
               <JoinQr base={host} size={150} />
