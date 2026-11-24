@@ -30,7 +30,7 @@ export function SimStatus({ sim }: { sim: SimulatorState }) {
       ? [Sprout, 'RECOVERING', 'border-warning/40 bg-warning/10 text-warning']
       : sim.running
         ? [ShieldCheck, 'ACHRONA CALM', 'border-success/40 bg-success/10 text-success']
-        : [Activity, 'SENSORS OFFLINE', 'border-line bg-subtle text-muted']
+        : [Activity, 'STANDBY', 'border-line bg-subtle text-muted']
 
   return (
     <div className={`relative overflow-hidden rounded-md border px-4 py-1.5 ${cls}`}>

@@ -61,7 +61,7 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 ## Integration and polish
 | Done | Task | Ref | Owner | Notes |
 |:---:|---|---|---|---|
-| [x] | Headless E2E suite (14 flows, incl. hydration check) | Phase 2 | Claude | `npm run e2e` (Playwright, reseeds DB) |
+| [x] | Headless E2E suite (15 flows, incl. hydration check + SSE fallback) | Phase 2 | Claude | `npm run e2e` (Playwright, reseeds DB) |
 | [x] | AI via `claude -p --model haiku` (no API key) | §2 | Claude | ~4s per echo; live-tested triage, grouping, moderation, auto-close, Oracle, runbook |
 | [ ] | Show AI assignment pick + AI badge in the app | F22 | Claude | assignment pick done (glitch detail); AI badge only on /oracle |
 | [ ] | Send photos through moderation too | F19 | Claude | |
@@ -74,6 +74,18 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 | [x] | /mission fits small projectors (1280×720, 1024×768) | F30 | Claude (agent) | checked at 1024×768 → 1920×1080, calm + lockdown |
 | [x] | Visual V4: /report, /leaderboard, /council, /oracle | F32 | Claude (agent) | |
 | [ ] | Radio desk: walkie-talkie → speech-to-text → echoes | F31 | | hardware: walkie audio out → laptop mic in |
+
+## Visual fixes round 1 (from the first real use)
+| Done | Task | Ref | Owner | Notes |
+|:---:|---|---|---|---|
+| [x] | Characters stand on a bottom edge / behind panels (login orc, join archer, Oracle witch, empty state) | F32 | Claude | rule added to docs/DESIGN.md |
+| [x] | Live updates over the Cloudflare quick tunnel (SSE buffered → long-poll fallback) | F11 | Claude | verified through a real trycloudflare tunnel; E2E test added |
+| [x] | "Sensors offline" chip → "Standby" (was just the idle simulator) | F14 | Claude | |
+| [x] | QR caption URL hidden (overflowed) | F30 | Claude | |
+| [x] | HTF eye-orb cursor everywhere + consistent ringed "clickable" cursor | F32 | Claude | |
+| [x] | Profile menu misaligned + pushed the theme switch (CSS layer bug) | F32 | Claude | component classes moved to @layer components |
+| [x] | Light mode: sidebar icons invisible, map broken | F10 | Claude | sidebar/tab bar/map are always-dark zones |
+| [x] | Bigger, higher-contrast text for a lit projector room | F32 | Claude | type scale +8-10%, weight 500, brighter muted |
 
 ## Demo day
 | Done | Task | Ref | Owner | Notes |

@@ -30,9 +30,10 @@ export function GlitchList({
   const navigate = useNavigate()
   if (!glitches.length) {
     return (
-      <div className="glass flex flex-col items-center gap-3 rounded-lg border-dashed px-6 py-8 text-center sm:flex-row sm:text-left">
-        <img src="/htf/character-3.avif" alt="" aria-hidden="true" className="h-28 w-auto shrink-0" />
-        <div>
+      <div className="glass flex flex-col items-center gap-3 overflow-hidden rounded-lg border-dashed px-6 pt-8 text-center sm:flex-row sm:items-end sm:text-left">
+        {/* Sits on the panel's bottom edge: the art fades out at the bottom. */}
+        <img src="/htf/character-3.avif" alt="" aria-hidden="true" className="order-last h-28 w-auto shrink-0 self-center sm:order-first sm:self-end" />
+        <div className="sm:pb-8">
           <p className="font-display text-xl font-bold uppercase tracking-wide text-fg">No glitches match</p>
           <p className="mt-1 text-muted">Achrona is calm, or the filters are too narrow. Clear them to see the full log.</p>
         </div>

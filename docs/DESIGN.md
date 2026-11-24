@@ -77,6 +77,9 @@ Never hard-code colours that exist as tokens. Glitch type colours: `GLITCH_TYPE_
 | `character-5.avif` / `oracle-orb.png` | the eye-orb drone | the Oracle, AI, brand mark |
 | `cursor-32.png` | eye-orb cursor (32px) | optional custom cursor on /mission |
 
+**The character art fades out at the bottom** (the files are "FadeArtboard"s). Always stand a character
+**on a bottom edge**: the bottom of the screen, or the bottom of a panel with `overflow-hidden`, ideally
+partly **behind** a container (lower z-index) so it peeks out. Never float one mid-page or use it as an icon.
 Use characters as **accents** (empty states, a corner of a hero panel, the podium), never as wallpaper,
 and never over data. `alt=""` + `aria-hidden` when decorative. Use `<img>` with explicit width/height
 classes; they're large files, so keep them to 1-2 per screen.

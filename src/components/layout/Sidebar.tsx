@@ -20,7 +20,8 @@ export function Sidebar() {
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <aside className="no-print sticky top-0 z-40 hidden h-screen w-20 shrink-0 flex-col items-center border-r border-line bg-sidebar py-5 md:flex">
+    // data-theme="dark": the rail stays dark in light mode, so its icons use the dark palette too.
+    <aside data-theme="dark" className="no-print sticky top-0 z-40 hidden h-screen w-20 shrink-0 flex-col items-center border-r border-line bg-sidebar py-5 md:flex">
       <span aria-hidden className="rail-line pointer-events-none absolute inset-y-0 right-1" />
       <Link to="/" aria-label="Achrona Mission Control" title="Achrona Mission Control" className="mb-4">
         <img src="/htf/oracle-orb.png" alt="" className="size-12 drop-shadow-[0_4px_0_rgb(0_0_0/0.45)] transition hover:-rotate-6" />

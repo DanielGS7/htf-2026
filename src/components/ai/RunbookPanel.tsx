@@ -5,7 +5,7 @@
  * @usedBy src/routes/glitches.$glitchId.tsx
  */
 import { useEffect, useState } from 'react'
-import { BookOpen, RefreshCw } from 'lucide-react'
+import { BookOpen, RefreshCw, ScrollText } from 'lucide-react'
 import { Button } from '#/components/ui/Button.tsx'
 import type { Glitch } from '#/lib/glitch.ts'
 import { generateRunbookFn } from '#/lib/ai.functions.ts'
@@ -33,7 +33,9 @@ export function RunbookPanel({ glitch, canGenerate }: { glitch: Glitch; canGener
     <section className="glass hud rounded-lg p-4" aria-label="Runbook: field orders">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-line pb-3">
         <div className="flex min-w-0 items-center gap-2.5">
-          <img src="/htf/character-4.avif" alt="" aria-hidden className="size-10 shrink-0 object-contain" />
+          <span className="grid size-10 shrink-0 place-items-center rounded-md border border-line bg-subtle text-accent">
+            <ScrollText className="size-5" aria-hidden />
+          </span>
           <div className="min-w-0">
             <p className="label">Field orders</p>
             <h2 className="font-display text-lg leading-tight font-bold tracking-wide uppercase">Runbook</h2>

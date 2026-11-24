@@ -20,6 +20,7 @@ import { Route as OracleRouteImport } from './routes/oracle'
 import { Route as ReportRouteImport } from './routes/report'
 import { Route as ApiEventsRouteImport } from './routes/api/events'
 import { Route as GlitchesGlitchIdRouteImport } from './routes/glitches.$glitchId'
+import { Route as ApiEventsPollRouteImport } from './routes/api/events.poll'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -76,6 +77,11 @@ const GlitchesGlitchIdRoute = GlitchesGlitchIdRouteImport.update({
   path: '/glitches/$glitchId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiEventsPollRoute = ApiEventsPollRouteImport.update({
+  id: '/poll',
+  path: '/poll',
+  getParentRoute: () => ApiEventsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -87,8 +93,9 @@ export interface FileRoutesByFullPath {
   '/mission': typeof MissionRoute
   '/oracle': typeof OracleRoute
   '/report': typeof ReportRoute
-  '/api/events': typeof ApiEventsRoute
+  '/api/events': typeof ApiEventsRouteWithChildren
   '/glitches/$glitchId': typeof GlitchesGlitchIdRoute
+  '/api/events/poll': typeof ApiEventsPollRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -100,8 +107,9 @@ export interface FileRoutesByTo {
   '/mission': typeof MissionRoute
   '/oracle': typeof OracleRoute
   '/report': typeof ReportRoute
-  '/api/events': typeof ApiEventsRoute
+  '/api/events': typeof ApiEventsRouteWithChildren
   '/glitches/$glitchId': typeof GlitchesGlitchIdRoute
+  '/api/events/poll': typeof ApiEventsPollRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -114,8 +122,9 @@ export interface FileRoutesById {
   '/mission': typeof MissionRoute
   '/oracle': typeof OracleRoute
   '/report': typeof ReportRoute
-  '/api/events': typeof ApiEventsRoute
+  '/api/events': typeof ApiEventsRouteWithChildren
   '/glitches/$glitchId': typeof GlitchesGlitchIdRoute
+  '/api/events/poll': typeof ApiEventsPollRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/report'
     | '/api/events'
     | '/glitches/$glitchId'
+    | '/api/events/poll'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/report'
     | '/api/events'
     | '/glitches/$glitchId'
+    | '/api/events/poll'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/report'
     | '/api/events'
     | '/glitches/$glitchId'
+    | '/api/events/poll'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -169,7 +181,7 @@ export interface RootRouteChildren {
   MissionRoute: typeof MissionRoute
   OracleRoute: typeof OracleRoute
   ReportRoute: typeof ReportRoute
-  ApiEventsRoute: typeof ApiEventsRoute
+  ApiEventsRoute: typeof ApiEventsRouteWithChildren
   GlitchesGlitchIdRoute: typeof GlitchesGlitchIdRoute
 }
 
@@ -252,8 +264,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GlitchesGlitchIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/events/poll': {
+      id: '/api/events/poll'
+      path: '/poll'
+      fullPath: '/api/events/poll'
+      preLoaderRoute: typeof ApiEventsPollRouteImport
+      parentRoute: typeof ApiEventsRoute
+    }
   }
 }
+
+interface ApiEventsRouteChildren {
+  ApiEventsPollRoute: typeof ApiEventsPollRoute
+}
+
+const ApiEventsRouteChildren: ApiEventsRouteChildren = {
+  ApiEventsPollRoute: ApiEventsPollRoute,
+}
+
+const ApiEventsRouteWithChildren = ApiEventsRoute._addFileChildren(
+  ApiEventsRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -265,7 +296,7 @@ const rootRouteChildren: RootRouteChildren = {
   MissionRoute: MissionRoute,
   OracleRoute: OracleRoute,
   ReportRoute: ReportRoute,
-  ApiEventsRoute: ApiEventsRoute,
+  ApiEventsRoute: ApiEventsRouteWithChildren,
   GlitchesGlitchIdRoute: GlitchesGlitchIdRoute,
 }
 export const routeTree = rootRouteImport

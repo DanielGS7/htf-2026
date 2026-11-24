@@ -151,7 +151,8 @@ export function AchronaMap({
   const p = (suffix: string) => `${uid}${suffix}`
 
   return (
-    <div className={`relative overflow-hidden rounded-md border border-line bg-sidebar ${className}`}>
+    // Always the dark palette (a "scrying table"), also in light mode: the art is drawn for dark ground.
+    <div data-theme="dark" className={`relative overflow-hidden rounded-md border border-line bg-sidebar ${className}`}>
       <svg viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet" className="block size-full" role="img" aria-label="Map of Achrona with district magic levels and open glitches">
         <defs>
           <pattern id={p('grid')} width="28" height="28" patternUnits="userSpaceOnUse">

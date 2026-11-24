@@ -6,6 +6,7 @@
  * @usedBy src/routes/__root.tsx
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useRouter } from '@tanstack/react-router'
 import { ShieldAlert, WifiOff } from 'lucide-react'
 import { ToastProvider } from '#/components/ui/Toast.tsx'
 import { useConnectionStatus, useLiveEvents } from '#/lib/useLiveEvents.ts'
@@ -19,6 +20,7 @@ export const useTheme = () => useContext(Ctx)
 const LOW_MAGIC = 40
 
 export function AppProviders({ children, signedIn }: { children: ReactNode; signedIn: boolean }) {
+  const router = useRouter()
   const [theme, setTheme] = useState<Theme>('dark')
   const [manual, setManual] = useState<{ active: boolean; reason: string | null }>({ active: false, reason: null })
   const [lowMagic, setLowMagic] = useState(false)
@@ -42,6 +44,8 @@ export function AppProviders({ children, signedIn }: { children: ReactNode; sign
   useLiveEvents((e) => {
     if (e.type === 'lockdown') setManual({ active: e.active, reason: e.reason })
     else if (e.type === 'magic.level') setLowMagic(e.level < LOW_MAGIC)
+    // Missed events (live transport reconnected or long-poll gap): refetch every page's data.
+    else if (e.type === 'resync') void router.invalidate()
   })
 
   const toggleTheme = useCallback(() => {

@@ -135,7 +135,6 @@ function MissionControl() {
   return (
     <div
       className={`fixed inset-0 z-50 flex flex-col overflow-y-auto bg-app lg:overflow-hidden ${lockdown ? 'pt-11' : ''}`}
-      style={{ cursor: 'url(/htf/cursor-32.png) 16 16, auto' }}
     >
       <div className="starfield pointer-events-none absolute inset-0 opacity-60" aria-hidden />
       <EdgeLightning level={lock ? 2 : attack ? 1 : 0} />
@@ -215,7 +214,7 @@ function MissionControl() {
             ) : (
               <div className="flex flex-col items-center gap-3 text-center">
                 <p className="font-display text-3xl leading-none font-bold tracking-wide text-fg uppercase 2xl:text-4xl">Scan to join the defense</p>
-                <JoinQr base={host} size={qrSize} />
+                <JoinQr base={host} size={qrSize} showUrl={false} />
                 <Guardians n={snap.guardianCount} />
               </div>
             )}

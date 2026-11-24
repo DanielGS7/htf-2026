@@ -12,6 +12,7 @@ export function TabBar() {
   const me = useMe()
   return (
     <nav
+      data-theme="dark"
       aria-label="Main"
       className="no-print fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-line bg-sidebar px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:hidden"
     >

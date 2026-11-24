@@ -19,7 +19,8 @@ function OraclePage() {
         src="/htf/character-3.avif"
         alt=""
         aria-hidden
-        className="pointer-events-none absolute -right-60 bottom-0 hidden h-64 w-auto 2xl:block"
+        // Stands on the bottom-right of the screen, behind the panels (fade art needs a bottom edge).
+        className="pointer-events-none fixed right-0 bottom-0 -z-10 hidden h-[42vh] max-h-[480px] w-auto xl:block"
       />
     </div>
   )

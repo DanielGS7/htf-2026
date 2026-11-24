@@ -195,3 +195,29 @@ test('no hydration mismatches or invalid HTML nesting on any page', async ({ pag
   }
   expect(problems).toEqual([])
 })
+
+test('live updates still arrive when a proxy buffers SSE (Cloudflare quick tunnel fallback)', async ({ browser }) => {
+  test.setTimeout(60_000)
+  const commanderCtx = await browser.newContext()
+  const commander = await commanderCtx.newPage()
+  // Simulate the quick tunnel: the SSE request hangs and never delivers a byte.
+  await commander.route('**/api/events', () => {})
+  await login(commander, 'Nova')
+  await commander.waitForTimeout(5_000) // hello timeout -> long-poll fallback
+  await expect(commander.getByText(/Offline, reconnecting/i)).toHaveCount(0)
+  // Total echoes across all rows: rises whether the new echo opens a glitch or is grouped into one.
+  const totalEchoes = async () =>
+    (await commander.locator('[data-glitch-id] td:nth-child(6)').allInnerTexts()).reduce((n, t) => n + (Number(t.trim()) || 0), 0)
+  const before = await totalEchoes()
+
+  const defenderCtx = await browser.newContext()
+  const defender = await defenderCtx.newPage()
+  await quickJoin(defender)
+  await defender.locator('#echo-text').fill('Portal gates in the Whispering Forest are opening onto the sea')
+  await defender.getByRole('button', { name: 'Send echo' }).click()
+  await expect(defender.getByText(/New glitch opened|Grouped with/)).toBeVisible()
+
+  await expect.poll(totalEchoes, { timeout: 15_000 }).toBeGreaterThan(before)
+  await commanderCtx.close()
+  await defenderCtx.close()
+})

@@ -20,6 +20,16 @@
   --font-gothic: "Grenze Gotisch", "Saira Variable", serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 
+  /* Projector-friendly type scale: every step ~8-10% above Tailwind's default (sizes only, not spacing). */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.15rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.35rem;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.6rem;
+  --text-lg: 1.1875rem;
+  --text-lg--line-height: 1.7rem;
+
   /* Tighter corners than Tailwind's defaults: panels, not bubbles. */
   --radius-sm: 3px;
   --radius-md: 4px;
@@ -60,7 +70,7 @@
   --card-strong: #efe5cf;
   --line: #d3c39f;
   --fg: #1d1427;
-  --muted: #6e6152;
+  --muted: #574b3f;
   --subtle: #eee4cc;
   --subtle-hover: #e4d7b8;
   --accent: #004fe2;
@@ -88,7 +98,7 @@
   --card-strong: #2a1f3c;
   --line: #3a2d50;
   --fg: #e1e7ff;
-  --muted: #a3a1bb;
+  --muted: #c0bed6; /* bright enough to survive a washed-out projector */
   --subtle: #261b36;
   --subtle-hover: #32254a;
   /* #4a7dff, not the brand #004fe2: readable as text on plum (4.9:1). The brand blue stays in gradients + titles. */
@@ -107,8 +117,9 @@
   color-scheme: dark;
 }
 
-/* Lockdown: the Desync broke through. Orange-red alarm, both themes. */
-[data-lockdown="true"] {
+/* Lockdown: the Desync broke through. Orange-red alarm, both themes (also inside always-dark zones). */
+[data-lockdown="true"],
+[data-lockdown="true"] [data-theme="dark"] {
   --accent: #eb4c2d;
   --accent-from: #f48d30;
   --accent-to: #d2341b;
@@ -117,7 +128,8 @@
   --line: #5c2a2a;
   --on-accent: #ffffff;
 }
-[data-lockdown="true"][data-theme="dark"] {
+[data-lockdown="true"][data-theme="dark"],
+[data-lockdown="true"] [data-theme="dark"] {
   --app: #1a0b10;
   --sidebar: #120609;
   --panel: #220e14;
@@ -125,7 +137,7 @@
   --card-strong: #341620;
   --subtle: #2e121b;
   --subtle-hover: #401a26;
-  --muted: #d2a9a9;
+  --muted: #e0bcbc;
 }
 
 html,
@@ -137,7 +149,42 @@ body {
 
 body {
   font-family: var(--font-sans);
+  /* Slightly heavier than 400: thin strokes vanish on a projector in a lit room. */
+  font-weight: 500;
   transition: background-color 0.4s ease;
+}
+
+/* The HTF eye-orb cursor everywhere; an orange-ringed orb on anything clickable (consistent site-wide). */
+@layer base {
+  html {
+    cursor: url("/htf/cursor-32.png") 16 16, auto;
+  }
+  a[href],
+  button:not(:disabled),
+  [role="button"],
+  [role="tab"],
+  [role="link"],
+  select:not(:disabled),
+  summary,
+  label[for],
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="file"],
+  .cursor-pointer {
+    cursor: url("/htf/cursor-pointer-32.png") 16 16, pointer;
+  }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+  textarea {
+    cursor: text;
+  }
+  :disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+  /* Always-dark zones (sidebar, tab bar, map) inside a light page: text inherits the dark palette. */
+  [data-theme="dark"] {
+    color: var(--fg);
+  }
 }
 
 /* Film grain over everything, like the HTF artwork. Pure decoration, never intercepts input. */
@@ -156,6 +203,11 @@ body::after {
   color: #fff;
 }
 
+/*
+ * Component classes live in @layer components so Tailwind utilities on the same element win
+ * (e.g. `glass hud absolute`: without the layer, .hud's position:relative beat `absolute`).
+ */
+@layer components {
 /* UI headings: Saira, a little condensed, firm. Page titles use .font-gothic / <GothicTitle>. */
 h1, h2, h3, .font-display {
   font-family: var(--font-display);
@@ -231,9 +283,9 @@ h1, h2, h3, .font-display {
 /* Small uppercase data label above a value (HUD readout pattern). */
 .label {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -283,6 +335,7 @@ h1, h2, h3, .font-display {
 .ornament::after {
   background: linear-gradient(to left, transparent, var(--line));
 }
+}
 
 @keyframes gg-lockdown-pulse {
   0%, 100% { box-shadow: inset 0 0 0 3px rgb(235 76 45 / 0.3), inset 0 0 120px rgb(235 76 45 / 0.12); }
@@ -328,6 +381,7 @@ h1, h2, h3, .font-display {
   body::after { display: none; }
 }
 
+@layer components {
 /* Lockdown alert strip: orange-red plate with stepped hazard edges (see AppProviders). */
 .hazard-strip {
   background:
@@ -341,4 +395,5 @@ h1, h2, h3, .font-display {
 .rail-line {
   width: 1px;
   background: linear-gradient(to bottom, transparent, var(--line), transparent);
+}
 }

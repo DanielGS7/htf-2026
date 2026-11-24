@@ -65,7 +65,7 @@
 - `src/components/layout/AppProviders.tsx` — Client providers for the whole app: theme (dark/light, persisted), lockdown state (from `lockdown` live events or magic < 40), toaster, lockdown banner frame and offline pill. `useTheme()` -> { theme, toggleTheme, lockdown }.
   - @exports AppProviders, useTheme
   - @usedBy src/routes/__root.tsx
-- `src/components/layout/AuthShell.tsx` — Full-screen shell for the public /login and /join pages, in the HTF 2026 look: plum vignette, purple voxel lightning on both edges, the official "Curse of Achrona" title art and a character peeking past the form (desktop only).
+- `src/components/layout/AuthShell.tsx` — Full-screen shell for the public /login and /join pages, in the HTF 2026 look: plum vignette, purple voxel lightning on both edges, the official "Curse of Achrona" title art, and a character standing on the bottom edge of the screen, partly BEHIND the form card. (The HTF character art fades out at the bottom, so it must always sit on a bottom edge; see docs/DESIGN.md §6.)
   - @exports AuthShell
   - @usedBy src/routes/login.tsx, src/routes/join.tsx
 - `src/components/layout/Sidebar.tsx` — Desktop (md+) left icon rail: logo, nav to every route (commander items hidden for defenders), theme toggle and user menu. Mobile uses TabBar instead. z-40: the sticky rail is its own stacking context, so it must sit above page content for the hover labels to show over it (modals are z-50, toasts z-[70]).
@@ -179,7 +179,7 @@
 - `src/lib/theme.ts` — Client theme helpers: dark/light preference in localStorage and the <html> data attributes. `THEME_INIT_SCRIPT` is inlined in the root shell to avoid a flash of the wrong theme.
   - @exports Theme, THEME_KEY, THEME_INIT_SCRIPT, readTheme, writeTheme, applyTheme, applyLockdown
   - @usedBy src/components/layout/AppProviders.tsx, src/routes/__root.tsx
-- `src/lib/useLiveEvents.ts` — Client hook: subscribe to the live SSE stream (/api/events). ONE EventSource per browser, not per tab: the tab holding the `gg-live-leader` Web Lock opens the stream and relays events + connection status to other tabs over BroadcastChannel; when it closes, another tab takes over. This keeps us under the browser's 6-connections-per-host limit (HTTP/1.1), which several open tabs (mission + admin + overview) would otherwise exhaust. Falls back to one EventSource per tab when Web Locks/BroadcastChannel are unavailable.
+- `src/lib/useLiveEvents.ts` — Client hook: subscribe to live events from the server. Transport: Server-Sent Events (/api/events) first. If the stream doesn't deliver its `hello` event within 4s, or goes silent for 25s (no `ping`), it falls back to long-polling (/api/events/poll), which works through proxies that buffer SSE (e.g. Cloudflare quick tunnels). Events carry a sequence number, so switching transports never loses or repeats events; a gap triggers a `resync` event. ONE connection per browser, not per tab: the tab holding the `gg-live-leader` Web Lock runs the transport and relays events + status to other tabs over BroadcastChannel (keeps us under the 6-connections-per-host limit). Falls back to one transport per tab without Web Locks.
   - @exports useLiveEvents(handler), useConnectionStatus(), LiveEvent (re-exported type)
   - @usedBy any component that must update in real time
   - @example useLiveEvents((e) => { if (e.type === 'glitch.created') router.invalidate() })
@@ -193,7 +193,9 @@
 - `src/routes/__root.tsx` — Root route: HTML shell (theme init script, no-flash) + app layout. beforeLoad fetches the current guardian (`getMe`) and exposes it as route context `{ me }` (read with `useMe()` from #/lib/auth.functions.ts or `useRouteContext({ from: '__root__' })`). Redirects logged-out users to /login?next=..., and logged-in users away from /login. Public paths: /login, /join, /api/*. Public pages render without the sidebar/tab bar.
 - `src/routes/admin.tsx` — Route /admin — Command deck (commander only; defenders see a "forbidden" state). PageHeader + HUD panels: simulator start/stop and Desync "war plan" cards (banner accent, danger plate Launch buttons), reset demo (two-step confirm), lockdown control with a reason, live magic gauge + sensor bars, and the guardian table with role change.
   - @usedBy router
-- `src/routes/api/events.ts` — GET /api/events — Server-Sent Events stream of LiveEvent JSON (one per `data:` line). Sends a heartbeat comment every 15s so proxies/tunnels keep the connection open.
+- `src/routes/api/events.poll.ts` — GET /api/events/poll?since=<seq> — long-poll fallback for the live stream, for networks where SSE is buffered (e.g. Cloudflare quick tunnels). Returns `{ latest, events, gap }` immediately if anything happened after `since`; otherwise waits up to 20s for the next event (then answers empty). `since=-1` just returns the current `latest` (initial sync).
+  - @usedBy src/lib/useLiveEvents.ts (fallback mode)
+- `src/routes/api/events.ts` — GET /api/events — Server-Sent Events stream of LiveEvent JSON (one per `data:` line). Sends `event: hello` immediately and `event: ping` every 10s as REAL events (not comments), so the client can tell a working stream from one a proxy is silently buffering, and fall back to long-polling (/api/events/poll). Each message carries `id: <seq>`.
   - @usedBy src/lib/useLiveEvents.ts (EventSource)
 - `src/routes/council.tsx` — Route /council: official decree "Report to the High Council of Achrona" (commander only; friendly forbidden state otherwise). On screen: PageHeader + a sealed decree sheet. "Download PDF" calls window.print(); scoped @media print styles hide the app chrome and give a clean black-on-white page with the scroll banner as letterhead.
   - @usedBy router
@@ -229,9 +231,9 @@
 - `src/server/auth.ts` — Session auth helpers. SERVER-ONLY: call these inside createServerFn handlers or server route handlers, never from components. All DB helpers are async. Session = random token in the `gg_session` httpOnly cookie -> `sessions` table.
   - @exports hashPassword, verifyPassword, startSession, endSession, getCurrentGuardian, requireGuardian, requireCommander, AuthError
   - @usedBy src/lib/auth.functions.ts and every mutating *.functions.ts
-- `src/server/bus.ts` — In-process pub/sub that feeds the SSE stream (src/routes/api/events.ts). SERVER-ONLY. Call `publish()` after every DB mutation that clients should see live.
-  - @exports publish, subscribe, LiveEvent (type)
-  - @usedBy src/server/*, src/lib/*.functions.ts handlers, src/routes/api/events.ts
+- `src/server/bus.ts` — In-process pub/sub that feeds the live transports. SERVER-ONLY. Call `publish()` after every DB mutation that clients should see live. Every event gets a sequence number and is kept in a ring buffer, so the long-poll fallback (/api/events/poll, used when a proxy such as a Cloudflare quick tunnel buffers SSE) can resume.
+  - @exports publish, subscribe, eventsSince, latestSeq, LiveEvent (type), SequencedEvent (type)
+  - @usedBy src/server/*, src/lib/*.functions.ts handlers, src/routes/api/events.ts, src/routes/api/events.poll.ts
 - `src/server/echo-pipeline.ts` — The heart of the app: turn a raw echo into glitch state. SERVER-ONLY. Flow: AI triage -> moderation (reject) -> attach to matching glitch OR open a new LEAKED glitch -> auto-close when the echo says "resolved" -> reopen FIXED glitches on a new similar echo -> award points -> publish live events.
   - @exports ingestEcho, addScore, IngestInput, IngestResult
   - @usedBy src/lib/echoes.functions.ts (createEcho), src/server/simulator.ts
