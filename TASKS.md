@@ -50,13 +50,13 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 ## WP-E — Field and engagement
 | Done | Task | Ref | Owner | Notes |
 |:---:|---|---|---|---|
-| [ ] | `/report` mobile echo form | F15 | Claude (agent) | in progress |
-| [ ] | Speech-to-text | F25 | Claude (agent) | in progress |
-| [ ] | Photo upload (client-side resize) | F26 | Claude (agent) | in progress |
-| [ ] | Offline queue for echoes | F16 | Claude (agent) | in progress |
-| [ ] | Leaderboard + badges | F27 | Claude (agent) | in progress |
-| [ ] | Browser notifications for critical glitches | F28 | Claude (agent) | in progress |
-| [ ] | `/council` printable PDF report | F29 | Claude (agent) | in progress |
+| [x] | `/report` mobile echo form | F15 | Claude (agent) | submit path not tested live |
+| [x] | Speech-to-text | F25 | Claude (agent) | test on a real phone |
+| [x] | Photo upload (client-side resize) | F26 | Claude (agent) | test on a real phone |
+| [x] | Offline queue for echoes | F16 | Claude (agent) | reconnect flush untested |
+| [x] | Leaderboard + badges | F27 | Claude (agent) | |
+| [x] | Browser notifications for critical glitches | F28 | Claude (agent) | only while `/report` is open; Android shows toast + vibrate only |
+| [x] | `/council` printable PDF report | F29 | Claude (agent) | check print preview |
 
 ## Ship and present
 | Done | Task | Ref | Owner | Notes |
