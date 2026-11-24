@@ -110,6 +110,9 @@
 - `src/components/layout/AuthShell.tsx` — Full-screen shell for the public /login and /join pages, in the HTF 2026 look: plum vignette, purple voxel lightning on both edges, the official "Curse of Achrona" title art, and a character standing on the bottom edge of the screen, partly BEHIND the form card. (The HTF character art fades out at the bottom, so it must always sit on a bottom edge; see docs/DESIGN.md §6.)
   - @exports AuthShell
   - @usedBy src/routes/login.tsx, src/routes/join.tsx
+- `src/components/layout/RouteError.tsx` — Friendly error + not-found screens for the router. A dropped request (tunnel hiccup, laptop asleep) shows "Signal lost" with a Retry that re-runs the loaders, instead of TanStack's raw error output. Retries by itself when the browser comes back online.
+  - @exports RouteError, RouteNotFound
+  - @usedBy src/router.tsx (defaultErrorComponent / defaultNotFoundComponent), src/routes/__root.tsx
 - `src/components/layout/Sidebar.tsx` — Desktop (md+) left icon rail: logo, nav to every route (commander items hidden for defenders), theme toggle and user menu. Mobile uses TabBar instead. z-40: the sticky rail is its own stacking context, so it must sit above page content for the hover labels to show over it (modals are z-50, toasts z-[45], hidden on /mission).
   - @usedBy src/routes/__root.tsx
 - `src/components/layout/TabBar.tsx` — Mobile (<md) bottom tab bar: primary routes plus the user menu (which holds the rest).
@@ -193,7 +196,7 @@
   - @exports PageHeader
   - @usedBy src/routes/* (all signed-in pages)
   - @example <PageHeader label="Mission log" title="Overview" subtitle="3 open glitches" actions={<Button/>} />
-- `src/components/ui/Toast.tsx` — Toast system. <ToastProvider> mounts the stack and feeds it from `toast` live events; `useToast()` returns push({ tone, message }) for local toasts. Hidden on /mission; z-45 sits under modals and full-screen game overlays (z-50) so it never covers a role card or meeting.
+- `src/components/ui/Toast.tsx` — Toast system. <ToastProvider> mounts the stack and feeds it from `toast` live events; `useToast()` returns push({ tone, message }) for local toasts. Hidden on /mission; z-45 sits under modals and full-screen game overlays (z-50) so it never covers a role card or meeting. Phones show only the newest 2 (a full stack hides the fix list).
   - @exports ToastProvider, useToast
   - @usedBy src/components/layout/AppProviders.tsx
 - `src/db/index.ts` — PostgreSQL connection pool (node-postgres) wrapped in Drizzle. SERVER-ONLY. Reads DATABASE_URL (default: the docker-compose database). All queries are async: `await db.select()...`, use `.returning()` for inserted rows.

@@ -8,7 +8,7 @@
  */
 import { useState } from 'react'
 import { useRouter } from '@tanstack/react-router'
-import { ArrowRightLeft, Ban } from 'lucide-react'
+import { ArrowRightLeft, Ban, EyeOff } from 'lucide-react'
 import { getGlitches, moveEcho } from '#/lib/glitches.functions.ts'
 import type { Echo, Glitch } from '#/lib/glitch.ts'
 import { TimeAgo } from './badges.tsx'
@@ -82,7 +82,7 @@ export function EchoTimeline({ echoes, isCommander }: { echoes: Echo[]; isComman
                 )}
               </div>
               <p className={`mt-1 text-fg ${rejected ? 'line-through decoration-muted/60' : ''}`}>{e.description}</p>
-              {e.imageUrl && <img src={e.imageUrl} alt="Echo attachment" className="mt-2 max-h-48 rounded-md border border-line" />}
+              {e.imageUrl && <EchoPhoto src={e.imageUrl} />}
             </div>
             {rejected && (
               <p className="mt-1.5 inline-flex items-center gap-1.5 rounded-sm border border-danger/40 bg-danger/10 px-2 py-0.5 text-xs text-danger">
@@ -93,5 +93,26 @@ export function EchoTimeline({ echoes, isCommander }: { echoes: Echo[]; isComman
         )
       })}
     </ol>
+  )
+}
+
+/** Photos skip AI moderation, so they stay blurred until someone chooses to look (safe on the projector). */
+function EchoPhoto({ src }: { src: string }) {
+  const [shown, setShown] = useState(false)
+  return (
+    <button
+      type="button"
+      onClick={() => setShown((v) => !v)}
+      title={shown ? 'Hide photo' : 'Show photo'}
+      aria-label={shown ? 'Hide photo' : 'Show photo'}
+      className="relative mt-2 block overflow-hidden rounded-md border border-line"
+    >
+      <img src={src} alt="" className={`max-h-48 transition duration-300 ${shown ? '' : 'scale-125 blur-2xl brightness-50'}`} />
+      {!shown && (
+        <span className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 text-sm font-semibold tracking-wide text-white uppercase">
+          <EyeOff className="size-4" /> Unchecked photo, tap to show
+        </span>
+      )}
+    </button>
   )
 }

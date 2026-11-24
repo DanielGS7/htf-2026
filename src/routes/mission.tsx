@@ -9,6 +9,7 @@
  * Eye-orb cursor on this page only. Press `f` for fullscreen; `?host=https://venue.example` overrides the QR base URL.
  * @usedBy router
  */
+import { AiBadge } from '#/components/ai/AiBadge.tsx'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, Maximize2, Minimize2, ShieldAlert, ShieldCheck, Skull, Users, Volume2, VolumeX } from 'lucide-react'
@@ -168,6 +169,10 @@ function MissionControl() {
         <div className={alarm ? 'max-[1400px]:hidden [@media(max-height:800px)]:hidden' : ''}>
           <SimStatus sim={snap.sim} />
         </div>
+        {/* Proof for the jury that a real model is triaging. Hidden during an alarm: the header needs the room. */}
+        <div className={alarm ? 'hidden' : 'max-[1400px]:hidden [@media(max-height:800px)]:hidden'}>
+          <AiBadge />
+        </div>
         <div className="flex min-w-fit flex-1 justify-center">
           {lock ? (
             <LockdownPlate reason={reason} />
@@ -320,8 +325,8 @@ function LockdownPlate({ reason }: { reason: string | null }) {
 function AttackPlate({ name }: { name: string }) {
   return (
     <div className="glitch flex min-w-0 items-center gap-3 border-2 border-magic bg-magic/25 px-5 py-2" role="status">
-      <Skull className="size-9 shrink-0 text-magic-soft" />
-      <div className="truncate font-display text-3xl leading-none font-black tracking-[0.18em] text-fg uppercase 2xl:text-4xl">Desync: {name}</div>
+      <Skull className="size-9 shrink-0 text-magic-soft max-xl:size-6" />
+      <div className="truncate font-display text-3xl leading-none font-black tracking-[0.18em] text-fg uppercase max-xl:text-xl max-xl:tracking-[0.08em] 2xl:text-4xl">Desync: {name}</div>
     </div>
   )
 }

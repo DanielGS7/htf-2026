@@ -63,8 +63,8 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 |:---:|---|---|---|---|
 | [x] | Headless E2E suite (17 flows: app + game engine + full game round) | Phase 2 | Claude | `npm run e2e` (Playwright, reseeds DB) |
 | [x] | AI via `claude -p --model haiku` (no API key) | §2 | Claude | ~4s per echo; live-tested triage, grouping, moderation, auto-close, Oracle, runbook |
-| [ ] | Show AI assignment pick + AI badge in the app | F22 | Claude | assignment pick done (glitch detail); AI badge only on /oracle |
-| [ ] | Send photos through moderation too | F19 | Claude | |
+| [x] | Show AI assignment pick + AI badge in the app | F22 | Claude | AI badge also in the /mission header (hidden during alarms) |
+| [x] | Photos blurred until tapped (they skip AI moderation) | F19 | Claude | safe on the projector |
 | [x] | Fix /mission layout (lockdown banner over map, empty space) | F30 | Claude (agent) | |
 | [ ] | README: how to run locally | | Claude | |
 | [x] | Visual foundation: HTF 2026 palette, fonts, assets, PageHeader, docs/DESIGN.md | F32 | Claude | |
@@ -98,6 +98,8 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 | [x] | Light mode: sensor percentages readable, badge text 12px + darker orange/teal | F10 | Claude | |
 | [x] | Glitch detail uses the real compact Achrona map (old mini map clipped labels) | F5 | Claude | |
 | [x] | /mission on a phone no longer overflows; leaderboard badge chips don't wrap | F32 | Claude | |
+| [x] | "Signal lost" screen with Retry instead of a raw crash when a request drops (tunnel blips) | F16 | Claude | auto-retries when back online |
+| [x] | Readable offline Oracle briefing, Desync vote count on the reveal, attack plate fits 1024, max 2 toasts on phones | F24, F33 | Claude | |
 
 ## Game mode: Desync Protocol (F33, Among Us-style)
 | Done | Task | Ref | Owner | Notes |

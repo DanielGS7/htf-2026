@@ -9,7 +9,7 @@ import { Siren } from 'lucide-react'
 import type { MeetingState, PublicGameState } from '#/lib/game.ts'
 import { formatClock, useNow } from './useGameLive.ts'
 
-function Reveal({ meeting }: { meeting: MeetingState }) {
+function Reveal({ meeting, votes }: { meeting: MeetingState; votes: number }) {
   const r = meeting.result
   if (!r) return null
   const desync = r.wasDesync === true
@@ -20,6 +20,9 @@ function Reveal({ meeting }: { meeting: MeetingState }) {
       <div className="font-display text-5xl leading-none font-black tracking-wide uppercase [@media(max-height:800px)]:text-3xl">{r.ejectedCodename}</div>
       <div className="font-display text-3xl leading-tight font-bold tracking-[0.1em] uppercase [@media(max-height:800px)]:text-xl">
         {desync ? 'was the Desync' : 'was not the Desync'}
+      </div>
+      <div className="mt-3 font-mono text-lg font-semibold tracking-[0.2em] uppercase opacity-80 [@media(max-height:800px)]:mt-1 [@media(max-height:800px)]:text-sm">
+        Ejected with {votes} {votes === 1 ? 'vote' : 'votes'}
       </div>
     </div>
   )
@@ -83,7 +86,7 @@ export function MeetingTakeover({ game }: { game: PublicGameState }) {
               /* The reveal card itself is never dimmed: the engine marks the player ejected as the reveal starts. */
             >
               {out ? (
-                <Reveal meeting={m} />
+                <Reveal meeting={m} votes={votes} />
               ) : (
                 <>
                   <div

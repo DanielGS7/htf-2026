@@ -2,6 +2,7 @@
  * @file Toast system. <ToastProvider> mounts the stack and feeds it from `toast` live events;
  * `useToast()` returns push({ tone, message }) for local toasts. Hidden on /mission; z-45 sits under
  * modals and full-screen game overlays (z-50) so it never covers a role card or meeting.
+ * Phones show only the newest 2 (a full stack hides the fix list).
  * @exports ToastProvider, useToast
  * @usedBy src/components/layout/AppProviders.tsx
  */
@@ -64,7 +65,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {items.map((t) => {
           const Icon = ICON[t.tone]
           return (
-            <div key={t.id} className={`glass float-in pointer-events-auto flex items-start gap-3 rounded-md border-l-4 p-3 ${EDGE[t.tone]}`}>
+            <div key={t.id} className={`glass float-in pointer-events-auto max-md:[&:nth-last-child(n+3)]:hidden flex items-start gap-3 rounded-md border-l-4 p-3 ${EDGE[t.tone]}`}>
               <Icon className={`mt-0.5 size-4 shrink-0 ${COLOR[t.tone]}`} />
               <p className="flex-1 text-sm">{t.message}</p>
               <button type="button" aria-label="Dismiss" title="Dismiss" onClick={() => dismiss(t.id)} className="rounded-sm text-muted hover:text-fg focus-visible:outline-2 focus-visible:outline-accent">

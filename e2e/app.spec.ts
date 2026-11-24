@@ -108,7 +108,7 @@ test('the Oracle answers (offline heuristics when AI is disabled)', async ({ pag
   await gotoReady(page, '/oracle')
   await page.getByPlaceholder('Ask the Oracle...').fill('What is the most critical glitch?')
   await page.getByRole('button', { name: 'Send' }).click()
-  await expect(page.getByText(/Oracle is offline|situation/i).first()).toBeVisible({ timeout: 15_000 })
+  await expect(page.getByText(/plain briefing/i).first()).toBeVisible({ timeout: 15_000 })
 })
 
 test('leaderboard ranks guardians', async ({ page }) => {

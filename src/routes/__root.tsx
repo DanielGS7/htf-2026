@@ -18,6 +18,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import { Sidebar } from '#/components/layout/Sidebar'
 import { TabBar } from '#/components/layout/TabBar'
 import { AppProviders } from '#/components/layout/AppProviders'
+import { RouteError, RouteNotFound } from '#/components/layout/RouteError'
 import { getMe } from '#/lib/auth.functions'
 import { THEME_INIT_SCRIPT } from '#/lib/theme'
 
@@ -45,6 +46,9 @@ export const Route = createRootRoute({
   }),
   shellComponent: RootDocument,
   component: AppLayout,
+  // beforeLoad (getMe) failing = no connection at all: show Signal lost, not a raw stack trace.
+  errorComponent: RouteError,
+  notFoundComponent: RouteNotFound,
 })
 
 function AppLayout() {

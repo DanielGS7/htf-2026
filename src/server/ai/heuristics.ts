@@ -77,8 +77,27 @@ export function runbookHeuristic(input: RunbookInput): string {
   ].join('\n')
 }
 
+/** Offline answer: a short briefing read from the context lines (magic, worst open glitches, top defender). */
 export function oracleHeuristic(input: OracleInput): string {
-  return `The Oracle is offline (no AI connection). Current situation:\n\n${input.context}`
+  const lines = input.context.split('\n')
+  const magic = lines.find((l) => l.startsWith('Magic level:'))?.replace('Magic level: ', '') ?? '?'
+  const rank = { critical: 0, high: 1, medium: 2, low: 3 } as Record<string, number>
+  const open = lines
+    .filter((l) => /^- GL-\S+ \[(LEAKED|ASSESSING|CONTAINING)\]/.test(l))
+    .map((l) => {
+      const m = l.match(/^- (GL-\S+) \[(\w+)\] \S+ (\w+) @ ([^|]+)\|.*"(.*)"$/)
+      return m ? { id: m[1], status: m[2], severity: m[3], district: m[4].trim(), text: m[5] } : null
+    })
+    .filter((g): g is NonNullable<typeof g> => !!g)
+    .sort((a, b) => (rank[a.severity] ?? 9) - (rank[b.severity] ?? 9))
+  const top = lines[lines.indexOf('Top defenders:') + 1]?.replace(/^1\. /, '')
+  const out = [`*The Oracle's AI link is down, so here is the plain briefing.*`, '', `**Magic level:** ${magic}`]
+  if (open.length) {
+    out.push('', `**Most urgent of ${open.length} open glitch${open.length === 1 ? '' : 'es'}:**`)
+    for (const g of open.slice(0, 3)) out.push(`- **${g.id}** (${g.severity}, ${g.status.toLowerCase()}) at ${g.district}: ${g.text}`)
+  } else out.push('', 'No open glitches. Achrona is calm.')
+  if (top) out.push('', `**Top defender:** ${top}`)
+  return out.join('\n')
 }
 
 /** Fewest open assignments wins; ties go to the most experienced with this glitch type. */
