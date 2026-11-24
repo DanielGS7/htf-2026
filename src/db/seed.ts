@@ -1,6 +1,8 @@
 /**
  * @file `npm run db:seed` — wipe + refill the DB with demo guardians, glitches,
  * echoes and healthy sensor readings. Safe to re-run.
+ * Also clears game artefacts: hidden sabotage glitches (F33) go with the glitches wipe; the in-memory game
+ * state lives in the server process and is reset by gameStop / a server restart.
  * Logins: commander "Nova" / password "achrona", defender "Ember" / "achrona".
  */
 import { scryptSync, randomBytes } from 'node:crypto'

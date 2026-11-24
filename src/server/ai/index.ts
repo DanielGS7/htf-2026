@@ -4,6 +4,7 @@
  * `api` (Anthropic SDK + ANTHROPIC_API_KEY, claude.ts) or `off`. AI_DISABLED=1 also forces `off`.
  * Every function falls back to heuristics.ts on unavailable provider / error / timeout,
  * so the demo never breaks.
+ * triageEcho first runs the heuristic as a quota prefilter: clear junk is rejected without calling the CLI.
  * @exports triageEcho, generateRunbook, askOracle, suggestAssignee, aiEnabled, aiModel, aiProvider
  * @usedBy src/server/echo-pipeline.ts, src/lib/ai.functions.ts
  */
@@ -54,6 +55,9 @@ async function withFallback<T>(label: string, fn: () => Promise<T>, fallback: ()
 
 // Timeouts include queueing behind other CLI calls (~3s each, 3 in parallel).
 export function triageEcho(input: TriageInput): Promise<TriageResult> {
+  // Quota saver: obvious junk (too short / gibberish) is rejected locally without calling the CLI.
+  const pre = triageHeuristic(input)
+  if (!pre.accept) return Promise.resolve(pre)
   return withFallback('triage', async () => (await impl()).triageClaude(input), () => triageHeuristic(input), 20_000)
 }
 

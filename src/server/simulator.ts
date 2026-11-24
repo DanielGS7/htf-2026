@@ -6,8 +6,11 @@
  * handles lockdown (auto below 40, lifted above 60; commanders can also toggle it by hand).
  * Scenarios ("Clocktower Cascade", "Total Desync") script ~90s of staged district drains,
  * Sentinel echoes and toasts. When a scenario ends the districts heal slowly.
+ * Game mode (F33): a sabotaged district (`isSabotaged`) loses `GAME_RULES.sabotageDrainPerTick` every tick and
+ * never heals until fixed; `onSimulatorTick()` runs at the end of each tick; `prepareSimulatorForRound()`
+ * drops any scenario and resets the sensors to calm.
  * `resetDemo()` restores the seed data (glitches, echoes, scores, readings) and clears lockdown.
- * @exports startSimulator, stopSimulator, getSimulatorState, triggerDesync, resetDemo, setLockdown,
+ * @exports startSimulator, stopSimulator, prepareSimulatorForRound, getSimulatorState, triggerDesync, resetDemo, setLockdown,
  *   getLockdown, getSentinelId, SCENARIOS, SCENARIO_IDS, ScenarioId, SimulatorState
  * @usedBy src/lib/ops.functions.ts
  */
@@ -17,6 +20,8 @@ import { echoes, glitches, guardians, sensorReadings } from '#/db/schema.ts'
 import { DISTRICTS, type DistrictId, type SensorReading } from '#/lib/glitch.ts'
 import { publish } from './bus.ts'
 import { ingestEcho } from './echo-pipeline.ts'
+import { GAME_RULES } from '#/lib/game.ts'
+import { isSabotaged, onSimulatorTick } from './game.ts'
 import { computeMagicLevel, listGlitches, newId } from './repo.ts'
 
 export const TICK_MS = 3000
@@ -201,6 +206,24 @@ export function stopSimulator(): void {
   publish({ type: 'toast', tone: 'info', message: 'Simulator paused.' })
 }
 
+/** Game start: drop any running scenario and put every district back to calm (published immediately). */
+export async function prepareSimulatorForRound(): Promise<void> {
+  sim.scenario = null
+  sim.alertedAt = {}
+  sim.history = {}
+  sim.suppressAuto = false
+  const iso = new Date().toISOString()
+  const rows: SensorReading[] = DISTRICTS.map((d) => {
+    const m = Math.round((CALM + jitter(2)) * 10) / 10
+    sim.level[d.id] = m
+    return { districtId: d.id, magic: m, timestamp: iso }
+  })
+  await db.insert(sensorReadings).values(rows)
+  for (const reading of rows) publish({ type: 'sensor.reading', reading })
+  publish({ type: 'magic.level', level: await computeMagicLevel() })
+  if (sim.lockdown.active) setLockdown(false)
+}
+
 export function triggerDesync(scenario: ScenarioId = 'desync'): void {
   if (!SCENARIOS[scenario]) throw new Error(`Unknown scenario: ${scenario}`)
   sim.scenario = { id: scenario, startedAt: Date.now(), fired: new Set(), done: false }
@@ -249,6 +272,8 @@ async function runTick(): Promise<void> {
         const goal = CALM + jitter(3)
         next = cur < goal - 4 ? cur + HEAL_PER_TICK + jitter(0.8) : goal
       }
+      // Game mode: an unfixed sabotage drains the district every tick and blocks healing.
+      if (isSabotaged(d.id)) next = Math.min(next, cur) - GAME_RULES.sabotageDrainPerTick
       next = clamp(next, 0, 100)
       sim.level[d.id] = next
       const h = (sim.history[d.id] ??= [])
@@ -286,6 +311,7 @@ async function runTick(): Promise<void> {
     const level = await computeMagicLevel()
     publish({ type: 'magic.level', level })
     updateLockdown(level)
+    await onSimulatorTick()
   } catch (err) {
     console.error('[simulator] tick failed', err)
   } finally {

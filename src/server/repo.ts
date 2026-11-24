@@ -5,7 +5,7 @@
  * @usedBy src/server/echo-pipeline.ts, src/server/simulator.ts, src/lib/*.functions.ts
  */
 import { randomBytes } from 'node:crypto'
-import { desc, eq, ne, sql } from 'drizzle-orm'
+import { and, desc, eq, ne, sql } from 'drizzle-orm'
 import { db } from '#/db/index.ts'
 import { echoes, glitches, guardians, sensorReadings } from '#/db/schema.ts'
 import { DISTRICTS, type DistrictId, type Echo, type Glitch } from '#/lib/glitch.ts'
@@ -75,7 +75,7 @@ const SEVERITY_PENALTY = { low: 2, medium: 5, high: 10, critical: 18 } as const
 
 /**
  * Magic level 0-100: average of the latest sensor reading per district,
- * minus a penalty per open glitch by severity.
+ * minus a penalty per open VISIBLE glitch by severity (hidden sabotages act only through their drain).
  */
 export async function computeMagicLevel(): Promise<number> {
   const latest = await db
@@ -84,7 +84,7 @@ export async function computeMagicLevel(): Promise<number> {
     .orderBy(sensorReadings.districtId, desc(sensorReadings.id))
   const byDistrict = new Map(latest.map((r) => [r.districtId, r.magic]))
   let level = DISTRICTS.reduce((sum, d) => sum + (byDistrict.get(d.id) ?? 100), 0) / DISTRICTS.length
-  const open = await db.select({ severity: glitches.severity }).from(glitches).where(ne(glitches.status, 'FIXED'))
+  const open = await db.select({ severity: glitches.severity }).from(glitches).where(and(ne(glitches.status, 'FIXED'), eq(glitches.hidden, false)))
   for (const g of open) level -= SEVERITY_PENALTY[g.severity]
   return Math.max(0, Math.min(100, Math.round(level)))
 }

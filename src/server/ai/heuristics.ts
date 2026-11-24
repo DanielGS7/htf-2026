@@ -15,7 +15,7 @@ const TYPE_KEYWORDS: [GlitchType, RegExp][] = [
   ['REALITY_TEAR', /\b(tear|rift|crack|void|collapse|reality)\b/i],
 ]
 const RESOLVED = /\b(fixed|resolved|back to normal|all good|in orde|opgelost|stable again)\b/i
-const JUNK = /^(.)\1{4,}$|^(test|asdf|lol|hi|hello)$/i
+const JUNK = /^(.)\1{4,}$|^(test|asdf|lol|hi|hello)$|^[^a-z]*$|^[^aeiouy\s]{5,}$/i
 const CRITICAL = /\b(collapse|everyone|massive|critical|help|urgent|dying)\b/i
 
 function words(s: string): Set<string> {

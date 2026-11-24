@@ -91,7 +91,7 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 | Done | Task | Ref | Owner | Notes |
 |:---:|---|---|---|---|
 | [x] | Spec in PRD + shared contracts (types, server fns, schema: hidden/sabotage glitches, echo source/flag) | F33 | Claude | after pulling: `npm run db:push` |
-| [ ] | G1 Engine: roles, silent sabotage, discovery, fixes, meetings + votes, win/lose, quota prefilter | F33 | Claude (agent) | in progress |
+| [x] | G1 Engine: roles, silent sabotage, discovery, fixes, meetings + votes, win/lose, quota prefilter | F33 | Claude (agent) | `e2e/game.spec.ts` covers the full loop |
 | [ ] | G2 Phone: role card, hidden sabotage console, fix mini-task, emergency meeting + voting | F33 | Claude (agent) | in progress |
 | [ ] | G3 Projector + admin: lobby, round HUD, meeting/vote screen, ejection reveal, end screen, spoken announcements | F33 | Claude (agent) | in progress |
 | [x] | G4 Radio desk `/radio`: walkie → speech-to-text → echoes ("over"), level meter | F31 | Claude (agent) | real speech path untested (needs Chrome + real mic): test with the walkie |
