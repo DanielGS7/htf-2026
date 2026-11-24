@@ -134,6 +134,18 @@ IDs are referenced by work packages. **P0 = base assignment, must be rock solid.
 - **F31 Radio desk (walkie-talkie)**: a guardian "on duty" reports over a real walkie-talkie. The receiving walkie's audio out is wired into the laptop's mic/line in; `/radio` listens continuously (Web Speech API, works on localhost), shows a live signal meter + transcript, and turns each transmission (ended by "over" or a pause) into an echo from the radio guardian, tagged as a radio report on the mission screen. Optional: Mission Control replies over the air (text-to-speech into the walkie's mic in, VOX).
 - **F32 Visual overhaul**: complete restyle based on the reference repository chosen by the team: flashy for the projector, but instantly readable and intuitive without explanation.
 
+### P5 — Game mode: "Desync Protocol" (Among Us-style)
+- **F33 Game mode.** One round (default 4 min) played live in the room. Contracts: `src/lib/game.ts` (types) + `src/lib/game.functions.ts` (server fns). Engine: `src/server/game.ts`.
+  - **Crew & roles:** a commander picks the **crew** (the 3 teammates) in the lobby on `/admin`. At round start the server picks **one crew member at random as THE DESYNC** (saboteur); everyone else, crew and audience, is a **defender**. Each phone shows a private full-screen role card. Roles are never sent in broadcast events; a phone asks `getMyGameView()`.
+  - **Sabotage (silent):** the Desync's `/report` looks like a normal defender screen; a hidden gesture (long-press the points tile for 1s) opens the sabotage console: pick a district + catastrophe type → `sabotage()`. 30s cooldown; max one active sabotage per district. Effect: that district's magic drains every simulator tick, and a **hidden** glitch (`glitches.hidden = true`, `sabotage = true`) is created. Hidden glitches are invisible everywhere **until someone reports it**.
+  - **Discovery:** echoes are triaged as usual, and hidden sabotage glitches are included as triage candidates. When an echo matches one, it is revealed (`hidden = false`, `glitch.created` event, "DISCOVERED" moment on the projector) and the reporter gets +5. Reports about a district whose sensors are healthy and that has no sabotage are flagged `echoes.flag = 'unconfirmed'` ("sensors disagree"); that's how the AI-backed control center exposes the Desync's fake reports.
+  - **Fixing:** any player can open a discovered glitch on the phone and do a ~5s **mini-task** (hold-to-channel, then tap 3 runes in the shown order) → `completeFix()`. A defender's fix resolves the glitch (FIXED, the district stops draining and heals, +10). **The Desync can "fake" a fix: same UI, no effect** (just like Among Us fake tasks).
+  - **Emergency meeting:** any non-ejected player can call one (`callMeeting()`, max 3 per round, 60s between). The projector shows the meeting; every phone votes on a crew member or "skip" (`castVote()`); 30s. The plurality is ejected and revealed ("X was / was not the Desync"). Ejecting the Desync → defenders win.
+  - **Win:** defenders win when the timer runs out with magic > 0, or by ejecting the Desync. The Desync wins when magic hits 0, or when only one other crew member is left un-ejected. The end screen on `/mission` reveals the Desync and shows the top defenders.
+  - **Mission Control speaks:** `/mission` announces key moments with browser text-to-speech (meeting called, sabotage discovered, ejection result, victory).
+  - **Quota:** obvious junk is rejected by the heuristic prefilter without calling Haiku.
+- **F31 (decision):** the radio desk is its own page `/radio` on the laptop the receiving walkie is wired into. Radio echoes are sent as the logged-in guardian with `echoes.source = 'radio'` and get a radio tag everywhere.
+
 ---
 
 ## 6. Architecture
@@ -261,11 +273,11 @@ If a dependency isn't built yet, create **nothing** in another WP's folder. Rend
 
 ## 9. Demo (5 minutes, app only, no slides)
 The app has to explain itself: big type, obvious next actions, no menus to hunt through.
-1. **0:00 Join:** `/mission` on the projector (calm, magic ~76%). "Scan this, you're guardians now." Phones join via the tunnel URL.
-2. **0:45 Attack:** commander launches *Total Desync* from `/admin`. Gauge drains, map turns red, lockdown at ~30s.
-3. **1:30 Report:** the room sends echoes; the guardian on duty radios one in over the walkie (F31). AI groups, types and moderates them live on the big screen.
-4. **3:00 Command:** open a glitch: assign, AI runbook, ask the Oracle "what should we fix first?", advance statuses.
-5. **4:15 Recover:** "all good again" echoes auto-close glitches, magic climbs back, leaderboard crowns the room's best defenders.
+1. **0:00 Join:** `/mission` on the projector. "Scan this, you're guardians now." Phones join through the tunnel URL.
+2. **0:45 Start the round:** commander starts *Desync Protocol*. Every phone flips to a secret role card; one of the three of us is secretly the Desync.
+3. **1:00 Play:** districts start draining silently. The room reports what it sees (phones, and the guardian on duty over the walkie). Haiku-powered Mission Control turns reports into glitches, reveals the hidden sabotage, and flags reports the sensors don't back up. Defenders fix glitches with phone mini-tasks.
+4. **~3:00 Emergency meeting:** someone calls one; the room votes on the projector; the ejected player is revealed.
+5. **~4:30 End:** victory or defeat screen, the Desync is unmasked, the top defenders are crowned.
 
 ---
 

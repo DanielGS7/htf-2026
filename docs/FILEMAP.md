@@ -144,7 +144,7 @@
   - @usedBy src/components/layout/AppProviders.tsx
 - `src/db/index.ts` — PostgreSQL connection pool (node-postgres) wrapped in Drizzle. SERVER-ONLY. Reads DATABASE_URL (default: the docker-compose database). All queries are async: `await db.select()...`, use `.returning()` for inserted rows.
   - @exports db, DEFAULT_DATABASE_URL
-- `src/db/schema.ts` — Drizzle PostgreSQL schema: guardians, sessions, glitches, echoes, sensor_readings.
+- `src/db/schema.ts` — Drizzle PostgreSQL schema: guardians, sessions, glitches (incl. game-mode hidden/sabotage), echoes (incl. source + flag), sensor_readings.
   - @exports guardians, sessions, glitches, echoes, sensorReadings (drizzle tables)
   - @usedBy src/db/index.ts, src/db/seed.ts, src/server/*
   - @note Apply changes with `npm run db:push`. Timestamps are ISO 8601 text (UTC), so lexical order is chronological order and they serialize as-is.
@@ -164,6 +164,11 @@
 - `src/lib/field.functions.ts` — Server functions for the field + engagement views: phone echo reporting (createEchoField), own stats, the live feed for /report, the leaderboard (badges computed here) and the High Council report.
   - @exports createEchoField, getReportData, getMyStats, getLeaderboard, getCouncilReport, FieldResult, MyStats, ReportData, LeaderboardEntry, Leaderboard, CouncilReport (types)
   - @usedBy src/routes/report.tsx, src/routes/leaderboard.tsx, src/routes/council.tsx, src/components/field/*
+- `src/lib/game.functions.ts` — Server functions for the "Desync Protocol" game mode (F33). Thin, validated wrappers around the engine in src/server/game.ts. Signatures are the contract for the phone (/report) and projector/admin (/mission, /admin) UIs; keep them stable.
+  - @exports getGameState, getMyGameView, gameSetup, gameStart, gameStop, sabotage, listFixable, completeFix, callMeeting, castVote, listCrewCandidates
+  - @usedBy src/routes/report.tsx, src/routes/mission.tsx, src/routes/admin.tsx, src/components/game/**
+- `src/lib/game.ts` — Shared types + constants for the "Desync Protocol" game mode (F33, Among Us-style). Client + server safe (no imports with side effects). Engine: src/server/game.ts; server fns: src/lib/game.functions.ts. Spec: PRD.md §5 F33.
+  - @exports GamePhase, PlayerRole, CrewMember, MeetingResult, MeetingState, PublicGameState, ActiveSabotage, MyGameView, FixableGlitch, GAME_RULES, IDLE_GAME_STATE
 - `src/lib/glitch.ts` — Shared domain model: statuses, roles, glitch types, districts and the plain TS types passed between server functions and components.
   - @exports GLITCH_STATUSES, GlitchStatus, ROLES, Role, GLITCH_TYPES, GlitchType, GLITCH_TYPE_META, SEVERITIES, Severity, DISTRICTS, DistrictId, District, Glitch, Echo, Guardian, SensorReading, nextStatus
   - @usedBy everything (client + server safe: no imports, no side effects)
@@ -211,6 +216,7 @@
   - @usedBy router
 - `src/routes/oracle.tsx` — Route /oracle: scrying terminal to chat with the Oracle of Achrona (AI grounded in live glitch data). PageHeader with the AI status tag; the witch lurks beside the chat on wide screens.
   - @usedBy router
+- `src/routes/radio.tsx` — Route /radio — walkie-talkie radio desk (F31). PLACEHOLDER: owned and replaced by G4 (see PRD.md).
 - `src/routes/report.tsx` — Route /report: mobile-first field report (the audience's phone screen). Codename + big points readout, EchoComposer hero (text/voice/photo, offline queue), critical-alert opt-in and a live feed of the latest glitches. Refreshes on live events.
   - @usedBy router (QR/quick-join landing page)
 - `src/server/ai/claude-cli.ts` — Claude Code CLI provider (AI_PROVIDER=cli, the default): runs `claude -p --model haiku` as a subprocess on the presenter's logged-in subscription, so no API key is needed. SERVER-ONLY. Each call: no tools, no settings/CLAUDE.md, no MCP servers, no session files, cwd = OS temp dir. User text goes over stdin (never argv). Structured output via --json-schema (`structured_output`). At most AI_CLI_CONCURRENCY (default 3) calls run at once; the rest queue. Env: CLAUDE_BIN (default `claude`), AI_MODEL (default `haiku`).
@@ -237,8 +243,11 @@
 - `src/server/echo-pipeline.ts` — The heart of the app: turn a raw echo into glitch state. SERVER-ONLY. Flow: AI triage -> moderation (reject) -> attach to matching glitch OR open a new LEAKED glitch -> auto-close when the echo says "resolved" -> reopen FIXED glitches on a new similar echo -> award points -> publish live events.
   - @exports ingestEcho, addScore, IngestInput, IngestResult
   - @usedBy src/lib/echoes.functions.ts (createEcho), src/server/simulator.ts
+- `src/server/game.ts` — "Desync Protocol" game engine (F33). SERVER-ONLY. In-memory state on globalThis (single process). STATUS: STUB with the final signatures. Implemented by work package G1 (see PRD.md F33 + TASKS.md).
+  - @exports getPublicState, getPlayerView, listCrewCandidates, setup, start, stop, sabotage, listFixable, completeFix, callMeeting, castVote, isSabotaged, onSimulatorTick, onEchoMatchedHidden
+  - @usedBy src/lib/game.functions.ts, src/server/simulator.ts, src/server/echo-pipeline.ts
 - `src/server/repo.ts` — Read helpers shared by server functions: DB rows -> domain types, glitch/echo queries and the overall magic level. SERVER-ONLY, all async.
-  - @exports listGlitches, getGlitch, listEchoes, computeMagicLevel, newId
+  - @exports listGlitches (visible only), getGlitch (incl. hidden), listEchoes, computeMagicLevel, newId
   - @usedBy src/server/echo-pipeline.ts, src/server/simulator.ts, src/lib/*.functions.ts
 - `src/server/simulator.ts` — The Achrona simulator. SERVER-ONLY. State lives on `globalThis` so it survives Vite HMR. Every 3s it writes one `sensor_readings` row per district (calm: 92-100 with noise), publishes `sensor.reading` + `magic.level`, runs the F21 anomaly detector (a district falling >25 points in 30s opens a predictive glitch through `ingestEcho`, reporter = system guardian "Sentinel") and handles lockdown (auto below 40, lifted above 60; commanders can also toggle it by hand). Scenarios ("Clocktower Cascade", "Total Desync") script ~90s of staged district drains, Sentinel echoes and toasts. When a scenario ends the districts heal slowly. `resetDemo()` restores the seed data (glitches, echoes, scores, readings) and clears lockdown.
   - @exports startSimulator, stopSimulator, getSimulatorState, triggerDesync, resetDemo, setLockdown, getLockdown, getSentinelId, SCENARIOS, SCENARIO_IDS, ScenarioId, SimulatorState

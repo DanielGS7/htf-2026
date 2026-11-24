@@ -84,6 +84,8 @@ export type Glitch = {
   updatedAt: string
   /** Number of echoes grouped under this glitch (joined, not stored). */
   echoCount?: number
+  /** Game mode: created by the Desync's sabotage (revealed once reported). */
+  sabotage?: boolean
 }
 
 export type Echo = {
@@ -101,7 +103,13 @@ export type Echo = {
   imageUrl: string | null
   /** Joined for display. */
   reporterCodename?: string
+  /** 'radio' = reported over the walkie-talkie via /radio. */
+  source?: EchoSource
+  /** 'unconfirmed' = sensors disagree (game mode: a likely fake report). */
+  flag?: 'unconfirmed' | null
 }
+
+export type EchoSource = 'app' | 'radio'
 
 export type SensorReading = {
   districtId: DistrictId

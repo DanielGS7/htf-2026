@@ -1,11 +1,12 @@
 /**
- * @file Drizzle PostgreSQL schema: guardians, sessions, glitches, echoes, sensor_readings.
+ * @file Drizzle PostgreSQL schema: guardians, sessions, glitches (incl. game-mode hidden/sabotage),
+ * echoes (incl. source + flag), sensor_readings.
  * @exports guardians, sessions, glitches, echoes, sensorReadings (drizzle tables)
  * @usedBy src/db/index.ts, src/db/seed.ts, src/server/*
  * @note Apply changes with `npm run db:push`. Timestamps are ISO 8601 text
  *   (UTC), so lexical order is chronological order and they serialize as-is.
  */
-import { integer, pgTable, real, serial, text } from 'drizzle-orm/pg-core'
+import { boolean, integer, pgTable, real, serial, text } from 'drizzle-orm/pg-core'
 // Relative import: drizzle-kit loads this file and doesn't resolve the `#/` alias.
 import { GLITCH_STATUSES, GLITCH_TYPES, ROLES, SEVERITIES } from '../lib/glitch.ts'
 
@@ -39,6 +40,10 @@ export const glitches = pgTable('glitches', {
   assigneeId: text('assignee_id').references(() => guardians.guardianId, { onDelete: 'set null' }),
   runbook: text('runbook'),
   updatedAt: text('updated_at').notNull(),
+  /** Game mode: a sabotage glitch stays hidden until someone reports it (F33). */
+  hidden: boolean('hidden').notNull().default(false),
+  /** Game mode: created by the Desync's sabotage (not by an echo). */
+  sabotage: boolean('sabotage').notNull().default(false),
 })
 
 export const echoes = pgTable('echoes', {
@@ -53,6 +58,10 @@ export const echoes = pgTable('echoes', {
   moderation: text('moderation', { enum: ['ok', 'rejected'] }).notNull().default('ok'),
   moderationReason: text('moderation_reason'),
   imageUrl: text('image_url'),
+  /** 'app' (phone/desktop form) or 'radio' (walkie-talkie via /radio, F31). */
+  source: text('source', { enum: ['app', 'radio'] }).notNull().default('app'),
+  /** 'unconfirmed' = sensors disagree with this report (game mode: a likely fake by the Desync). */
+  flag: text('flag', { enum: ['unconfirmed'] }),
 })
 
 export const sensorReadings = pgTable('sensor_readings', {

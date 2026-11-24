@@ -1,7 +1,7 @@
 /**
  * @file Read helpers shared by server functions: DB rows -> domain types,
  * glitch/echo queries and the overall magic level. SERVER-ONLY, all async.
- * @exports listGlitches, getGlitch, listEchoes, computeMagicLevel, newId
+ * @exports listGlitches (visible only), getGlitch (incl. hidden), listEchoes, computeMagicLevel, newId
  * @usedBy src/server/echo-pipeline.ts, src/server/simulator.ts, src/lib/*.functions.ts
  */
 import { randomBytes } from 'node:crypto'
@@ -26,6 +26,7 @@ const glitchColumns = {
   assigneeId: glitches.assigneeId,
   runbook: glitches.runbook,
   updatedAt: glitches.updatedAt,
+  sabotage: glitches.sabotage,
   // Fully qualified on purpose: Drizzle renders ${glitches.glitchId} as a bare "glitch_id", which inside
   // this subquery would resolve to echoes.glitch_id and count every echo.
   echoCount: sql<number>`(select count(*)::int from "echoes" e where e."glitch_id" = "glitches"."glitch_id" and e."moderation" = 'ok')`,
@@ -34,8 +35,9 @@ const glitchColumns = {
 type GlitchRow = { districtId: string | null } & Omit<Glitch, 'districtId'>
 const toGlitch = (row: GlitchRow): Glitch => ({ ...row, districtId: row.districtId as DistrictId | null })
 
+/** Visible glitches only: hidden (undiscovered sabotage, game mode) glitches are left out. */
 export async function listGlitches(): Promise<Glitch[]> {
-  const rows = await db.select(glitchColumns).from(glitches).orderBy(desc(glitches.timestamp))
+  const rows = await db.select(glitchColumns).from(glitches).where(eq(glitches.hidden, false)).orderBy(desc(glitches.timestamp))
   return rows.map(toGlitch)
 }
 
@@ -57,6 +59,8 @@ export async function listEchoes(glitchId?: string): Promise<Echo[]> {
       moderation: echoes.moderation,
       moderationReason: echoes.moderationReason,
       imageUrl: echoes.imageUrl,
+      source: echoes.source,
+      flag: echoes.flag,
       reporterCodename: guardians.codename,
     })
     .from(echoes)

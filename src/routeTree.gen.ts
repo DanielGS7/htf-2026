@@ -17,6 +17,7 @@ import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MissionRouteImport } from './routes/mission'
 import { Route as OracleRouteImport } from './routes/oracle'
+import { Route as RadioRouteImport } from './routes/radio'
 import { Route as ReportRouteImport } from './routes/report'
 import { Route as ApiEventsRouteImport } from './routes/api/events'
 import { Route as GlitchesGlitchIdRouteImport } from './routes/glitches.$glitchId'
@@ -62,6 +63,11 @@ const OracleRoute = OracleRouteImport.update({
   path: '/oracle',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RadioRoute = RadioRouteImport.update({
+  id: '/radio',
+  path: '/radio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReportRoute = ReportRouteImport.update({
   id: '/report',
   path: '/report',
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/mission': typeof MissionRoute
   '/oracle': typeof OracleRoute
+  '/radio': typeof RadioRoute
   '/report': typeof ReportRoute
   '/api/events': typeof ApiEventsRouteWithChildren
   '/glitches/$glitchId': typeof GlitchesGlitchIdRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/mission': typeof MissionRoute
   '/oracle': typeof OracleRoute
+  '/radio': typeof RadioRoute
   '/report': typeof ReportRoute
   '/api/events': typeof ApiEventsRouteWithChildren
   '/glitches/$glitchId': typeof GlitchesGlitchIdRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/mission': typeof MissionRoute
   '/oracle': typeof OracleRoute
+  '/radio': typeof RadioRoute
   '/report': typeof ReportRoute
   '/api/events': typeof ApiEventsRouteWithChildren
   '/glitches/$glitchId': typeof GlitchesGlitchIdRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/mission'
     | '/oracle'
+    | '/radio'
     | '/report'
     | '/api/events'
     | '/glitches/$glitchId'
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/mission'
     | '/oracle'
+    | '/radio'
     | '/report'
     | '/api/events'
     | '/glitches/$glitchId'
@@ -165,6 +176,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/mission'
     | '/oracle'
+    | '/radio'
     | '/report'
     | '/api/events'
     | '/glitches/$glitchId'
@@ -180,6 +192,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MissionRoute: typeof MissionRoute
   OracleRoute: typeof OracleRoute
+  RadioRoute: typeof RadioRoute
   ReportRoute: typeof ReportRoute
   ApiEventsRoute: typeof ApiEventsRouteWithChildren
   GlitchesGlitchIdRoute: typeof GlitchesGlitchIdRoute
@@ -243,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OracleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/radio': {
+      id: '/radio'
+      path: '/radio'
+      fullPath: '/radio'
+      preLoaderRoute: typeof RadioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/report': {
       id: '/report'
       path: '/report'
@@ -295,6 +315,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MissionRoute: MissionRoute,
   OracleRoute: OracleRoute,
+  RadioRoute: RadioRoute,
   ReportRoute: ReportRoute,
   ApiEventsRoute: ApiEventsRouteWithChildren,
   GlitchesGlitchIdRoute: GlitchesGlitchIdRoute,

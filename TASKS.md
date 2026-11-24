@@ -73,7 +73,7 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 | [x] | Visual V3: /mission, /admin, map, gauge (+ /mission layout fix) | F32 | Claude (agent) | good at 1920×1080 + 1440×900 |
 | [x] | /mission fits small projectors (1280×720, 1024×768) | F30 | Claude (agent) | checked at 1024×768 → 1920×1080, calm + lockdown |
 | [x] | Visual V4: /report, /leaderboard, /council, /oracle | F32 | Claude (agent) | |
-| [ ] | Radio desk: walkie-talkie → speech-to-text → echoes | F31 | | hardware: walkie audio out → laptop mic in |
+| [ ] | Radio desk: walkie-talkie → speech-to-text → echoes | F31 | Claude (agent) | see G4 below; hardware: walkie out → USB sound card / TRRS splitter mic in |
 
 ## Visual fixes round 1 (from the first real use)
 | Done | Task | Ref | Owner | Notes |
@@ -87,6 +87,15 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 | [x] | Light mode: sidebar icons invisible, map broken | F10 | Claude | sidebar/tab bar/map are always-dark zones |
 | [x] | Bigger, higher-contrast text for a lit projector room | F32 | Claude | type scale +8-10%, weight 500, brighter muted |
 
+## Game mode: Desync Protocol (F33, Among Us-style)
+| Done | Task | Ref | Owner | Notes |
+|:---:|---|---|---|---|
+| [x] | Spec in PRD + shared contracts (types, server fns, schema: hidden/sabotage glitches, echo source/flag) | F33 | Claude | after pulling: `npm run db:push` |
+| [ ] | G1 Engine: roles, silent sabotage, discovery, fixes, meetings + votes, win/lose, quota prefilter | F33 | Claude (agent) | in progress |
+| [ ] | G2 Phone: role card, hidden sabotage console, fix mini-task, emergency meeting + voting | F33 | Claude (agent) | in progress |
+| [ ] | G3 Projector + admin: lobby, round HUD, meeting/vote screen, ejection reveal, end screen, spoken announcements | F33 | Claude (agent) | in progress |
+| [ ] | G4 Radio desk `/radio`: walkie → speech-to-text → echoes ("over"), level meter | F31 | Claude (agent) | in progress |
+
 ## Demo day
 | Done | Task | Ref | Owner | Notes |
 |:---:|---|---|---|---|
@@ -94,4 +103,4 @@ How to use it: put your name in **Owner** to claim a task, and change `[ ]` to `
 | [ ] | Real-phone pass over the tunnel (voice, camera, offline queue, 360px) | F15, F25, F26, F16 | | after the tunnel works |
 | [ ] | Wire + level-test the walkie-talkie audio | F31 | | |
 | [ ] | Check `claude -p` is logged in on the demo laptop | §10 | | |
-| [ ] | Rehearse the 5-minute app-only demo twice | §9 | | |
+| [ ] | Rehearse the 5-minute app-only demo twice (with a game round) | §9 | | |

@@ -9,7 +9,7 @@
 import { eq, gt, ne, or, sql } from 'drizzle-orm'
 import { db } from '#/db/index.ts'
 import { echoes, glitches, guardians } from '#/db/schema.ts'
-import type { DistrictId, Echo, Glitch } from '#/lib/glitch.ts'
+import type { DistrictId, Echo, EchoSource, Glitch } from '#/lib/glitch.ts'
 import { triageEcho } from './ai/index.ts'
 import { publish } from './bus.ts'
 import { computeMagicLevel, getGlitch, newId } from './repo.ts'
@@ -19,6 +19,8 @@ export type IngestInput = {
   districtId: DistrictId | null
   guardianId: string
   imageUrl?: string | null
+  /** 'radio' for walkie-talkie reports from /radio (F31). Default 'app'. */
+  source?: EchoSource
 }
 
 export type IngestResult = {
@@ -65,6 +67,8 @@ export async function ingestEcho(input: IngestInput): Promise<IngestResult> {
     moderationReason: t.rejectReason,
     imageUrl: input.imageUrl ?? null,
     reporterCodename: reporter?.codename,
+    source: input.source ?? 'app',
+    flag: null,
   }
   const { reporterCodename: _omit, ...echoRow } = echo
 

@@ -52,6 +52,8 @@ export const createEchoField = createServerFn({ method: 'POST' })
           .max(820_000, 'Photo is too large')
           .regex(/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/, 'Unsupported image')
           .nullable(),
+        /** 'radio' when sent from the walkie-talkie desk (/radio, F31). */
+        source: z.enum(['app', 'radio']).optional(),
       })
       .parse(d),
   )
@@ -62,6 +64,7 @@ export const createEchoField = createServerFn({ method: 'POST' })
       districtId: data.districtId as IngestResult['echo']['districtId'],
       guardianId: me.guardianId,
       imageUrl: data.imageUrl,
+      source: data.source,
     })
     const [row] = await db.select({ score: guardians.score }).from(guardians).where(eq(guardians.guardianId, me.guardianId)).limit(1)
     return {

@@ -7,6 +7,7 @@
  * @usedBy src/server/*, src/lib/*.functions.ts handlers, src/routes/api/events.ts, src/routes/api/events.poll.ts
  */
 import type { Echo, Glitch, SensorReading } from '#/lib/glitch.ts'
+import type { PublicGameState } from '#/lib/game.ts'
 
 /** Every event pushed to browsers. Add new variants here (client reads the same type). */
 export type LiveEvent =
@@ -19,6 +20,10 @@ export type LiveEvent =
   | { type: 'magic.level'; level: number }
   | { type: 'lockdown'; active: boolean; reason: string | null }
   | { type: 'toast'; tone: 'info' | 'warning' | 'danger' | 'success'; message: string }
+  /** Game mode (F33): public game state changed. Never carries secret roles while playing. */
+  | { type: 'game.state'; state: PublicGameState }
+  /** Game mode: a hidden sabotage was just discovered by a report (projector "DISCOVERED" moment). */
+  | { type: 'game.discovered'; glitch: Glitch; byCodename: string | null }
   /** Client-side only: events were missed (long-poll gap); refetch page data. Never published. */
   | { type: 'resync' }
 
